@@ -15,6 +15,8 @@ let squareX;
 let squareY;
 let squareSize = 100;
 
+// The x position of the shape
+let posX = 0;
 
 // preload()
 //
@@ -73,4 +75,10 @@ function draw() {
   fill(0,0,255,10);
   // Display the square
   rect(squareX,squareY,squareSize,squareSize);
+
+  // draws one circle per frame from left to right
+  background(255);
+  fill(0);
+  ellipse(posX,320,75)
+  posX += 4;
 }
