@@ -78,7 +78,11 @@ function draw() {
 
   // draws one circle per frame from left to right
   background(255);
-  fill(0);
-  ellipse(posX,320,75)
-  posX += 4;
+  fill(0); // black
+  ellipse(posX,320,75);
+  posX += 4; // the speed is 4
+
+  // adds a sqaure follows the mouse
+  fill(120); // grey
+  rect(mouseX,mouseY,75,75);
 }
