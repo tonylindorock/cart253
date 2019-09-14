@@ -1,5 +1,5 @@
 // Exercise 1 - Movement
-// Pippin Barr
+// Yichen Wang
 //
 // Starter code for exercise 1.
 // Draws a moving square and circle that intersect
@@ -17,6 +17,10 @@ let squareSize = 100;
 
 // The x position of the shape
 let posX = 0;
+
+// The position of the circle
+let positionX = 0;
+let positionY = 320;
 
 // preload()
 //
@@ -76,7 +80,7 @@ function draw() {
   // Display the square
   rect(squareX,squareY,squareSize,squareSize);
 
-  // draws one circle per frame from left to right
+  // draws a black circle per frame from left to right
   background(255);
   fill(0); // black
   ellipse(posX,320,75);
@@ -85,4 +89,19 @@ function draw() {
   // adds a sqaure follows the mouse
   fill(120); // grey
   rect(mouseX,mouseY,75,75);
+
+  // adds a shaking square follows the opposite direction of the mouse
+  fill(100,100,180); // purple
+  rect(640-(mouseX+random(50)),640-mouseY+random(50),75,75);
+
+  // adds a yellow circle that moves "according" to a sine wave
+  fill(255,216,110); // yellow
+  ellipse(positionX,positionY,50);
+  // to move like a sine wave, kinda of
+  if ((positionX/60)%2==1){
+    positionY+=30;
+  }else if ((positionX/60)%2==0) {
+    positionY-=30;
+  }
+  positionX+=2;
 }
