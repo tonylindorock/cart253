@@ -1,1 +1,1 @@
-https://tonylidorock.github.io/cart253/Exercises/exercise1/index.html
+https://tonylidorock.github.io/Exercises/exercise1/index.html
