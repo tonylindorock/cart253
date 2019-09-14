@@ -5,6 +5,13 @@
 // Draws a moving square and circle that intersect
 // in the middle of the canvas.
 
+// Updates:
+// 0 - Previous animation will not be available
+// 1 - Added a black circle that moves from left to right
+// 2 - Added a grey square that follows the mouse
+// 3 - Added a shaking, purple square that follows the opposite direction of the mouse
+// 4 - Added a yellow circle that moves to a sine wave
+
 // The current position and size of the circle
 let circleX;
 let circleY;
@@ -80,8 +87,9 @@ function draw() {
   // Display the square
   rect(squareX,squareY,squareSize,squareSize);
 
-  // draws a black circle per frame from left to right
-  background(255);
+  background(255); // makes everything clean
+
+  // draws a black circle moves from left to right
   fill(0); // black
   ellipse(posX,320,75);
   posX += 4; // the speed is 4
@@ -98,10 +106,11 @@ function draw() {
   fill(255,216,110); // yellow
   ellipse(positionX,positionY,50);
   // to move like a sine wave, kinda of
+  // to move repetitively up and down
   if ((positionX/60)%2==1){
     positionY+=30;
   }else if ((positionX/60)%2==0) {
     positionY-=30;
   }
-  positionX+=2;
+  positionX+=2; // the speed is 2
 }
