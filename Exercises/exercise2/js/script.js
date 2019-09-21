@@ -46,7 +46,10 @@ let gameStart = false;
 let hardMode = false;
 // which game mode the player chooses
 let gameMode = "EASY";
-
+// original backgroud rgb colors: dark blue (43,47,79)
+let bG_R = 43;
+let bG_G = 47;
+let bG_B = 79;
 
 // setup()
 // Make the canvas, position the avatar and anemy
@@ -151,10 +154,9 @@ function draw() {
 
 
   if (gameStart){
-    // A dark blue background
-    background("#2b2f4f");
+    background(bG_R,bG_G,bG_B);
 
-    // The dodge text
+    // The dodge and game mode text
     fill("#ffcd59");
     textSize(16);
     textStyle(BOLD);
@@ -220,6 +222,9 @@ function draw() {
       // reset enemy size and speed
       enemySpeed = DEFAULT_ENEMYSPEED;
       enemySize = DEFAULT_ENEMYSIZE;
+      // reset background
+      bG_R = 43;
+      bG_G = 47;
     }
     // second enemy checking for hard mode
     if (hardMode){
@@ -236,6 +241,9 @@ function draw() {
         dodges = 0;
         enemySpeed = DEFAULT_ENEMYSPEED;
         enemySize = DEFAULT_ENEMYSIZE;
+
+        bG_R = 43;
+        bG_G = 47;
       }
     }
 
@@ -257,12 +265,21 @@ function draw() {
       dodges = 0;
       enemySpeed = DEFAULT_ENEMYSPEED;
       enemySize = DEFAULT_ENEMYSIZE;
+
+      bG_R = 43;
+      bG_G = 47;
     }
 
     // Check if the enemy has moved all the way across the screen
     if (enemyX > width) {
       // This means the player dodged so update its dodge statistic
       dodges = dodges + 1;
+      // the background will change color after each 10 points
+      if (dodges%10==0 && dodges!=0){
+        // 43-80 range will keep it dark
+        bG_R = random(43,80);
+        bG_G = random(43,80);
+      }
       // enemy speed and size will increase after each successful dodge
       enemySpeed += 0.05;
       enemySize += 5;
