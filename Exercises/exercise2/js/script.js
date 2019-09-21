@@ -25,11 +25,17 @@ let enemyX;
 let enemyY;
 let enemyX2; // second enemy x position for hard mode
 let enemyY2; // second enemy y position for hard mode
-let enemySize = 50;
+let DEFAULT_ENEMYSIZE = 50; // default value for enemy size
+let enemySize = DEFAULT_ENEMYSIZE;
 
+let DEFAULT_ENEMYSPEED = 5; // default value for enemy speed
 // The speed and velocity of our enemy circle
-let enemySpeed = 5;
+let enemySpeed = DEFAULT_ENEMYSPEED;
 let enemyVX = 5;
+
+// colors for enemy
+let randomGreen;
+let randomBlue;
 
 // How many dodges the player has made
 let dodges = 0;
@@ -40,6 +46,7 @@ let gameStart = false;
 let hardMode = false;
 // which game mode the player chooses
 let gameMode = "EASY";
+
 
 // setup()
 // Make the canvas, position the avatar and anemy
@@ -56,6 +63,10 @@ function setup() {
   enemyX2 = 0; // second x position for hard mode
   enemyY = random(0,height);
   enemyY2 = random(0,height); // second random y position for hard mode
+
+  // random colors for enemy
+  randomGreen = random(0,255);
+  randomBlue = random(0,255);
 
   // No stroke so it looks cleaner
   noStroke();
@@ -81,7 +92,9 @@ function setup() {
 // game over situations.
 function draw() {
   // This is the simple control for the main menu
-  // If the mouse hovers over the "START" button, the text color changes
+  // If the mouse hovers over the "EASY" or "HARD" button, the text color changes
+
+  // This is easy button
     if (dist(mouseX,mouseY,avatarX,avatarY+50) < 25){
       fill("255");
       textSize(40);
@@ -96,10 +109,11 @@ function draw() {
       textSize(20);
       textStyle(NORMAL);
       text("Use arrowkeys to dodge other circles!",avatarX,avatarY+150);
-      // If the mouse is pressed, the game will start
+      // If the mouse is pressed, the game will start in easy mode
       if (mouseIsPressed){
         gameStart = true;
       }
+    // This is hard button
     }else if (dist(mouseX,mouseY,avatarX,avatarY+100) < 25){
       fill(255);
       textSize(40);
@@ -114,12 +128,13 @@ function draw() {
       textSize(20);
       textStyle(NORMAL);
       text("Use arrowkeys to dodge other circles!",avatarX,avatarY+150);
-      // If the mouse is pressed, the game will start
+      // If the mouse is pressed, the game will start in hard mode
       if (mouseIsPressed){
         gameStart = true;
         hardMode = true;
         gameMode = "HARD";
       }
+    // when the mouse is not hovering any buttons, the buttons go back to white
     }else{
       textStyle(NORMAL);
       fill(255);
@@ -179,26 +194,49 @@ function draw() {
     enemyVX = enemySpeed;
     // Update the enemy's position based on its velocity
     enemyX = enemyX + enemyVX;
-    enemyX2 = enemyX2 + enemyVX;
+    if (hardMode){
+      enemyX2 = enemyX2 + enemyVX;
+    }
 
 
     // Check if the enemy and avatar overlap - if they do the player loses
     // We do this by checking if the distance between the centre of the enemy
     // and the centre of the avatar is less that their combined radii
-    if ((dist(enemyX,enemyY,avatarX,avatarY) < enemySize/2 + avatarSize/2 )
-    ||(dist(enemyX,enemyY2,avatarX,avatarY) < enemySize/2 + avatarSize/2 )) {
+    if (dist(enemyX,enemyY,avatarX,avatarY) < enemySize/2 + avatarSize/2 ) {
       // Tell the player they lost
       console.log("YOU LOSE!");
       // Reset the enemy's position
       enemyX = 0;
-      enemyX2 = 0
       enemyY = random(0,height);
-      enemyY2 = random(0,height);
+      if (hardMode){
+        enemyX2 = 0
+        enemyY2 = random(0,height);
+      }
       // Reset the avatar's position
       avatarX = width/2;
       avatarY = height/2;
       // Reset the dodge counter
       dodges = 0;
+      // reset enemy size and speed
+      enemySpeed = DEFAULT_ENEMYSPEED;
+      enemySize = DEFAULT_ENEMYSIZE;
+    }
+    // second enemy checking for hard mode
+    if (hardMode){
+      if (dist(enemyX,enemyY2,avatarX,avatarY) < enemySize/2 + avatarSize/2 ){
+        console.log("YOU LOSE!");
+        enemyX = 0;
+        enemyY = random(0,height);
+        enemyX2 = 0
+        enemyY2 = random(0,height);
+
+        avatarX = width/2;
+        avatarY = height/2;
+
+        dodges = 0;
+        enemySpeed = DEFAULT_ENEMYSPEED;
+        enemySize = DEFAULT_ENEMYSIZE;
+      }
     }
 
     // Check if the avatar has gone off the screen (cheating!)
@@ -207,27 +245,39 @@ function draw() {
       console.log("YOU LOSE!");
 
       enemyX = 0;
-      enemyX2 = 0
       enemyY = random(0,height);
-      enemyY2 = random(0,height);
+      if (hardMode){
+        enemyY2 = random(0,height);
+        enemyX2 = 0;
+      }
 
       avatarX = width/2;
       avatarY = height/2;
 
       dodges = 0;
+      enemySpeed = DEFAULT_ENEMYSPEED;
+      enemySize = DEFAULT_ENEMYSIZE;
     }
 
     // Check if the enemy has moved all the way across the screen
     if (enemyX > width) {
       // This means the player dodged so update its dodge statistic
       dodges = dodges + 1;
+      // enemy speed and size will increase after each successful dodge
+      enemySpeed += 0.05;
+      enemySize += 5;
+      // different color for the enemy
+      randomGreen = random(0,255);
+      randomBlue = random(0,255);
       // Tell them how many dodges they have made
       console.log(dodges + " DODGES!");
       // Reset the enemy's position to the left at a random height
       enemyX = 0;
-      enemyX2 = 0
       enemyY = random(0,height);
-      enemyY2 = random(0,height);
+      if (hardMode){
+        enemyX2 = 0;
+        enemyY2 = random(0,height);
+      }
     }
 
     // Display the number of successful dodges in the console
@@ -238,13 +288,14 @@ function draw() {
     // Draw the player as a circle
     ellipse(avatarX,avatarY,avatarSize,avatarSize);
 
-    // The enemy is red
-    fill(255,0,0);
+    // The enemy is random colored
+    fill(255,randomGreen,randomBlue);
     // Draw the enemy as a circle
-    ellipse(enemyX,enemyY,enemySize);
     if (hardMode){
       ellipse(enemyX,enemyY,enemySize);
       ellipse(enemyX2,enemyY2,enemySize);
+    }else{
+      ellipse(enemyX,enemyY,enemySize);
     }
   }
 }
