@@ -84,8 +84,8 @@ function setup() {
   text("THE ARTFUL DODGER",avatarX,avatarY); // Title
   textSize(32);
   textStyle(BOLD);
-  text("EASY",avatarX,avatarY+50); // Start button
-  text("HARD",avatarX,avatarY+100);
+  text("EASY",avatarX,avatarY+50); // easy button
+  text("HARD",avatarX,avatarY+100); // hard button
   textSize(20);
   textStyle(ITALIC);
   text("Use arrowkeys to dodge other circles!",avatarX,avatarY+150); // rule
@@ -98,7 +98,7 @@ function draw() {
   // This is the simple control for the main menu
   // If the mouse hovers over the "EASY" or "HARD" button, the text color changes
 
-  // This is easy button hovering
+  // This is when easy button hovering
     if (dist(mouseX,mouseY,avatarX,avatarY+50) < 25){
       fill("255");
       textSize(40);
@@ -117,7 +117,7 @@ function draw() {
       if (mouseIsPressed){
         gameStart = true;
       }
-    // This is hard button hovering
+    // This is when hard button hovering
     }else if (dist(mouseX,mouseY,avatarX,avatarY+100) < 25){
       fill(255);
       textSize(40);
@@ -153,12 +153,12 @@ function draw() {
       text("Use arrowkeys to dodge other circles!",avatarX,avatarY+150);
     }
 
-
+  // When mouse clicks either easy or hard, game will start
   if (gameStart){
     // set the background
     background(bG_R,bG_G,bG_B);
     // The scores and game mode text
-    fill("#ffcd59");
+    fill("#ffcd59"); // Gold
     textSize(16);
     textStyle(BOLD);
     textAlign(LEFT);
