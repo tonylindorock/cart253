@@ -39,6 +39,7 @@ let randomBlue;
 
 // How many dodges the player has made
 let dodges = 0;
+let bestScore = 0;
 
 // determining whether the game is starting
 let gameStart = false;
@@ -75,10 +76,10 @@ function setup() {
   noStroke();
 
   // The main menu setup
-  background("#2b2f4f"); // dark blue backgroud
+  background(bG_R,bG_G,bG_B); // dark blue backgroud
   fill(255);
   textAlign(CENTER);
-  textFont("Futura");
+  textFont("Helvetica"); // ui font
   textSize(40);
   text("THE ARTFUL DODGER",avatarX,avatarY); // Title
   textSize(32);
@@ -86,7 +87,7 @@ function setup() {
   text("EASY",avatarX,avatarY+50); // Start button
   text("HARD",avatarX,avatarY+100);
   textSize(20);
-  textStyle(NORMAL);
+  textStyle(ITALIC);
   text("Use arrowkeys to dodge other circles!",avatarX,avatarY+150); // rule
 }
 
@@ -97,7 +98,7 @@ function draw() {
   // This is the simple control for the main menu
   // If the mouse hovers over the "EASY" or "HARD" button, the text color changes
 
-  // This is easy button
+  // This is easy button hovering
     if (dist(mouseX,mouseY,avatarX,avatarY+50) < 25){
       fill("255");
       textSize(40);
@@ -106,17 +107,17 @@ function draw() {
       fill("#8effbd"); // GREEN
       textSize(32);
       textStyle(BOLD);
-      text("EASY",avatarX,avatarY+50);
+      text("EASY",avatarX,avatarY+50); // easy button
       fill(255);
-      text("HARD",avatarX,avatarY+100);
+      text("HARD",avatarX,avatarY+100); // hard button
       textSize(20);
-      textStyle(NORMAL);
+      textStyle(ITALIC);
       text("Use arrowkeys to dodge other circles!",avatarX,avatarY+150);
       // If the mouse is pressed, the game will start in easy mode
       if (mouseIsPressed){
         gameStart = true;
       }
-    // This is hard button
+    // This is hard button hovering
     }else if (dist(mouseX,mouseY,avatarX,avatarY+100) < 25){
       fill(255);
       textSize(40);
@@ -129,7 +130,7 @@ function draw() {
       text("HARD",avatarX,avatarY+100);
       fill(255);
       textSize(20);
-      textStyle(NORMAL);
+      textStyle(ITALIC);
       text("Use arrowkeys to dodge other circles!",avatarX,avatarY+150);
       // If the mouse is pressed, the game will start in hard mode
       if (mouseIsPressed){
@@ -137,7 +138,7 @@ function draw() {
         hardMode = true;
         gameMode = "HARD";
       }
-    // when the mouse is not hovering any buttons, the buttons go back to white
+    // when the mouse is not hovering any buttons, the buttons go back to normal
     }else{
       textStyle(NORMAL);
       fill(255);
@@ -145,24 +146,25 @@ function draw() {
       text("THE ARTFUL DODGER",avatarX,avatarY); // Title
       textSize(32);
       textStyle(BOLD);
-      text("EASY",avatarX,avatarY+50); // Start button
+      text("EASY",avatarX,avatarY+50); // easy button
       text("HARD",avatarX,avatarY+100);
       textSize(20);
-      textStyle(NORMAL);
+      textStyle(ITALIC);
       text("Use arrowkeys to dodge other circles!",avatarX,avatarY+150);
     }
 
 
   if (gameStart){
+    // set the background
     background(bG_R,bG_G,bG_B);
-
-    // The dodge and game mode text
+    // The scores and game mode text
     fill("#ffcd59");
     textSize(16);
     textStyle(BOLD);
     textAlign(LEFT);
     text("DODGED: "+dodges,350,30);
     text(gameMode,25,30);
+    text("BEST: "+bestScore,25,45);
 
     // Default the avatar's velocity to 0 in case no key is pressed this frame
     avatarVX = 0;
@@ -217,6 +219,11 @@ function draw() {
       // Reset the avatar's position
       avatarX = width/2;
       avatarY = height/2;
+      // remember the best score
+      if (dodges > bestScore){
+        bestScore = dodges;
+      }
+      text("BEST: "+bestScore,25,45);
       // Reset the dodge counter
       dodges = 0;
       // reset enemy size and speed
@@ -238,7 +245,12 @@ function draw() {
         avatarX = width/2;
         avatarY = height/2;
 
+        if (dodges > bestScore){
+          bestScore = dodges;
+        }
+        text("BEST: "+bestScore,25,45);
         dodges = 0;
+
         enemySpeed = DEFAULT_ENEMYSPEED;
         enemySize = DEFAULT_ENEMYSIZE;
 
@@ -262,7 +274,12 @@ function draw() {
       avatarX = width/2;
       avatarY = height/2;
 
+      if (dodges > bestScore){
+        bestScore = dodges;
+      }
+      text("BEST: "+bestScore,25,45);
       dodges = 0;
+
       enemySpeed = DEFAULT_ENEMYSPEED;
       enemySize = DEFAULT_ENEMYSIZE;
 
@@ -276,7 +293,7 @@ function draw() {
       dodges = dodges + 1;
       // the background will change color after each 10 points
       if (dodges%10==0 && dodges!=0){
-        // 43-80 range will keep it dark
+        // 43-79 range will keep it dark and consistent
         bG_R = random(43,80);
         bG_G = random(43,80);
       }
@@ -307,7 +324,7 @@ function draw() {
 
     // The enemy is random colored
     fill(255,randomGreen,randomBlue);
-    // Draw the enemy as a circle
+    // Draw the enemy as one circle in easy mode and two circles in hard mode
     if (hardMode){
       ellipse(enemyX,enemyY,enemySize);
       ellipse(enemyX2,enemyY2,enemySize);
