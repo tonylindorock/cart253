@@ -1,8 +1,8 @@
 "use strict";
 
 /******************************************************************************
-Where's Sausage Dog?
-by Pippin Barr
+Where's Sausage Dog Plus
+Modified by Yichen Wang
 
 An algorithmic version of a Where's Wally/Waldo searching game where you
 need to click on the sausage dog you're searching for in amongst all
@@ -33,8 +33,13 @@ let decoyImage10;
 // chosen from the decoy images
 let numDecoys = 100;
 
+// allow player to start from main menu
+let gameStart = false;
+
 // Keep track of whether they've won
 let gameOver = false;
+
+let dogFound = 0;
 
 // preload()
 //
@@ -60,14 +65,14 @@ function preload() {
 // of decoys in random positions, then the target
 function setup() {
   createCanvas(windowWidth,windowHeight);
-  background("#ffff00");
+  background("#8effbd");
   imageMode(CENTER);
 
   // Use a for loop to draw as many decoys as we need
   for (let i = 0; i < numDecoys; i++) {
     // Choose a random location on the canvas for this decoy
     let x = random(0,width);
-    let y = random(0,height);
+    let y = random(80,height);
     // Generate a random number we can use for probability
     let r = random();
     // Use the random number to display one of the ten decoy
@@ -108,10 +113,25 @@ function setup() {
 
   // Once we've displayed all decoys, we choose a random location for the target
   targetX = random(0,width);
-  targetY = random(0,height);
+  targetY = random(80,height);
 
   // And draw it (because it's the last thing drawn, it will always be on top)
   image(targetImage,targetX,targetY);
+
+  // improved UI containing the target image and success count
+  noStroke();
+  fill("#ff7474"); // red
+  rect(0,0,width,75);
+  textStyle(BOLD);
+  textFont("Arial");
+  textAlign(LEFT,CENTER);
+  textSize(32);
+  fill(255);
+  text(dogFound,width*0.94,37.5); // number of found dog
+  textSize(32);
+  fill(255);
+  text("WHERE IS THE SAUSAGE DOG?",25,37.5); // title
+  image(targetImage,width*0.90,40,100,100); // sample image
 }
 
 
@@ -130,6 +150,13 @@ function draw() {
 
     // Tell them they won!
     text("YOU WINNED!",width/2,height/2);
+    dogFound++;
+    textStyle(BOLD);
+    textFont("Arial");
+    textAlign(LEFT,CENTER);
+    textSize(32);
+    fill(255);
+    text(dogFound,width*0.94,37.5);
 
     // Draw a circle around the sausage dog to show where it is (even though
     // they already know because they found it!)
