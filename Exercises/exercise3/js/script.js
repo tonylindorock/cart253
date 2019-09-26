@@ -10,6 +10,8 @@ the visual noise of other animals.
 
 Animal images from:
 https://creativenerds.co.uk/freebies/80-free-wildlife-icons-the-best-ever-animal-icon-set/
+Font from:
+https://www.wfonts.com/font/futura
 ******************************************************************************/
 
 // Position and image of the sausage dog we're searching for
@@ -20,9 +22,13 @@ let targetImage;
 // move position variables for dog
 let moveX;
 let moveY;
+let speed = 25; // speed
+let v = speed; // velocity
 // possibility
 let p;
 
+// the image size
+let size = 125;
 // The ten decoy images
 let decoyImage1;
 let decoyImage2;
@@ -79,6 +85,7 @@ function preload() {
   decoyImage10 = loadImage("assets/images/animals-10.png");
 
   // load the font
+  // Downloaded from https://www.wfonts.com/font/futura
   Futura = loadFont("assets/futura heavy font.ttf");
 }
 
@@ -95,20 +102,20 @@ function setup() {
   textFont("Futura");
   textAlign(CENTER,CENTER);
   textStyle(BOLD);
-  fill(DARK_BLUE);
+  fill(RED);
   textSize(40);
-  text("WHERE'S SAUSAGE DOG",width/2,height/2-80); // Title
+  text("WHERE'S SAUSAGE DOG?",width/2,height/2-80); // Title
+  fill(DARK_BLUE);
   textSize(32);
   textStyle(BOLD);
   text("PLAY",width/2,height/2); // easy button
   textSize(20);
   textStyle(ITALIC);
   text("Find and click the sausage dog!",width/2,height/2+80);
+  image(targetImage,width/2,height/2+150,size,size);
 }
 
 // draw()
-//
-// Main menu
 //
 // Displays the game over screen if the player has won,
 // otherwise nothing (all the gameplay stuff is in mousePressed())
@@ -123,17 +130,19 @@ function draw() {
     noFill();
     stroke(random(135,255),random(135,255),random(135,255));
     strokeWeight(10);
-    ellipse(targetX,targetY,targetImage.width,targetImage.height);
+    ellipse(targetX,targetY,size,size);
 
     // Prepare our typography
     textSize(128);
     textAlign(CENTER,CENTER);
     noStroke();
-    fill(255);
 
     // Tell them they won!
+    fill(RED);
     text("YOU WON!",width/2,height/2);
+    fill(255);
     textSize(32);
+    // continue button
     text("CONTINUE",width/2+200,37.5);
 
     // move the dog!
@@ -141,11 +150,11 @@ function draw() {
 
     // check continue button
     check_Continue_Button();
-  }else{
+    }else{
     // reset the game graphics
     if (gameStart && runOnce){
       setup_Animals();
-      runOnce=false;
+      runOnce = false;
       setup_Stats();
     }
   }
@@ -159,15 +168,15 @@ function mousePressed() {
   // Check if the cursor is in the x range of the target
   // (We're subtracting the image's width/2 because we're using imageMode(CENTER) -
   // the key is we want to determine the left and right edges of the image.)
-  if (mouseX > targetX - targetImage.width/2 && mouseX < targetX + targetImage.width/2) {
+  if (mouseX > targetX - size/2 && mouseX < targetX + size/2) {
     // Check if the cursor is also in the y range of the target
     // i.e. check if it's within the top and bottom of the image
-    if (mouseY > targetY - targetImage.height/2 && mouseY < targetY + targetImage.height/2) {
+    if (mouseY > targetY - size/2 && mouseY < targetY + size/2) {
       gameOver = true;
       // clear all the animals except the dog
       background(GREEN);
       setup_Stats();
-      image(targetImage,targetX,targetY);
+      image(targetImage,targetX,targetY,size,size);
       // allow the dog to move
       dogRuns = true;
     }
@@ -179,17 +188,9 @@ function check_MainMenu_Buttons(){
   // if the mouse is hovering
   if (dist(mouseX,mouseY,width/2,height/2) < 25 && !gameStart){
     textAlign(CENTER,CENTER);
-    fill(DARK_BLUE);
-    textSize(40);
-    textStyle(BOLD);
-    text("WHERE'S SAUSAGE DOG",width/2,height/2-80);
     fill(255);
     textSize(32);
     text("PLAY",width/2,height/2); // play button
-    fill(DARK_BLUE);
-    textSize(20);
-    textStyle(ITALIC);
-    text("Find and click the sausage dog!",width/2,height/2+80);
     // If the mouse is pressed, the game will start
     if (mouseIsPressed){
       gameStart = true;
@@ -200,16 +201,10 @@ function check_MainMenu_Buttons(){
   // when the mouse is not hovering any buttons, the buttons go back to normal
   }else{
     if (!gameStart){
-      textAlign(CENTER,CENTER);
       textStyle(BOLD);
       fill(DARK_BLUE);
-      textSize(40);
-      text("WHERE'S SAUSAGE DOG",width/2,height/2-80); // Title
       textSize(32);
       text("PLAY",width/2,height/2); // play button
-      textSize(20);
-      textStyle(ITALIC);
-      text("Find and click the sausage dog!",width/2,height/2+80);
     }
   }
 }
@@ -227,7 +222,19 @@ function check_Continue_Button(){
     if (mouseIsPressed){
       gameOver = false;
       gameStart = true;
-      runOnce=true;
+      runOnce = true;
+
+      //add the count
+      dogFound++;
+      // every 10 points is reached, decoy images will be added 50 more until after reaching 50 points
+      if (dogFound%10==0 && dogFound>0 && dogFound<=50){
+        numDecoys += 50;
+        console.log("Number of dog found: "+dogFound+"\nNumber of decoys: "+numDecoys+"\nSize: "+size);
+      }
+      // after reaching 40 points, images will not be shrunk
+      if (dogFound<40){
+        size -= 2;
+      }
     }
   // if the mouth is not hovering, it will go back to normal
   }else{
@@ -243,13 +250,13 @@ function check_Continue_Button(){
 function setup_Stats(){
   // improved UI containing the target image and success count
   noStroke();
-  fill(RED); // red
+  fill(RED);
   rect(0,0,width,75);
   textStyle(BOLD);
   textAlign(LEFT,CENTER);
   textSize(32);
   fill(255);
-  text(dogFound,width*0.94,37.5); // number of found dog
+  text(dogFound,width*0.94,37.5); // the number of found dog
   textSize(32);
   fill(255);
   text("WHERE IS THE SAUSAGE DOG?",25,37.5); // quest
@@ -273,34 +280,34 @@ function setup_Animals(){
       // We'll talk more about this nice quality of random soon enough.
       // But basically each "if" and "else if" has a 10% chance of being true
       if (r < 0.1) {
-        image(decoyImage1,x,y);
+        image(decoyImage1,x,y,size,size);
       }
       else if (r < 0.2) {
-        image(decoyImage2,x,y);
+        image(decoyImage2,x,y,size,size);
       }
       else if (r < 0.3) {
-        image(decoyImage3,x,y);
+        image(decoyImage3,x,y,size,size);
       }
       else if (r < 0.4) {
-        image(decoyImage4,x,y);
+        image(decoyImage4,x,y,size,size);
       }
       else if (r < 0.5) {
-        image(decoyImage5,x,y);
+        image(decoyImage5,x,y,size,size);
       }
       else if (r < 0.6) {
-        image(decoyImage6,x,y);
+        image(decoyImage6,x,y,size,size);
       }
       else if (r < 0.7) {
-        image(decoyImage7,x,y);
+        image(decoyImage7,x,y,size,size);
       }
       else if (r < 0.8) {
-        image(decoyImage8,x,y);
+        image(decoyImage8,x,y,size,size);
       }
       else if (r < 0.9) {
-        image(decoyImage9,x,y);
+        image(decoyImage9,x,y,size,size);
       }
       else if (r < 1.0) {
-        image(decoyImage10,x,y);
+        image(decoyImage10,x,y,size,size);
       }
     }
 
@@ -315,7 +322,7 @@ function setup_Animals(){
     p = random(0,1); // decide possibility
 
     // And draw it (because it's the last thing drawn, it will always be on top)
-    image(targetImage,targetX,targetY);
+    image(targetImage,targetX,targetY,size,size);
   }
 }
 
@@ -325,15 +332,15 @@ function dogRunsOff(){
     setup_Stats();
     // decide a movement direction
     if (p<0.25 && p>=0){
-      moveX += 25;
+      moveX += v;
     }else if (p<0.5 && p>=0.25){
-      moveX -= 25;
+      moveX -= v;
     }else if (p<0.75 && p>=0.5){
-      moveY += 25;
+      moveY += v;
     }else if (p<1 && p>= 0.75){
-      moveY -= 25;
+      moveY -= v;
     }
     // move the dog!
-    image(targetImage,moveX,moveY);
+    image(targetImage,moveX,moveY,size,size);
   }
 }
