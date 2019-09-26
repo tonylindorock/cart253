@@ -17,6 +17,12 @@ let targetX;
 let targetY;
 let targetImage;
 
+// move position variables for dog
+let moveX;
+let moveY;
+// possibility
+let p;
+
 // The ten decoy images
 let decoyImage1;
 let decoyImage2;
@@ -111,6 +117,7 @@ function draw() {
   check_MainMenu_Buttons();
   // if a game is over
   if (gameOver) {
+    background(GREEN);
     // Draw a circle around the sausage dog to show where it is (even though
     // they already know because they found it!)
     noFill();
@@ -128,6 +135,9 @@ function draw() {
     text("YOU WON!",width/2,height/2);
     textSize(32);
     text("CONTINUE",width/2+200,37.5);
+
+    // move the dog!
+    dogRunsOff();
 
     // check continue button
     check_Continue_Button();
@@ -154,9 +164,11 @@ function mousePressed() {
     // i.e. check if it's within the top and bottom of the image
     if (mouseY > targetY - targetImage.height/2 && mouseY < targetY + targetImage.height/2) {
       gameOver = true;
+      // clear all the animals except the dog
       background(GREEN);
       setup_Stats();
       image(targetImage,targetX,targetY);
+      // allow the dog to move
       dogRuns = true;
     }
   }
@@ -205,6 +217,7 @@ function check_MainMenu_Buttons(){
 // checking continue button
 // reset the game
 function check_Continue_Button(){
+  textAlign(CENTER,CENTER);
   // if mouth is hovering
   if (dist(mouseX,mouseY,width/2+200,37.5) < 25 && gameOver){
     fill(DARK_BLUE);
@@ -252,7 +265,7 @@ function setup_Animals(){
     for (let i = 0; i < numDecoys; i++) {
       // Choose a random location on the canvas for this decoy
       let x = random(0,width);
-      let y = random(80,height);
+      let y = random(90,height);
       // Generate a random number we can use for probability
       let r = random();
       // Use the random number to display one of the ten decoy
@@ -293,21 +306,34 @@ function setup_Animals(){
 
     // Once we've displayed all decoys, we choose a random location for the target
     targetX = random(0,width);
-    targetY = random(80,height);
+    targetY = random(100,height);
 
-    targetX=width/2;
-    targetY=height/2+125;
+    // let the dog move without moving the cirle
+    moveX = targetX;
+    moveY = targetY;
+
+    p = random(0,1); // decide possibility
 
     // And draw it (because it's the last thing drawn, it will always be on top)
     image(targetImage,targetX,targetY);
   }
 }
 
+// move the dog across the screen in randomly chosen 1 out of 4 directions
 function dogRunsOff(){
   if (dogRuns){
-    background(GREEN);
     setup_Stats();
-    targetX += 1;
-    image(targetImage,targetX,targetY);
+    // decide a movement direction
+    if (p<0.25 && p>=0){
+      moveX += 25;
+    }else if (p<0.5 && p>=0.25){
+      moveX -= 25;
+    }else if (p<0.75 && p>=0.5){
+      moveY += 25;
+    }else if (p<1 && p>= 0.75){
+      moveY -= 25;
+    }
+    // move the dog!
+    image(targetImage,moveX,moveY);
   }
 }
