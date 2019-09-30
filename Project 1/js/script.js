@@ -2,7 +2,7 @@
 
 /******************************************************
 
-Game - Chaser
+Game - The Chaser
 Yichen Wang
 
 A "simple" game of cat and mouse. The player is a circle and can move with keys,
@@ -13,10 +13,8 @@ eating to stay alive.
 Includes: Physics-based movement, keyboard controls, health/stamina,
 random movement, screen wrap.
 
+Font used from https://www.wfonts.com/font/futura
 ******************************************************/
-
-// Track whether the game is over
-let gameOver = false;
 
 // Player position, size, velocity
 let playerX;
@@ -49,17 +47,65 @@ let eatHealth = 10;
 // Number of prey eaten during the game (the "score")
 let preyEaten = 0;
 
+// Track whether the game is over
+let gameOver = false;
+
+let gameStart = false;
+
+let ORANGE = "#efbb3f";
+
+// custom font variable
+let Futura_Heavy;
+
+function preload(){
+  // font downloaded from https://www.wfonts.com/font/futura
+  Futura_Heavy = loadFont("assets/futura heavy font.ttf");
+}
 // setup()
 //
 // Sets up the basic elements of the game
 function setup() {
-  createCanvas(500,500);
+  textFont(Futura_Heavy);
+  createCanvas(windowWidth,windowHeight);
+  background(ORANGE);
+
+  setupMainMenu();
 
   noStroke();
+}
 
-  // We're using simple functions to separate code out
-  setupPrey();
-  setupPlayer();
+function setupMainMenu(){
+  textAlign(CENTER,CENTER);
+  fill(255);
+  textSize(128);
+  text("THE CHASER",width/2,height/2-64);
+  textSize(64);
+  text("START",width/2,height/2+64);
+  textSize(20);
+  let rule = "You have to catch the running cheese to survive!\nControls: WASD or ARROWKEYS"
+  text(rule,width/2,height/2+148);
+}
+
+function check_MainMenu_Button(){
+  let startIsHovering = (dist(mouseX,mouseY,width/2-32,height/2+64) < 50 ||
+  dist(mouseX,mouseY,width/2+32,height/2+64) < 50 ||
+  dist(mouseX,mouseY,width/2,height/2+64) < 25)
+
+  if (startIsHovering && !gameStart){
+    textSize(64);
+    fill(0);
+    text("START",width/2,height/2+64);
+    if (mouseIsPressed){
+      gameStart = true;
+      // We're using simple functions to separate code out
+      setupPrey();
+      setupPlayer();
+    }
+  }else{
+    fill(255);
+    textSize(64);
+    text("START",width/2,height/2+64);
+  }
 }
 
 // setupPrey()
@@ -90,22 +136,24 @@ function setupPlayer() {
 // displays the two agents.
 // When the game is over, shows the game over screen.
 function draw() {
-  background(100,100,200);
+  if (gameStart){
+    background(ORANGE);
+    if (!gameOver) {
+      handleInput();
 
-  if (!gameOver) {
-    handleInput();
+      movePlayer();
+      movePrey();
 
-    movePlayer();
-    movePrey();
+      updateHealth();
+      checkEating();
 
-    updateHealth();
-    checkEating();
-
-    drawPrey();
-    drawPlayer();
-  }
-  else {
-    showGameOver();
+      drawPrey();
+      drawPlayer();
+    }else{
+      showGameOver();
+    }
+  }else{
+    check_MainMenu_Button();
   }
 }
 
@@ -273,9 +321,9 @@ function showGameOver() {
   textAlign(CENTER,CENTER);
   fill(0);
   // Set up the text to display
-  let gameOverText = "GAME OVER\n"; // \n means "new line"
-  gameOverText = gameOverText + "You ate " + preyEaten + " prey\n";
-  gameOverText = gameOverText + "before you died."
+  let gameOverText = "GAME OVER\n\n"; // \n means "new line"
+  gameOverText += "YOU ATE " + preyEaten + " PREY\n";
+  gameOverText += "BEFORE YOU STRAVED"
   // Display it in the centre of the screen
   text(gameOverText,width/2,height/2);
 }
