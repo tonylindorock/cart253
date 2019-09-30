@@ -10,8 +10,6 @@ the visual noise of other animals.
 
 Animal images from:
 https://creativenerds.co.uk/freebies/80-free-wildlife-icons-the-best-ever-animal-icon-set/
-Font from:
-https://www.wfonts.com/font/futura
 ******************************************************************************/
 
 // Position and image of the sausage dog we're searching for
@@ -40,9 +38,6 @@ let decoyImage7;
 let decoyImage8;
 let decoyImage9;
 let decoyImage10;
-
-// font
-let Futura;
 
 // The number of decoys to show on the screen, randomly
 // chosen from the decoy images
@@ -83,10 +78,6 @@ function preload() {
   decoyImage8 = loadImage("assets/images/animals-08.png");
   decoyImage9 = loadImage("assets/images/animals-09.png");
   decoyImage10 = loadImage("assets/images/animals-10.png");
-
-  // load the font
-  // Downloaded from https://www.wfonts.com/font/futura
-  Futura = loadFont("assets/futura heavy font.ttf");
 }
 
 // setup()
