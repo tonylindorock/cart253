@@ -49,13 +49,22 @@ let preyEaten = 0;
 
 // Track whether the game is over
 let gameOver = false;
-
+// whether the game is started
 let gameStart = false;
 
+// BG color
 let ORANGE = "#efbb3f";
+let DARK_BLUE = "#264667";
 
 // custom font variable
 let Futura_Heavy;
+
+// images variables
+let cheeseImage0;
+let cheeseImage1;
+let cheeseImage2;
+let cheeseImage3;
+let playerImage;
 
 function preload(){
   // font downloaded from https://www.wfonts.com/font/futura
@@ -65,42 +74,55 @@ function preload(){
 //
 // Sets up the basic elements of the game
 function setup() {
+  // choose font
   textFont(Futura_Heavy);
   createCanvas(windowWidth,windowHeight);
   background(ORANGE);
 
+  // set up the main menu
   setupMainMenu();
 
   noStroke();
 }
 
+// everything for setting up the main menu
+// including the title, start button, and the rule
 function setupMainMenu(){
   textAlign(CENTER,CENTER);
-  fill(255);
+  fill(255); // white
+  // title
   textSize(128);
   text("THE CHASER",width/2,height/2-64);
+  // start button
   textSize(64);
   text("START",width/2,height/2+64);
+  // rule
   textSize(20);
-  let rule = "You have to catch the running cheese to survive!\nControls: WASD or ARROWKEYS"
-  text(rule,width/2,height/2+148);
+  fill(0); // black
+  let rule = "You have to catch the running cheese to survive!\nAnd avoid the poison ones because humans are evil!\n\nControls: WASD or ARROWKEYS"
+  text(rule,width/2,height/2+172);
 }
 
+// handle the start button behaviour
 function check_MainMenu_Button(){
+  // determine if the mouse is hovering the button
   let startIsHovering = (dist(mouseX,mouseY,width/2-32,height/2+64) < 50 ||
   dist(mouseX,mouseY,width/2+32,height/2+64) < 50 ||
   dist(mouseX,mouseY,width/2,height/2+64) < 25)
 
+  // if the mouse is hovering, the text will change color
   if (startIsHovering && !gameStart){
     textSize(64);
     fill(0);
     text("START",width/2,height/2+64);
+    // when the mouse is pressed on the button, the game will start
     if (mouseIsPressed){
       gameStart = true;
       // We're using simple functions to separate code out
       setupPrey();
       setupPlayer();
     }
+  // if the mouse is not hovering, the button goes back to normal
   }else{
     fill(255);
     textSize(64);
@@ -319,11 +341,11 @@ function showGameOver() {
   // Set up the font
   textSize(32);
   textAlign(CENTER,CENTER);
-  fill(0);
+  fill(255);
   // Set up the text to display
   let gameOverText = "GAME OVER\n\n"; // \n means "new line"
-  gameOverText += "YOU ATE " + preyEaten + " PREY\n";
-  gameOverText += "BEFORE YOU STRAVED"
+  gameOverText += "YOU ATE " + preyEaten + " CHEESE\n";
+  gameOverText += "BEFORE YOU DIED"
   // Display it in the centre of the screen
   text(gameOverText,width/2,height/2);
 }
