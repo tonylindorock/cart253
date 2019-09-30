@@ -13,7 +13,7 @@ eating to stay alive.
 Includes: Physics-based movement, keyboard controls, health/stamina,
 random movement, screen wrap.
 
-Font used from https://www.wfonts.com/font/futura
+Font used downloaded from https://www.wfonts.com/font/futura
 ******************************************************/
 
 // Player position, size, velocity
@@ -25,7 +25,7 @@ let playerVY = 0;
 let playerMaxSpeed = 2;
 // Player health
 let playerHealth;
-let playerMaxHealth = 255;
+let playerMaxHealth = 255; // default 255
 // Player fill color
 let playerFill = 50;
 
@@ -55,6 +55,7 @@ let gameStart = false;
 // BG color
 let ORANGE = "#efbb3f";
 let DARK_BLUE = "#264667";
+let RED = "#ef3f3f";
 
 // custom font variable
 let Futura_Heavy;
@@ -156,7 +157,8 @@ function setupPlayer() {
 // updates positions of prey and player,
 // checks health (dying), checks eating (overlaps)
 // displays the two agents.
-// When the game is over, shows the game over screen.
+// When the game is over, shows the game over screen with restart button
+// if restart button is clicked, the game will reset
 function draw() {
   if (gameStart){
     background(ORANGE);
@@ -173,6 +175,7 @@ function draw() {
       drawPlayer();
     }else{
       showGameOver();
+      check_Restart_Button();
     }
   }else{
     check_MainMenu_Button();
@@ -212,26 +215,26 @@ function handleInput() {
 // wraps around the edges.
 function movePlayer() {
   // Update position
-  playerX = playerX + playerVX;
-  playerY = playerY + playerVY;
+  playerX += playerVX;
+  playerY += playerVY;
 
   // Wrap when player goes off the canvas
   if (playerX < 0) {
     // Off the left side, so add the width to reset to the right
-    playerX = playerX + width;
+    playerX += width;
   }
   else if (playerX > width) {
     // Off the right side, so subtract the width to reset to the left
-    playerX = playerX - width;
+    playerX -= width;
   }
 
   if (playerY < 0) {
     // Off the top, so add the height to reset to the bottom
-    playerY = playerY + height;
+    playerY += height;
   }
   else if (playerY > height) {
     // Off the bottom, so subtract the height to reset to the top
-    playerY = playerY - height;
+    playerY -= height;
   }
 }
 
@@ -241,7 +244,7 @@ function movePlayer() {
 // Check if the player is dead
 function updateHealth() {
   // Reduce player health
-  playerHealth = playerHealth - 0.5;
+  playerHealth -= 0.5;
   // Constrain the result to a sensible range
   playerHealth = constrain(playerHealth,0,playerMaxHealth);
   // Check if the player is dead (0 health)
@@ -260,11 +263,11 @@ function checkEating() {
   // Check if it's an overlap
   if (d < playerRadius + preyRadius) {
     // Increase the player health
-    playerHealth = playerHealth + eatHealth;
+    playerHealth += eatHealth;
     // Constrain to the possible range
     playerHealth = constrain(playerHealth,0,playerMaxHealth);
     // Reduce the prey health
-    preHealth = preyHealth - eatHealth;
+    preHealth -= eatHealth;
     // Constrain to the possible range
     preyHealth = constrain(preyHealth,0,preyMaxHealth);
 
@@ -276,7 +279,7 @@ function checkEating() {
       // Give it full health
       preyHealth = preyMaxHealth;
       // Track how many prey were eaten
-      preyEaten = preyEaten + 1;
+      preyEaten += 1;
     }
   }
 }
@@ -299,22 +302,22 @@ function movePrey() {
   }
 
   // Update prey position based on velocity
-  preyX = preyX + preyVX;
+  preyX += preyVX;
   preyY = preyX + preyVY;
 
   // Screen wrapping
   if (preyX < 0) {
-    preyX = preyX + width;
+    preyX += width;
   }
   else if (preyX > width) {
-    preyX = preyX - width;
+    preyX -= width;
   }
 
   if (preyY < 0) {
-    preyY = preyY + height;
+    preyY += height;
   }
   else if (preyY > height) {
-    preyY = preyY - height;
+    preyY -= height;
   }
 }
 
@@ -339,13 +342,51 @@ function drawPlayer() {
 // Display text about the game being over!
 function showGameOver() {
   // Set up the font
-  textSize(32);
   textAlign(CENTER,CENTER);
-  fill(255);
+  fill(RED);
   // Set up the text to display
-  let gameOverText = "GAME OVER\n\n"; // \n means "new line"
-  gameOverText += "YOU ATE " + preyEaten + " CHEESE\n";
-  gameOverText += "BEFORE YOU DIED"
+  textSize(128);
+  text("GAME OVER",width/2,height/2-64);
+  let achievement = "YOU ATE " + preyEaten + " CHEESE\n";
+  achievement += "BEFORE YOU DIED"
   // Display it in the centre of the screen
-  text(gameOverText,width/2,height/2);
+  fill(255);
+  textSize(32);
+  text(achievement,width/2,height/2+64);
+  textSize(64);
+  text("RESTART",width/2,height/2+164);
+}
+
+// check if the restart button is hovered
+function check_Restart_Button(){
+  // determine whether the mouse is hovering the button
+  let restartIsHovering = (dist(mouseX,mouseY,width/2,height/2+164)<25||
+  dist(mouseX,mouseY,width/2+72,height/2+164)<50 ||
+  dist(mouseX,mouseY,width/2-72,height/2+164)<50)
+  // hovering state
+  if (restartIsHovering && gameOver){
+    textSize(64);
+    fill(0);
+    text("RESTART",width/2,height/2+164);
+    // if the mouse is hovering and clicked, the game will restart
+    if(mouseIsPressed){
+      gameOver = false;
+      restartGame();
+    }
+  // unhovering state
+  }else{
+    textSize(64);
+    fill(255);
+    text("RESTART",width/2,height/2+164);
+  }
+}
+
+// restart function
+// reset the game
+function restartGame(){
+  // reset player health
+  playerHealth = playerMaxHealth;
+  // reset their positions
+  setupPrey();
+  setupPlayer();
 }
