@@ -2,13 +2,14 @@
 
 /******************************************************
 
-Game - The Chaser
+Game - The Cheser
 Yichen Wang
 
-A "simple" game of cat and mouse. The player is a circle and can move with keys,
-if they overlap the (randomly moving) prey they "eat it" by sucking out its life
+A "simple" game of mouse and cheese. The player is a mouse and can move with keys,
+if they overlap the (randomly moving) cheese they "eat it" by sucking out its life
 and adding it to their own. The player "dies" slowly over time so they have to keep
-eating to stay alive.
+eating to stay alive. The player also need to avoid eating poisoned cheese because
+them make the mouse sick and die faster.
 
 Includes: Physics-based movement, keyboard controls, health/stamina,
 random movement, screen wrap.
@@ -22,13 +23,13 @@ let playerY;
 let playerRadius = 25;
 let playerVX = 0;
 let playerVY = 0;
-let playerMaxSpeed = 2;
+let playerMaxSpeed = 5;
 // Player health
 let playerHealth;
 let playerMaxHealth = 255; // default 255
-// Player fill color
-let playerFill = 50;
 
+// possibility
+let p;
 // Prey position, size, velocity
 let preyX;
 let preyY;
@@ -39,8 +40,6 @@ let preyMaxSpeed = 4;
 // Prey health
 let preyHealth;
 let preyMaxHealth = 100;
-// Prey fill color
-let preyFill = 200;
 
 // Amount of health obtained per frame of "eating" (overlapping) the prey
 let eatHealth = 10;
@@ -64,17 +63,29 @@ let Futura_Heavy;
 let cheeseImage0;
 let cheeseImage1;
 let cheeseImage2;
-let cheeseImage3;
-let playerImage;
+let cheesePImage0;
+let cheesePImage1;
+let cheesePImage2;
+let mouseImage;
 
 function preload(){
   // font downloaded from https://www.wfonts.com/font/futura
   Futura_Heavy = loadFont("assets/futura heavy font.ttf");
+
+  cheeseImage0 = loadImage("assets/images/Cheese0.png");
+  cheeseImage1 = loadImage("assets/images/Cheese1.png");
+  cheeseImage2 = loadImage("assets/images/Cheese2.png");
+  cheesePImage0 = loadImage("assets/images/CheeseP0.png");
+  cheesePImage1 = loadImage("assets/images/CheeseP1.png");
+  cheesePImage2 = loadImage("assets/images/CheeseP2.png");
+
+  mouseImage = loadImage("assets/images/Mouse.png")
 }
 // setup()
 //
 // Sets up the basic elements of the game
 function setup() {
+  imageMode(CENTER);
   // choose font
   textFont(Futura_Heavy);
   createCanvas(windowWidth,windowHeight);
@@ -89,18 +100,28 @@ function setup() {
 // everything for setting up the main menu
 // including the title, start button, and the rule
 function setupMainMenu(){
+  image(cheeseImage0,width/2-424,height/2-164,150,150);
+  image(cheeseImage1,width/2-296,height/2-164,150,150);
+  image(cheeseImage2,width/2-168,height/2-164,150,150);
+  image(mouseImage,width/2,height/2-164,150,150);
+  image(cheesePImage2,width/2+168,height/2-164,150,150);
+  image(cheesePImage1,width/2+296,height/2-164,150,150);
+  image(cheesePImage0,width/2+424,height/2-164,150,150);
   textAlign(CENTER,CENTER);
+  fill(0);// black
+  textSize(84);
+  text("?",width/2,height/2-272);
   fill(255); // white
   // title
   textSize(128);
-  text("THE CHASER",width/2,height/2-64);
+  text("THE CHESER",width/2,height/2-64);
   // start button
   textSize(64);
   text("START",width/2,height/2+64);
   // rule
   textSize(20);
-  fill(0); // black
-  let rule = "You have to catch the running cheese to survive!\nAnd avoid the poison ones because humans are evil!\n\nControls: WASD or ARROWKEYS"
+  fill(0);
+  let rule = "You have to 'chese' & eat the running cheese to survive!\nAnd avoid the poisoned ones because humans are evil!\n\nControls: WASD or ARROWKEYS"
   text(rule,width/2,height/2+172);
 }
 
@@ -140,6 +161,8 @@ function setupPrey() {
   preyVX = -preyMaxSpeed;
   preyVY = preyMaxSpeed;
   preyHealth = preyMaxHealth;
+
+  p = random(0,1);
 }
 
 // setupPlayer()
@@ -173,6 +196,8 @@ function draw() {
 
       drawPrey();
       drawPlayer();
+
+      text(playerHealth,width/2,height/2+64);
     }else{
       showGameOver();
       check_Restart_Button();
@@ -267,12 +292,14 @@ function checkEating() {
     // Constrain to the possible range
     playerHealth = constrain(playerHealth,0,playerMaxHealth);
     // Reduce the prey health
-    preHealth -= eatHealth;
+    preyHealth -= eatHealth;
     // Constrain to the possible range
     preyHealth = constrain(preyHealth,0,preyMaxHealth);
 
     // Check if the prey died (health 0)
     if (preyHealth === 0) {
+      // change appearance
+      p = random(0,1);
       // Move the "new" prey to a random position
       preyX = random(0,width);
       preyY = random(0,height);
@@ -325,16 +352,21 @@ function movePrey() {
 //
 // Draw the prey as an ellipse with alpha based on health
 function drawPrey() {
-  fill(preyFill,preyHealth);
-  ellipse(preyX,preyY,preyRadius*2);
+  if (p < 0.3){
+    image(cheeseImage2,preyX,preyY,preyRadius*6,preyRadius*6);
+  }else if(p < 0.6 && p >= 0.3){
+    image(cheeseImage1,preyX,preyY,preyRadius*6,preyRadius*6);
+  }else if(p < 1 && p >= 0.6){
+    image(cheeseImage0,preyX,preyY,preyRadius*6,preyRadius*6);
+  }
+
 }
 
 // drawPlayer()
 //
 // Draw the player as an ellipse with alpha value based on health
 function drawPlayer() {
-  fill(playerFill,playerHealth);
-  ellipse(playerX,playerY,playerRadius*2);
+  image(mouseImage,playerX,playerY,playerRadius*6,playerRadius*6);
 }
 
 // showGameOver()
@@ -348,7 +380,7 @@ function showGameOver() {
   textSize(128);
   text("GAME OVER",width/2,height/2-64);
   let achievement = "YOU ATE " + preyEaten + " CHEESE\n";
-  achievement += "BEFORE YOU DIED"
+  achievement += "BEFORE YOU LEFT THIS WORLD"
   // Display it in the centre of the screen
   fill(255);
   textSize(32);
