@@ -14,7 +14,7 @@ them make the mouse sick and die faster.
 Includes: Physics-based movement, keyboard controls, health/stamina,
 random movement, screen wrap.
 
-Font used downloaded from https://www.wfonts.com/font/futura
+Font downloaded from https://www.wfonts.com/font/futura
 ******************************************************/
 
 // Player position, size, velocity
@@ -59,7 +59,7 @@ let RED = "#ef3f3f";
 // custom font variable
 let Futura_Heavy;
 
-// images variables
+// images
 let cheeseImage0;
 let cheeseImage1;
 let cheeseImage2;
@@ -72,6 +72,7 @@ function preload(){
   // font downloaded from https://www.wfonts.com/font/futura
   Futura_Heavy = loadFont("assets/futura heavy font.ttf");
 
+  // load images for the cheese and mouse
   cheeseImage0 = loadImage("assets/images/Cheese0.png");
   cheeseImage1 = loadImage("assets/images/Cheese1.png");
   cheeseImage2 = loadImage("assets/images/Cheese2.png");
