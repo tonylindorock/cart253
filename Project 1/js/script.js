@@ -23,10 +23,17 @@ let playerY;
 let playerRadius = 25;
 let playerVX = 0;
 let playerVY = 0;
-let playerMaxSpeed = 5;
+let playerMaxSpeed = 4;
+let speedUp = 2;
 // Player health
 let playerHealth;
-let playerMaxHealth = 255; // default 255
+let playerMaxHealth = 2550; // default 255
+
+// if the player can sprint
+let sprintable = true;
+// energy for sprinting
+let energy;
+let maxEnergy= 255;
 
 // possibility
 let p;
@@ -34,12 +41,21 @@ let p;
 let preyX;
 let preyY;
 let preyRadius = 25;
-let preyVX;
-let preyVY;
-let preyMaxSpeed = 4;
+let preySpeedUp = 1;
 // Prey health
 let preyHealth;
 let preyMaxHealth = 100;
+
+// for noise()
+let tx;
+let ty;
+
+// poisoned cheese pos & velocity
+let pCheeseX;
+let pCheeseY;
+let pCheeseVX;
+let pCheeseVY;
+let pCheeseSpeed = 5;
 
 // Amount of health obtained per frame of "eating" (overlapping) the prey
 let eatHealth = 10;
@@ -53,7 +69,7 @@ let gameStart = false;
 
 // BG color
 let ORANGE = "#efbb3f";
-let DARK_BLUE = "#264667";
+let BLUE = "#5bb9c4";
 let RED = "#ef3f3f";
 
 // custom font variable
@@ -86,6 +102,7 @@ function preload(){
 //
 // Sets up the basic elements of the game
 function setup() {
+  rectMode(CORNER);
   imageMode(CENTER);
   // choose font
   textFont(Futura_Heavy);
@@ -155,13 +172,23 @@ function check_MainMenu_Button(){
 
 // setupPrey()
 //
-// Initialises prey's position, velocity, and health
+// Initialises prey's position, and health
 function setupPrey() {
-  preyX = width/5;
-  preyY = height/2;
-  preyVX = -preyMaxSpeed;
-  preyVY = preyMaxSpeed;
+  tx = random(0,1000);
+  ty = random(0,1000);
+  preyX = random(0,width);
+  preyY = random(0,height);
+
   preyHealth = preyMaxHealth;
+
+  p = random(0,1);
+}
+
+function setup_PoisonedCheese(){
+  pCheeseX = random();
+  pCheeseY = random();
+  pCheeseVX = -pCheeseSpeed;
+  pCheeseVY = pCheeseSpeed;
 
   p = random(0,1);
 }
@@ -173,6 +200,7 @@ function setupPlayer() {
   playerX = 4*width/5;
   playerY = height/2;
   playerHealth = playerMaxHealth;
+  energy = maxEnergy;
 }
 
 // draw()
@@ -193,12 +221,14 @@ function draw() {
       movePrey();
 
       updateHealth();
+      restoreEnergy();
       checkEating();
 
       drawPrey();
       drawPlayer();
 
-      text(playerHealth,width/2,height/2+64);
+      text(playerHealth+"\n"+energy+"\n"+preyEaten,width/2,height/2+64);
+      showUI();
     }else{
       showGameOver();
       check_Restart_Button();
@@ -210,28 +240,53 @@ function draw() {
 
 // handleInput()
 //
-// Checks arrow keys and adjusts player velocity accordingly
+// Checks arrow keys & WASD and adjusts player velocity accordingly
 function handleInput() {
-  // Check for horizontal movement
-  if (keyIsDown(LEFT_ARROW)) {
-    playerVX = -playerMaxSpeed;
-  }
-  else if (keyIsDown(RIGHT_ARROW)) {
-    playerVX = playerMaxSpeed;
-  }
-  else {
-    playerVX = 0;
-  }
-
-  // Check for vertical movement
-  if (keyIsDown(UP_ARROW)) {
-    playerVY = -playerMaxSpeed;
-  }
-  else if (keyIsDown(DOWN_ARROW)) {
-    playerVY = playerMaxSpeed;
-  }
-  else {
-    playerVY = 0;
+  // if the shift key is not holding down, player moves at normal speed
+  if (!keyIsDown(SHIFT)){
+    // Check for horizontal movement
+    if (keyIsDown(LEFT_ARROW)||keyIsDown(65)) {
+      playerVX = -playerMaxSpeed;
+    }
+    else if (keyIsDown(RIGHT_ARROW)||keyIsDown(68)) {
+      playerVX = playerMaxSpeed;
+    }
+    else {
+      playerVX = 0;
+    }
+    // Check for vertical movement
+    if (keyIsDown(UP_ARROW)||keyIsDown(87)) {
+      playerVY = -playerMaxSpeed;
+    }
+    else if (keyIsDown(DOWN_ARROW)||keyIsDown(83)) {
+      playerVY = playerMaxSpeed;
+    }
+    else {
+      playerVY = 0;
+    }
+  // if the shift key is holding down, the player will move faster
+  }else{
+    if (energy > 0 && sprintable){
+      if (keyIsDown(LEFT_ARROW)) {
+        playerVX = -playerMaxSpeed*speedUp;
+      }
+      else if (keyIsDown(RIGHT_ARROW)) {
+        playerVX = playerMaxSpeed*speedUp;
+      }
+      else {
+        playerVX = 0;
+      }
+      if (keyIsDown(UP_ARROW)) {
+        playerVY = -playerMaxSpeed*speedUp;
+      }
+      else if (keyIsDown(DOWN_ARROW)) {
+        playerVY = playerMaxSpeed*speedUp;
+      }
+      else {
+        playerVY = 0;
+      }
+      energy -= 10;
+    }
   }
 }
 
@@ -280,6 +335,12 @@ function updateHealth() {
   }
 }
 
+// restore energy over time to max value
+function restoreEnergy(){
+  energy += 0.25;
+  energy = constrain(energy,0,maxEnergy);
+}
+
 // checkEating()
 //
 // Check if the player overlaps the prey and updates health of both
@@ -292,6 +353,11 @@ function checkEating() {
     playerHealth += eatHealth;
     // Constrain to the possible range
     playerHealth = constrain(playerHealth,0,playerMaxHealth);
+
+    // eating cheese will give energy
+    energy += eatHealth;
+    // constrain energy value
+    energy = constrain(energy,0,255);
     // Reduce the prey health
     preyHealth -= eatHealth;
     // Constrain to the possible range
@@ -299,11 +365,13 @@ function checkEating() {
 
     // Check if the prey died (health 0)
     if (preyHealth === 0) {
-      // change appearance
+      // change cheese
       p = random(0,1);
       // Move the "new" prey to a random position
-      preyX = random(0,width);
-      preyY = random(0,height);
+      tx = random(0,1000);
+      ty = random(0,1000);
+      preyX = noise(tx)*(width)*preySpeedUp;
+      preyY = noise(ty)*(height)*preySpeedUp;
       // Give it full health
       preyHealth = preyMaxHealth;
       // Track how many prey were eaten
@@ -316,22 +384,12 @@ function checkEating() {
 //
 // Moves the prey based on random velocity changes
 function movePrey() {
-  // Change the prey's velocity at random intervals
-  // random() will be < 0.05 5% of the time, so the prey
-  // will change direction on 5% of frames
-  if (random() < 0.05) {
-    // Set velocity based on random values to get a new direction
-    // and speed of movement
-    //
-    // Use map() to convert from the 0-1 range of the random() function
-    // to the appropriate range of velocities for the prey
-    preyVX = map(random(),0,1,-preyMaxSpeed,preyMaxSpeed);
-    preyVY = map(random(),0,1,-preyMaxSpeed,preyMaxSpeed);
-  }
-
-  // Update prey position based on velocity
-  preyX += preyVX;
-  preyY = preyX + preyVY;
+  // increment
+  tx += 0.01;
+  ty += 0.01;
+  // Update prey position based on noise and speed up
+  preyX = noise(tx)*width*preySpeedUp;
+  preyY = noise(ty)*height*preySpeedUp;
 
   // Screen wrapping
   if (preyX < 0) {
@@ -340,7 +398,6 @@ function movePrey() {
   else if (preyX > width) {
     preyX -= width;
   }
-
   if (preyY < 0) {
     preyY += height;
   }
@@ -360,14 +417,35 @@ function drawPrey() {
   }else if(p < 1 && p >= 0.6){
     image(cheeseImage0,preyX,preyY,preyRadius*6,preyRadius*6);
   }
-
 }
-
+function spawn_Poisoned_Cheese(){
+  p = random(0,1);
+}
 // drawPlayer()
 //
 // Draw the player as an ellipse with alpha value based on health
 function drawPlayer() {
   image(mouseImage,playerX,playerY,playerRadius*6,playerRadius*6);
+}
+
+// game UI
+function showUI(){
+  push();
+  // health bar
+  textAlign(LEFT,TOP);
+  fill(255);
+  textSize(32);
+  text("HEALTH",width/10-96,height/10-36);
+  fill(100);
+  rect(width/10+48,height/10-32,playerMaxHealth*1.5,32,0,16,16,0);
+  fill(RED);
+  rect(width/10+48,height/10-32,playerHealth*1.5,32,0,16,16,0);
+  // energy indicator
+
+  // poisoned indicator
+
+  // score
+  pop();
 }
 
 // showGameOver()
@@ -380,8 +458,8 @@ function showGameOver() {
   // Set up the text to display
   textSize(128);
   text("GAME OVER",width/2,height/2-64);
-  let achievement = "YOU ATE " + preyEaten + " CHEESE\n";
-  achievement += "BEFORE YOU LEFT THIS WORLD"
+  let achievement = `YOU ATE ${preyEaten} CHEESE\n`;
+  achievement += `BEFORE YOU LEFT THIS WORLD`
   // Display it in the centre of the screen
   fill(255);
   textSize(32);
@@ -419,6 +497,8 @@ function check_Restart_Button(){
 function restartGame(){
   // reset player health
   playerHealth = playerMaxHealth;
+  // reset score
+  preyEaten = 0;
   // reset their positions
   setupPrey();
   setupPlayer();
