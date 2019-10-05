@@ -23,6 +23,7 @@ let playerY;
 let playerRadius = 25;
 let playerVX = 0;
 let playerVY = 0;
+let playerSpeed;
 let playerMaxSpeed = 4;
 // speedup for sprint
 let speedUp = 2;
@@ -41,10 +42,13 @@ let goingLeft = true;
 
 // possibility
 let p;
+let p1;
+
 // Prey position, size, velocity
 let preyX;
 let preyY;
 let preyRadius = 25;
+// control the prey moving speed and behaviour
 let preySpeedUp = 1;
 // Prey health
 let preyHealth;
@@ -57,9 +61,9 @@ let ty;
 // poisoned cheese pos & velocity
 let pCheeseX;
 let pCheeseY;
-let pCheeseVX;
-let pCheeseVY;
 let pCheeseSpeed = 5;
+let spawnPoisonedCheese = true;
+let movePoisonedCheese = true;
 
 // Amount of health obtained per frame of "eating" (overlapping) the prey
 let eatHealth = 10;
@@ -102,7 +106,7 @@ function preload(){
   // font downloaded from https://www.wfonts.com/font/futura
   Futura_Heavy = loadFont("assets/futura heavy font.ttf");
 
-  // load images for the cheese and mouse
+  // load images for the cheese, mouse, and other UI elements
   cheeseImage0 = loadImage("assets/images/Cheese0.png");
   cheeseImage1 = loadImage("assets/images/Cheese1.png");
   cheeseImage2 = loadImage("assets/images/Cheese2.png");
@@ -181,6 +185,7 @@ function check_MainMenu_Button(){
       // We're using simple functions to separate code out
       setupPrey();
       setupPlayer();
+      setup_PosionedCheese();
     }
   // if the mouse is not hovering, the button goes back to normal
   }else{
@@ -204,13 +209,12 @@ function setupPrey() {
   p = random(0,1);
 }
 
-function setup_PoisonedCheese(){
-  pCheeseX = random();
-  pCheeseY = random();
-  pCheeseVX = -pCheeseSpeed;
-  pCheeseVY = pCheeseSpeed;
-
-  p = random(0,1);
+// set up the poisoned cheese
+// spawn it above the window and a random y position
+function setup_PosionedCheese(){
+  p1 = random(0,1);
+  pCheeseX = random(0,width);
+  pCheeseY = 0;
 }
 
 // setupPlayer()
@@ -220,6 +224,7 @@ function setupPlayer() {
   playerX = 4*width/5;
   playerY = height/2;
   playerHealth = playerMaxHealth;
+  playerSpeed = playerMaxSpeed;
 }
 
 // draw()
@@ -245,6 +250,9 @@ function draw() {
       drawPrey();
       drawPlayer();
 
+      spawn_PoisonedCheese();
+      move_PoisonedCheese();
+
       showUI();
     }else{
       showGameOver();
@@ -263,11 +271,11 @@ function handleInput() {
   if (!keyIsDown(SHIFT)){
     // Check for horizontal movement
     if (keyIsDown(LEFT_ARROW)||keyIsDown(65)) {
-      playerVX = -playerMaxSpeed*speedDown;
+      playerVX = -playerSpeed*speedDown;
       goingLeft = true;
     }
     else if (keyIsDown(RIGHT_ARROW)||keyIsDown(68)) {
-      playerVX = playerMaxSpeed*speedDown;
+      playerVX = playerSpeed*speedDown;
       goingLeft = false;
     }
     else {
@@ -275,10 +283,10 @@ function handleInput() {
     }
     // Check for vertical movement
     if (keyIsDown(UP_ARROW)||keyIsDown(87)) {
-      playerVY = -playerMaxSpeed*speedDown;
+      playerVY = -playerSpeed*speedDown;
     }
     else if (keyIsDown(DOWN_ARROW)||keyIsDown(83)) {
-      playerVY = playerMaxSpeed*speedDown;
+      playerVY = playerSpeed*speedDown;
     }
     else {
       playerVY = 0;
@@ -290,21 +298,21 @@ function handleInput() {
       // make health drop faster
       useHealth();
       if (keyIsDown(LEFT_ARROW)||keyIsDown(65)) {
-        playerVX = -playerMaxSpeed*speedUp*speedDown;
+        playerVX = -playerSpeed*speedUp*speedDown;
         goingLeft = true;
       }
       else if (keyIsDown(RIGHT_ARROW)||keyIsDown(68)) {
-        playerVX = playerMaxSpeed*speedUp*speedDown;
+        playerVX = playerSpeed*speedUp*speedDown;
         goingLeft = false;
       }
       else {
         playerVX = 0;
       }
       if (keyIsDown(UP_ARROW)||keyIsDown(87)) {
-        playerVY = -playerMaxSpeed*speedUp*speedDown;
+        playerVY = -playerSpeed*speedUp*speedDown;
       }
       else if (keyIsDown(DOWN_ARROW)||keyIsDown(83)) {
-        playerVY = playerMaxSpeed*speedUp*speedDown;
+        playerVY = playerSpeed*speedUp*speedDown;
       }
       else {
         playerVY = 0;
@@ -348,7 +356,11 @@ function movePlayer() {
 // Check if the player is dead
 function updateHealth() {
   // Reduce player health
-  playerHealth -= 0.5;
+  if (!poisoned){
+    playerHealth -= 0.5;
+  }else{
+    playerHealth -= 0.75;
+  }
   // Constrain the result to a sensible range
   playerHealth = constrain(playerHealth,0,playerMaxHealth);
   // Check if the player is dead (0 health)
@@ -370,12 +382,28 @@ function useHealth(){
 function checkEating() {
   // Get distance of player to prey
   let d = dist(playerX,playerY,preyX,preyY);
+  // get distance from player to poisoned cheese
+  let d2 = dist(playerX,playerY,pCheeseX,pCheeseY);
+
+  // if player eat the poisoned cheese
+  if (d2 < playerRadius + preyRadius){
+    // get poisoned, slower speed, and unable to sprint
+    poisoned = true;
+    sprintable = false;
+    speedDown = 0.65;
+    // lose health
+    playerHealth -= 2.5;
+    playerHealth = constrain(playerHealth,0,playerMaxHealth);
+  }
+
   // Check if it's an overlap
   if (d < playerRadius + preyRadius) {
     // Increase the player health
     playerHealth += eatHealth;
     // Constrain to the possible range
     playerHealth = constrain(playerHealth,0,playerMaxHealth);
+
+    speedDown = 1;
 
     // Reduce the prey health
     preyHealth -= eatHealth;
@@ -395,9 +423,16 @@ function checkEating() {
       preyHealth = preyMaxHealth;
       // Track how many prey were eaten
       preyEaten += 1;
+
+      // after eating one cheese, poison will be cured
+      poisoned = false;
+      sprintable = true;
+
       // for each 10 points earned, the prey moving speed will increase
+      // and more unpredictable
       if (preyEaten%10 === 0 && preyEaten>=10){
-        preySpeedUp+=0.05;
+        preySpeedUp+=0.07;
+        playerSpeed-=0.05;
       }
     }
   }
@@ -428,6 +463,26 @@ function movePrey() {
     preyY -= height;
   }
 }
+// spawn the poisoned cheese in 3 types
+function spawn_PoisonedCheese(){
+  if (p1 < 0.3){
+    image(cheesePImage2,pCheeseX,pCheeseY,preyRadius*6,preyRadius*6);
+  }else if(p1 < 0.6 && p1 >= 0.3){
+    image(cheesePImage1,pCheeseX,pCheeseY,preyRadius*6,preyRadius*6);
+  }else if(p1 < 1 && p1 >= 0.6){
+    image(cheesePImage0,pCheeseX,pCheeseY,preyRadius*6,preyRadius*6);
+  }
+}
+// move the poisoned cheese from top to bottom
+function move_PoisonedCheese(){
+  pCheeseY += pCheeseSpeed;
+
+  if (pCheeseY > windowHeight+150){
+    pCheeseX = random(0,windowWidth);
+    pCheeseY = -150;
+    p1 = random(0,1);
+  }
+}
 
 // drawPrey()
 //
@@ -440,9 +495,6 @@ function drawPrey() {
   }else if(p < 1 && p >= 0.6){
     image(cheeseImage0,preyX,preyY,preyRadius*6,preyRadius*6);
   }
-}
-function spawn_Poisoned_Cheese(){
-  p = random(0,1);
 }
 // drawPlayer()
 //
@@ -469,7 +521,7 @@ function showUI(){
   rect(width/10+48,height/10-32,playerHealth*1.5,32,0,16,16,0);
   // sprint indicator
   imageMode(CORNER);
-  if (keyIsDown(SHIFT)){
+  if (keyIsDown(SHIFT) && !poisoned){
     image(sprintIndicator,width/10-110,height/10,playerRadius*3,playerRadius*3);
   }else{
     image(notSprintIndicator,width/10-110,height/10,playerRadius*3,playerRadius*3);
@@ -549,6 +601,10 @@ function check_Restart_Button(){
 function restartGame(){
   // reset player health
   playerHealth = playerMaxHealth;
+  playerSpeed = playerMaxSpeed;
+  // reset poison & sprint stat
+  poisoned = false;
+  sprintable = true;
   // reset speed down
   speedDown = 1;
   // reset score
