@@ -24,13 +24,20 @@ let playerRadius = 25;
 let playerVX = 0;
 let playerVY = 0;
 let playerMaxSpeed = 4;
+// speedup for sprint
 let speedUp = 2;
+// speeddown for eating too much or getting poisoned
+let speedDown = 1;
 // Player health
 let playerHealth;
 let playerMaxHealth = 255; // default 255
 
 // if the player can sprint
 let sprintable = true;
+let poisoned = false;
+
+// player moving direction for flipping the player image
+let goingLeft = true;
 
 // possibility
 let p;
@@ -58,6 +65,10 @@ let pCheeseSpeed = 5;
 let eatHealth = 10;
 // Number of prey eaten during the game (the "score")
 let preyEaten = 0;
+// the best score
+let bestScore = 0;
+// is the best score is beaten
+let scoreBeaten = false;
 
 // Track whether the game is over
 let gameOver = false;
@@ -66,7 +77,7 @@ let gameStart = false;
 
 // BG color
 let ORANGE = "#efbb3f";
-let BLUE = "#5bb9c4";
+let DARK_BLUE = "#2b2f4f";
 let RED = "#ef3f3f";
 
 // custom font variable
@@ -79,7 +90,13 @@ let cheeseImage2;
 let cheesePImage0;
 let cheesePImage1;
 let cheesePImage2;
+
 let mouseImage;
+let mouseImageFlipped;
+
+let sprintIndicator;
+let notSprintIndicator;
+let poisonIndicator;
 
 function preload(){
   // font downloaded from https://www.wfonts.com/font/futura
@@ -93,7 +110,12 @@ function preload(){
   cheesePImage1 = loadImage("assets/images/CheeseP1.png");
   cheesePImage2 = loadImage("assets/images/CheeseP2.png");
 
-  mouseImage = loadImage("assets/images/Mouse.png")
+  mouseImage = loadImage("assets/images/Mouse.png");
+  mouseImageFlipped = loadImage("assets/images/Mouse (flipped).png");
+
+  sprintIndicator = loadImage("assets/images/Indicator_sprint.png");
+  notSprintIndicator = loadImage("assets/images/Indicator_notSpring.png");
+  poisonIndicator = loadImage("assets/images/Indicator_poisoned.png");
 }
 // setup()
 //
@@ -136,7 +158,8 @@ function setupMainMenu(){
   // rule
   textSize(20);
   fill(0);
-  let rule = "You have to 'chese' & eat the running cheese to survive!\nAnd avoid the poisoned ones because humans are evil!\n\nControls: WASD or ARROWKEYS"
+  let rule = "You have to 'chese' & eat the running cheese to survive!\nAnd avoid the poisoned ones because humans are evil!"
+  +"\n\nControls: WASD or ARROWKEYS to move\nSHIFT to sprint"
   text(rule,width/2,height/2+172);
 }
 
@@ -222,7 +245,6 @@ function draw() {
       drawPrey();
       drawPlayer();
 
-      text(playerHealth+"\n"+preyEaten,width/2,height/2+64);
       showUI();
     }else{
       showGameOver();
@@ -241,20 +263,22 @@ function handleInput() {
   if (!keyIsDown(SHIFT)){
     // Check for horizontal movement
     if (keyIsDown(LEFT_ARROW)||keyIsDown(65)) {
-      playerVX = -playerMaxSpeed;
+      playerVX = -playerMaxSpeed*speedDown;
+      goingLeft = true;
     }
     else if (keyIsDown(RIGHT_ARROW)||keyIsDown(68)) {
-      playerVX = playerMaxSpeed;
+      playerVX = playerMaxSpeed*speedDown;
+      goingLeft = false;
     }
     else {
       playerVX = 0;
     }
     // Check for vertical movement
     if (keyIsDown(UP_ARROW)||keyIsDown(87)) {
-      playerVY = -playerMaxSpeed;
+      playerVY = -playerMaxSpeed*speedDown;
     }
     else if (keyIsDown(DOWN_ARROW)||keyIsDown(83)) {
-      playerVY = playerMaxSpeed;
+      playerVY = playerMaxSpeed*speedDown;
     }
     else {
       playerVY = 0;
@@ -265,20 +289,22 @@ function handleInput() {
     if (sprintable){
       // make health drop faster
       useHealth();
-      if (keyIsDown(LEFT_ARROW)) {
-        playerVX = -playerMaxSpeed*speedUp;
+      if (keyIsDown(LEFT_ARROW)||keyIsDown(65)) {
+        playerVX = -playerMaxSpeed*speedUp*speedDown;
+        goingLeft = true;
       }
-      else if (keyIsDown(RIGHT_ARROW)) {
-        playerVX = playerMaxSpeed*speedUp;
+      else if (keyIsDown(RIGHT_ARROW)||keyIsDown(68)) {
+        playerVX = playerMaxSpeed*speedUp*speedDown;
+        goingLeft = false;
       }
       else {
         playerVX = 0;
       }
-      if (keyIsDown(UP_ARROW)) {
-        playerVY = -playerMaxSpeed*speedUp;
+      if (keyIsDown(UP_ARROW)||keyIsDown(87)) {
+        playerVY = -playerMaxSpeed*speedUp*speedDown;
       }
-      else if (keyIsDown(DOWN_ARROW)) {
-        playerVY = playerMaxSpeed*speedUp;
+      else if (keyIsDown(DOWN_ARROW)||keyIsDown(83)) {
+        playerVY = playerMaxSpeed*speedUp*speedDown;
       }
       else {
         playerVY = 0;
@@ -332,7 +358,7 @@ function updateHealth() {
   }
 }
 
-// Sprint will cost health function
+// Sprint will cost health
 function useHealth(){
   playerHealth -= 1;
   playerHealth = constrain(playerHealth,0,playerMaxHealth);
@@ -369,6 +395,10 @@ function checkEating() {
       preyHealth = preyMaxHealth;
       // Track how many prey were eaten
       preyEaten += 1;
+      // for each 10 points earned, the prey moving speed will increase
+      if (preyEaten%10 === 0 && preyEaten>=10){
+        preySpeedUp+=0.05;
+      }
     }
   }
 }
@@ -418,7 +448,11 @@ function spawn_Poisoned_Cheese(){
 //
 // Draw the player as an ellipse with alpha value based on health
 function drawPlayer() {
-  image(mouseImage,playerX,playerY,playerRadius*6,playerRadius*6);
+  if (goingLeft){
+    image(mouseImage,playerX,playerY,playerRadius*6,playerRadius*6);
+  }else{
+    image(mouseImageFlipped,playerX,playerY,playerRadius*6,playerRadius*6);
+  }
 }
 
 // game UI
@@ -433,11 +467,20 @@ function showUI(){
   rect(width/10+48,height/10-32,playerMaxHealth*1.5,32,0,16,16,0);
   fill(RED);
   rect(width/10+48,height/10-32,playerHealth*1.5,32,0,16,16,0);
-  // energy indicator
-
+  // sprint indicator
+  imageMode(CORNER);
+  if (keyIsDown(SHIFT)){
+    image(sprintIndicator,width/10-110,height/10,playerRadius*3,playerRadius*3);
+  }else{
+    image(notSprintIndicator,width/10-110,height/10,playerRadius*3,playerRadius*3);
+  }
   // poisoned indicator
-
+  if(poisoned){
+    image(poisonIndicator,width/10-50,height/10,playerRadius*3,playerRadius*3)
+  }
   // score
+  fill(DARK_BLUE);
+  text(`SCORE\n${preyEaten}`,width-136,height/10-48);
   pop();
 }
 
@@ -445,8 +488,20 @@ function showUI(){
 //
 // Display text about the game being over!
 function showGameOver() {
+  push();
   // Set up the font
   textAlign(CENTER,CENTER);
+  fill(DARK_BLUE);
+  textSize(24);
+  if (preyEaten > bestScore){
+    bestScore = preyEaten;
+    scoreBeaten = true;
+  }
+  if (scoreBeaten){
+    text("You beat your previous best score!",width/2,height/2-156);
+  }else{
+    text("You can do better! Believe in yourself.",width/2,height/2-156);
+  }
   fill(RED);
   // Set up the text to display
   textSize(128);
@@ -459,6 +514,10 @@ function showGameOver() {
   text(achievement,width/2,height/2+64);
   textSize(64);
   text("RESTART",width/2,height/2+164);
+  textSize(32);
+  fill(DARK_BLUE)
+  text(`YOUR BEST - ${bestScore}`,width/2,height/2-200);
+  pop();
 }
 
 // check if the restart button is hovered
@@ -490,8 +549,11 @@ function check_Restart_Button(){
 function restartGame(){
   // reset player health
   playerHealth = playerMaxHealth;
+  // reset speed down
+  speedDown = 1;
   // reset score
   preyEaten = 0;
+  scoreBeaten = false;
   // reset their positions
   setupPrey();
   setupPlayer();
