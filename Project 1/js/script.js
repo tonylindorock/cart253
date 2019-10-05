@@ -27,13 +27,10 @@ let playerMaxSpeed = 4;
 let speedUp = 2;
 // Player health
 let playerHealth;
-let playerMaxHealth = 2550; // default 255
+let playerMaxHealth = 255; // default 255
 
 // if the player can sprint
 let sprintable = true;
-// energy for sprinting
-let energy;
-let maxEnergy= 255;
 
 // possibility
 let p;
@@ -200,7 +197,6 @@ function setupPlayer() {
   playerX = 4*width/5;
   playerY = height/2;
   playerHealth = playerMaxHealth;
-  energy = maxEnergy;
 }
 
 // draw()
@@ -221,13 +217,12 @@ function draw() {
       movePrey();
 
       updateHealth();
-      restoreEnergy();
       checkEating();
 
       drawPrey();
       drawPlayer();
 
-      text(playerHealth+"\n"+energy+"\n"+preyEaten,width/2,height/2+64);
+      text(playerHealth+"\n"+preyEaten,width/2,height/2+64);
       showUI();
     }else{
       showGameOver();
@@ -266,7 +261,10 @@ function handleInput() {
     }
   // if the shift key is holding down, the player will move faster
   }else{
-    if (energy > 0 && sprintable){
+    // if the player can sprint
+    if (sprintable){
+      // make health drop faster
+      useHealth();
       if (keyIsDown(LEFT_ARROW)) {
         playerVX = -playerMaxSpeed*speedUp;
       }
@@ -285,7 +283,6 @@ function handleInput() {
       else {
         playerVY = 0;
       }
-      energy -= 10;
     }
   }
 }
@@ -335,10 +332,10 @@ function updateHealth() {
   }
 }
 
-// restore energy over time to max value
-function restoreEnergy(){
-  energy += 0.25;
-  energy = constrain(energy,0,maxEnergy);
+// Sprint will cost health function
+function useHealth(){
+  playerHealth -= 1;
+  playerHealth = constrain(playerHealth,0,playerMaxHealth);
 }
 
 // checkEating()
@@ -354,10 +351,6 @@ function checkEating() {
     // Constrain to the possible range
     playerHealth = constrain(playerHealth,0,playerMaxHealth);
 
-    // eating cheese will give energy
-    energy += eatHealth;
-    // constrain energy value
-    energy = constrain(energy,0,255);
     // Reduce the prey health
     preyHealth -= eatHealth;
     // Constrain to the possible range
