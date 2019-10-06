@@ -214,7 +214,7 @@ function setupPrey() {
 function setup_PosionedCheese(){
   p1 = random(0,1);
   pCheeseX = random(0,width);
-  pCheeseY = 0;
+  pCheeseY = -150;
 }
 
 // setupPlayer()
@@ -387,12 +387,14 @@ function checkEating() {
 
   // if player eat the poisoned cheese
   if (d2 < playerRadius + preyRadius){
+    // reset poisoned cheese
+    setup_PosionedCheese();
     // get poisoned, slower speed, and unable to sprint
     poisoned = true;
     sprintable = false;
     speedDown = 0.65;
     // lose health
-    playerHealth -= 2.5;
+    playerHealth -= 5;
     playerHealth = constrain(playerHealth,0,playerMaxHealth);
   }
 
@@ -402,9 +404,7 @@ function checkEating() {
     playerHealth += eatHealth;
     // Constrain to the possible range
     playerHealth = constrain(playerHealth,0,playerMaxHealth);
-
-    speedDown = 1;
-
+  
     // Reduce the prey health
     preyHealth -= eatHealth;
     // Constrain to the possible range
@@ -427,12 +427,15 @@ function checkEating() {
       // after eating one cheese, poison will be cured
       poisoned = false;
       sprintable = true;
+      speedDown = 1;
 
       // for each 10 points earned, the prey moving speed will increase
       // and more unpredictable
+      // player will have slower speed and bigger body
       if (preyEaten%10 === 0 && preyEaten>=10){
         preySpeedUp+=0.07;
         playerSpeed-=0.05;
+        playerRadius+=1;
       }
     }
   }
@@ -478,9 +481,7 @@ function move_PoisonedCheese(){
   pCheeseY += pCheeseSpeed;
 
   if (pCheeseY > windowHeight+150){
-    pCheeseX = random(0,windowWidth);
-    pCheeseY = -150;
-    p1 = random(0,1);
+    setup_PosionedCheese();
   }
 }
 
@@ -515,20 +516,28 @@ function showUI(){
   fill(255);
   textSize(32);
   text("HEALTH",width/10-96,height/10-36);
+  // BG of health bar
   fill(100);
   rect(width/10+48,height/10-32,playerMaxHealth*1.5,32,0,16,16,0);
+  // content of health bar
   fill(RED);
   rect(width/10+48,height/10-32,playerHealth*1.5,32,0,16,16,0);
+  // frame of health bar
+  stroke(255);
+  strokeWeight(4);
+  fill(100,0);
+  rect(width/10+48,height/10-32,playerMaxHealth*1.5,32,0,16,16,0);
+  noStroke();
   // sprint indicator
   imageMode(CORNER);
   if (keyIsDown(SHIFT) && !poisoned){
-    image(sprintIndicator,width/10-110,height/10,playerRadius*3,playerRadius*3);
+    image(sprintIndicator,width/10-110,height/10,playerRadius*4,playerRadius*4);
   }else{
-    image(notSprintIndicator,width/10-110,height/10,playerRadius*3,playerRadius*3);
+    image(notSprintIndicator,width/10-110,height/10,playerRadius*4,playerRadius*4);
   }
   // poisoned indicator
   if(poisoned){
-    image(poisonIndicator,width/10-50,height/10,playerRadius*3,playerRadius*3)
+    image(poisonIndicator,width/10-30,height/10,playerRadius*4,playerRadius*4)
   }
   // score
   fill(DARK_BLUE);
@@ -544,6 +553,8 @@ function showGameOver() {
   // Set up the font
   textAlign(CENTER,CENTER);
   fill(DARK_BLUE);
+  textSize(32);
+  text(`YOUR BEST: ${bestScore}`,width/2,height/2-200);
   textSize(24);
   if (preyEaten > bestScore){
     bestScore = preyEaten;
@@ -566,9 +577,6 @@ function showGameOver() {
   text(achievement,width/2,height/2+64);
   textSize(64);
   text("RESTART",width/2,height/2+164);
-  textSize(32);
-  fill(DARK_BLUE)
-  text(`YOUR BEST - ${bestScore}`,width/2,height/2-200);
   pop();
 }
 
@@ -599,9 +607,14 @@ function check_Restart_Button(){
 // restart function
 // reset the game
 function restartGame(){
-  // reset player health
+  // reset player stats
   playerHealth = playerMaxHealth;
   playerSpeed = playerMaxSpeed;
+  playerRadius = 25;
+
+  // reset prey stat
+  preySpeedUp = 1;
+
   // reset poison & sprint stat
   poisoned = false;
   sprintable = true;
@@ -613,4 +626,5 @@ function restartGame(){
   // reset their positions
   setupPrey();
   setupPlayer();
+  setup_PosionedCheese();
 }
