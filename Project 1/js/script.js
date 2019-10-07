@@ -205,13 +205,14 @@ function setupPrey() {
   preyY = random(0,height);
 
   preyHealth = preyMaxHealth;
-
+  // possibility
   p = random(0,1);
 }
 
 // set up the poisoned cheese
 // spawn it above the window and a random y position
 function setup_PosionedCheese(){
+  // possibility
   p1 = random(0,1);
   pCheeseX = random(0,width);
   pCheeseY = -150;
@@ -229,6 +230,7 @@ function setupPlayer() {
 
 // draw()
 //
+// Main menu waiting for player to start the game
 // While the game is active, checks input
 // updates positions of prey and player,
 // checks health (dying), checks eating (overlaps)
@@ -272,10 +274,12 @@ function handleInput() {
     // Check for horizontal movement
     if (keyIsDown(LEFT_ARROW)||keyIsDown(65)) {
       playerVX = -playerSpeed*speedDown;
+      // determining which direction the player is going to change the direction of the player image
       goingLeft = true;
     }
     else if (keyIsDown(RIGHT_ARROW)||keyIsDown(68)) {
       playerVX = playerSpeed*speedDown;
+      // change player image direction
       goingLeft = false;
     }
     else {
@@ -293,7 +297,7 @@ function handleInput() {
     }
   // if the shift key is holding down, the player will move faster
   }else{
-    // if the player can sprint
+    // if the player can sprint when not poisoned
     if (sprintable){
       // make health drop faster
       useHealth();
@@ -393,7 +397,7 @@ function checkEating() {
     poisoned = true;
     sprintable = false;
     speedDown = 0.65;
-    // lose health
+    // lose some health for eating the poisoned cheese
     playerHealth -= 5;
     playerHealth = constrain(playerHealth,0,playerMaxHealth);
   }
@@ -404,7 +408,7 @@ function checkEating() {
     playerHealth += eatHealth;
     // Constrain to the possible range
     playerHealth = constrain(playerHealth,0,playerMaxHealth);
-  
+
     // Reduce the prey health
     preyHealth -= eatHealth;
     // Constrain to the possible range
@@ -425,6 +429,7 @@ function checkEating() {
       preyEaten += 1;
 
       // after eating one cheese, poison will be cured
+      // be able to sprint again and move normally
       poisoned = false;
       sprintable = true;
       speedDown = 1;
@@ -466,7 +471,7 @@ function movePrey() {
     preyY -= height;
   }
 }
-// spawn the poisoned cheese in 3 types
+// spawn the poisoned cheese in 3 types randomly
 function spawn_PoisonedCheese(){
   if (p1 < 0.3){
     image(cheesePImage2,pCheeseX,pCheeseY,preyRadius*6,preyRadius*6);
@@ -476,11 +481,11 @@ function spawn_PoisonedCheese(){
     image(cheesePImage0,pCheeseX,pCheeseY,preyRadius*6,preyRadius*6);
   }
 }
-// move the poisoned cheese from top to bottom
+// move the poisoned cheese from the top to the bottom of the screen
 function move_PoisonedCheese(){
   pCheeseY += pCheeseSpeed;
-
   if (pCheeseY > windowHeight+150){
+    // if the cheese moves out of the screen, reset the poisoned cheese
     setup_PosionedCheese();
   }
 }
@@ -508,7 +513,7 @@ function drawPlayer() {
   }
 }
 
-// game UI
+// draw the game UI when the gameplay
 function showUI(){
   push();
   // health bar
@@ -529,13 +534,14 @@ function showUI(){
   rect(width/10+48,height/10-32,playerMaxHealth*1.5,32,0,16,16,0);
   noStroke();
   // sprint indicator
+  // if SHIFT is pressed down the icon will be lighted up, otherwise it will be dimmed
   imageMode(CORNER);
   if (keyIsDown(SHIFT) && !poisoned){
     image(sprintIndicator,width/10-110,height/10,playerRadius*4,playerRadius*4);
   }else{
     image(notSprintIndicator,width/10-110,height/10,playerRadius*4,playerRadius*4);
   }
-  // poisoned indicator
+  // poisoned indicator will appear when the player is poisoned
   if(poisoned){
     image(poisonIndicator,width/10-30,height/10,playerRadius*4,playerRadius*4)
   }
@@ -556,17 +562,19 @@ function showGameOver() {
   textSize(32);
   text(`YOUR BEST: ${bestScore}`,width/2,height/2-200);
   textSize(24);
+  // record the best score and whether the player beats their best scores
   if (preyEaten > bestScore){
     bestScore = preyEaten;
     scoreBeaten = true;
   }
+  // having 2 different msgs whether the player beats their best scores
   if (scoreBeaten){
     text("You beat your previous best score!",width/2,height/2-156);
   }else{
     text("You can do better! Believe in yourself.",width/2,height/2-156);
   }
   fill(RED);
-  // Set up the text to display
+  // Set up the text
   textSize(128);
   text("GAME OVER",width/2,height/2-64);
   let achievement = `YOU ATE ${preyEaten} CHEESE\n`;
@@ -605,7 +613,7 @@ function check_Restart_Button(){
 }
 
 // restart function
-// reset the game
+// reset the game and reset all the stats
 function restartGame(){
   // reset player stats
   playerHealth = playerMaxHealth;
