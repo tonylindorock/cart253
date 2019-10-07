@@ -24,7 +24,7 @@ let playerRadius = 25;
 let playerVX = 0;
 let playerVY = 0;
 let playerSpeed;
-let playerMaxSpeed = 4;
+let playerMaxSpeed = 4; // player initial speed
 // speedup for sprint
 let speedUp = 2;
 // speeddown for eating too much or getting poisoned
@@ -102,6 +102,16 @@ let sprintIndicator;
 let notSprintIndicator;
 let poisonIndicator;
 
+// sounds
+let bite_Sound;
+let swallow_Sound;
+let newRecord_Sound;
+let gameOver_Sound;
+let poisoned_Sound;
+let bg_Music;
+
+let playOnce = true;
+
 function preload(){
   // font downloaded from https://www.wfonts.com/font/futura
   Futura_Heavy = loadFont("assets/futura heavy font.ttf");
@@ -120,6 +130,15 @@ function preload(){
   sprintIndicator = loadImage("assets/images/Indicator_sprint.png");
   notSprintIndicator = loadImage("assets/images/Indicator_notSpring.png");
   poisonIndicator = loadImage("assets/images/Indicator_poisoned.png");
+
+  // load sounds
+  bite_Sound = loadSound("assets/sounds/Bite.ogg");
+  swallow_Sound = loadSound("assets/sounds/Swallow.ogg");
+  newRecord_Sound = loadSound("assets/sounds/New Record.ogg");
+  gameOver_Sound = loadSound("assets/sounds/Game Over.ogg");
+  poisoned_Sound = loadSound("assets/sounds/Poisoned.ogg");
+  bg_Music = loadSound("assets/sounds/Chesing.ogg");
+
 }
 // setup()
 //
@@ -182,6 +201,9 @@ function check_MainMenu_Button(){
     // when the mouse is pressed on the button, the game will start
     if (mouseIsPressed){
       gameStart = true;
+
+      bg_Music.setVolume(0.5);
+      bg_Music.loop();
       // We're using simple functions to separate code out
       setupPrey();
       setupPlayer();
@@ -391,12 +413,22 @@ function checkEating() {
 
   // if player eat the poisoned cheese
   if (d2 < playerRadius + preyRadius){
+    if (!swallow_Sound.isPlaying()){
+      swallow_Sound.play();
+      swallow_Sound.setVolume(1);
+    }
     // reset poisoned cheese
     setup_PosionedCheese();
+
+    if (!poisoned_Sound.isPlaying() && !poisoned){
+      poisoned_Sound.play();
+      poisoned_Sound.setVolume(1);
+    }
     // get poisoned, slower speed, and unable to sprint
     poisoned = true;
     sprintable = false;
     speedDown = 0.65;
+
     // lose some health for eating the poisoned cheese
     playerHealth -= 5;
     playerHealth = constrain(playerHealth,0,playerMaxHealth);
@@ -404,6 +436,10 @@ function checkEating() {
 
   // Check if it's an overlap
   if (d < playerRadius + preyRadius) {
+    if (!bite_Sound.isPlaying()){
+      bite_Sound.play();
+      bite_Sound.setVolume(0.25);
+    }
     // Increase the player health
     playerHealth += eatHealth;
     // Constrain to the possible range
@@ -428,6 +464,11 @@ function checkEating() {
       // Track how many prey were eaten
       preyEaten += 1;
 
+      if (!swallow_Sound.isPlaying()){
+        swallow_Sound.play();
+        swallow_Sound.setVolume(1);
+      }
+
       // after eating one cheese, poison will be cured
       // be able to sprint again and move normally
       poisoned = false;
@@ -441,6 +482,7 @@ function checkEating() {
         preySpeedUp+=0.07;
         playerSpeed-=0.05;
         playerRadius+=1;
+        playerHealth += 25;
       }
     }
   }
@@ -555,6 +597,7 @@ function showUI(){
 //
 // Display text about the game being over!
 function showGameOver() {
+  bg_Music.stop();
   push();
   // Set up the font
   textAlign(CENTER,CENTER);
@@ -572,6 +615,15 @@ function showGameOver() {
     text("You beat your previous best score!",width/2,height/2-156);
   }else{
     text("You can do better! Believe in yourself.",width/2,height/2-156);
+  }
+  if(scoreBeaten && playOnce){
+    newRecord_Sound.play();
+    newRecord_Sound.setVolume(0.75);
+    playOnce = false;
+  }else if (playOnce){
+    gameOver_Sound.play();
+    gameOver_Sound.setVolume(0.75);
+    playOnce = false;
   }
   fill(RED);
   // Set up the text
@@ -615,6 +667,10 @@ function check_Restart_Button(){
 // restart function
 // reset the game and reset all the stats
 function restartGame(){
+  playOnce = true;
+
+  bg_Music.loop();
+
   // reset player stats
   playerHealth = playerMaxHealth;
   playerSpeed = playerMaxSpeed;
