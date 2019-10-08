@@ -293,6 +293,7 @@ function check_MainMenuButton() {
 
       // set the Backgroud music volume and loop it
       bg_Music.setVolume(0.5);
+      bg_Music.playMode('restart')
       bg_Music.loop();
       // We're using simple functions to separate code out
       setupPrey();
@@ -625,7 +626,7 @@ function showUI() {
 // Display text about the game being over!
 function showGameOver() {
   // stop the background music
-  bg_Music.stop();
+  bg_Music.setVolume(0);
   push();
   // Set up the font
   textAlign(CENTER, CENTER);
@@ -704,6 +705,7 @@ function restartGame() {
   playOnce = true;
 
   // loop the background music after restarting the game
+  bg_Music.setVolume(0.5);
   bg_Music.loop();
 
   // reset player stats
