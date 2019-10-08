@@ -123,6 +123,7 @@ let playOnce = true;
 //
 // load all the images, sounds, and the font
 function preload() {
+  soundFormats('mp3','ogg');
   // font downloaded from https://www.wfonts.com/font/futura
   Futura_Heavy = loadFont("assets/futura heavy font.ttf");
 
