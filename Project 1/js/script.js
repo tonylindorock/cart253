@@ -123,7 +123,7 @@ let playOnce = true;
 //
 // load all the images, sounds, and the font
 function preload() {
-  // soundFormats('ogg','wav');
+  soundFormats('ogg','m4a');
   // font downloaded from https://www.wfonts.com/font/futura
   Futura_Heavy = loadFont("assets/futura heavy font.ttf");
 
@@ -143,12 +143,12 @@ function preload() {
   poisonIndicator = loadImage("assets/images/Indicator_poisoned.png");
 
   // load sounds
-  bite_Sound = loadSound("assets/sounds/Bite.wav");
-  swallow_Sound = loadSound("assets/sounds/Swallow.wav");
-  newRecord_Sound = loadSound("assets/sounds/New Record.wav");
-  gameOver_Sound = loadSound("assets/sounds/Game Over.wav");
-  poisoned_Sound = loadSound("assets/sounds/Poisoned.wav");
-  bg_Music = loadSound("assets/sounds/Chesing.wav");
+  bite_Sound = loadSound("assets/sounds/Bite.m4a");
+  swallow_Sound = loadSound("assets/sounds/Swallow.m4a");
+  newRecord_Sound = loadSound("assets/sounds/New Record.m4a");
+  gameOver_Sound = loadSound("assets/sounds/Game Over.m4a");
+  poisoned_Sound = loadSound("assets/sounds/Poisoned.m4a");
+  bg_Music = loadSound("assets/sounds/Chesing.m4a");
 }
 // setup()
 //
