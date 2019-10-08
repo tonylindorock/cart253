@@ -5,13 +5,16 @@
 Game - The Cheser
 Yichen Wang
 
-A "simple" game of mouse and cheese. The player is a mouse and can move with keys,
-if they overlap the (randomly moving) cheese they "eat it" by sucking out its life
-and adding it to their own. The player "dies" slowly over time so they have to keep
-eating to stay alive. The player also need to avoid eating poisoned cheese because
-them make the mouse sick and die faster. By eating the REAL cheese, poison can be cured.
+A "simple" game of mouse and cheese with original music and sound effects.
+The player is a mouse and can move with keys, if they overlap the (randomly moving)
+cheese they "eat it" by sucking out its life and adding it to their own.
+The player "dies" slowly over time so they have to keep eating to stay alive.
+The player also need to avoid eating poisoned cheese because they make the mouse
+sick and die faster. By eating the REAL cheese, poison can be cured.
 Player will get bigger, slower, and slightly stronger, but the running cheese will move
 even faster with being more unpredictable.
+
+"One bite of the cheese gives you strength, but one whole cheese gives you cure."
 
 Includes: Physics-based movement, keyboard controls, health/stamina,
 random movement, screen wrap.
@@ -33,7 +36,7 @@ let speedUp = 2;
 let speedDown = 1;
 // Player health
 let playerHealth;
-let playerMaxHealth = 255; // default 255
+let playerInitialHealth = 255; // default 255
 
 // if the player can sprint
 let sprintable = true;
@@ -42,8 +45,9 @@ let poisoned = false;
 // player moving direction for flipping the player image
 let goingLeft = true;
 
-// possibility
+// possibility for randomly deciding which cheese out of 3 to be drawn
 let p;
+// possibility for randomly deciding which poisoned cheese out of 3 to be drawn
 let p1;
 
 // Prey position, size, velocity
@@ -115,6 +119,9 @@ let bg_Music;
 // to let the sound play once
 let playOnce = true;
 
+// preload()
+//
+// load all the images, sounds, and the font
 function preload() {
   // font downloaded from https://www.wfonts.com/font/futura
   Futura_Heavy = loadFont("assets/futura heavy font.ttf");
@@ -159,9 +166,12 @@ function setup() {
   noStroke();
 }
 
+// setupMainMenu()
+//
 // everything for setting up the main menu
 // including the title, start button, and the rule
 function setupMainMenu() {
+  // decorations for the menu
   image(cheeseImage0, width / 2 - 424, height / 2 - 164, 150, 150);
   image(cheeseImage1, width / 2 - 296, height / 2 - 164, 150, 150);
   image(cheeseImage2, width / 2 - 168, height / 2 - 164, 150, 150);
@@ -183,43 +193,11 @@ function setupMainMenu() {
   // rule
   textSize(20);
   fill(0);
-  let rule = "You have to 'chese' & eat the running cheese to survive!"+
-  "\nAnd avoid the poisoned ones because humans are evil!" +
-  "\nEat the REAL cheese to cure the poison before it's too late!"+
+  let rule = "You have to 'chese' & eat the running cheese to survive!" +
+    "\nAnd avoid the poisoned ones because humans are evil!" +
+    "\nEat the REAL cheese to cure the poison before it's too late!" +
     "\n\nControls: WASD or ARROWKEYS to move\nSHIFT to sprint"
   text(rule, width / 2, height / 2 + 196);
-}
-
-// handle the start button behaviour
-function check_MainMenu_Button() {
-  // determine if the mouse is hovering the button
-  let startIsHovering = (dist(mouseX, mouseY, width / 2 - 32, height / 2 + 64) < 50 ||
-    dist(mouseX, mouseY, width / 2 + 32, height / 2 + 64) < 50 ||
-    dist(mouseX, mouseY, width / 2, height / 2 + 64) < 25)
-
-  // if the mouse is hovering, the text will change color
-  if (startIsHovering && !gameStart) {
-    textSize(64);
-    fill(0);
-    text("START", width / 2, height / 2 + 64);
-    // when the mouse is pressed on the button, the game will start
-    if (mouseIsPressed) {
-      gameStart = true;
-
-      // set the Backgroud music volume and loop it
-      bg_Music.setVolume(0.5);
-      bg_Music.loop();
-      // We're using simple functions to separate code out
-      setupPrey();
-      setupPlayer();
-      setup_PosionedCheese();
-    }
-    // if the mouse is not hovering, the button goes back to normal
-  } else {
-    fill(255);
-    textSize(64);
-    text("START", width / 2, height / 2 + 64);
-  }
 }
 
 // setupPrey()
@@ -232,14 +210,16 @@ function setupPrey() {
   preyY = random(0, height);
 
   preyHealth = preyMaxHealth;
-  // possibility
+  // decides which cheese out of 3
   p = random(0, 1);
 }
 
+// setup_PosionedCheese()
+//
 // set up the poisoned cheese
 // spawn it above the window and a random y position
 function setup_PosionedCheese() {
-  // possibility
+  // possibility which poisoned cheese out of 3
   p1 = random(0, 1);
   pCheeseX = random(0, width);
   pCheeseY = -150;
@@ -251,7 +231,7 @@ function setup_PosionedCheese() {
 function setupPlayer() {
   playerX = 4 * width / 5;
   playerY = height / 2;
-  playerHealth = playerMaxHealth;
+  playerHealth = playerInitialHealth;
   playerSpeed = playerMaxSpeed;
 }
 
@@ -285,10 +265,44 @@ function draw() {
       showUI();
     } else {
       showGameOver();
-      check_Restart_Button();
+      check_RestartButton();
     }
   } else {
-    check_MainMenu_Button();
+    check_MainMenuButton();
+  }
+}
+
+// check_MainMenuButton()
+//
+// handle the start button behaviour
+function check_MainMenuButton() {
+  // determine if the mouse is hovering the button
+  let startIsHovering = (dist(mouseX, mouseY, width / 2 - 32, height / 2 + 64) < 50 ||
+    dist(mouseX, mouseY, width / 2 + 32, height / 2 + 64) < 50 ||
+    dist(mouseX, mouseY, width / 2, height / 2 + 64) < 25)
+
+  // if the mouse is hovering, the text will change color
+  if (startIsHovering && !gameStart) {
+    textSize(64);
+    fill(0);
+    text("START", width / 2, height / 2 + 64);
+    // when the mouse is pressed on the button, the game will start
+    if (mouseIsPressed) {
+      gameStart = true;
+
+      // set the Backgroud music volume and loop it
+      bg_Music.setVolume(0.5);
+      bg_Music.loop();
+      // We're using simple functions to separate code out
+      setupPrey();
+      setupPlayer();
+      setup_PosionedCheese();
+    }
+    // if the mouse is not hovering, the button goes back to normal
+  } else {
+    fill(255);
+    textSize(64);
+    text("START", width / 2, height / 2 + 64);
   }
 }
 
@@ -300,6 +314,7 @@ function handleInput() {
   if (!keyIsDown(SHIFT)) {
     // Check for horizontal movement
     if (keyIsDown(LEFT_ARROW) || keyIsDown(65)) {
+      // speedDown will be applied when player is poisoned
       playerVX = -playerSpeed * speedDown;
       // determining which direction the player is going to change the direction of the player image
       goingLeft = true;
@@ -320,11 +335,12 @@ function handleInput() {
     }
     // if the shift key is holding down, the player will move faster
   } else {
-    // if the player can sprint when not poisoned
+    // the player can sprint when not poisoned
     if (sprintable) {
       // make health drop faster
       useHealth();
       if (keyIsDown(LEFT_ARROW) || keyIsDown(65)) {
+        // speedUp increases player's speed when sprinting
         playerVX = -playerSpeed * speedUp * speedDown;
         goingLeft = true;
       } else if (keyIsDown(RIGHT_ARROW) || keyIsDown(68)) {
@@ -383,7 +399,7 @@ function updateHealth() {
     playerHealth -= 0.75;
   }
   // Constrain the result to a sensible range
-  playerHealth = constrain(playerHealth, 0, playerMaxHealth);
+  playerHealth = constrain(playerHealth, 0, playerInitialHealth);
   // Check if the player is dead (0 health)
   if (playerHealth === 0) {
     // If so, the game is over
@@ -391,10 +407,12 @@ function updateHealth() {
   }
 }
 
+// useHealth()
+//
 // Sprint will cost health
 function useHealth() {
   playerHealth -= 1;
-  playerHealth = constrain(playerHealth, 0, playerMaxHealth);
+  playerHealth = constrain(playerHealth, 0, playerInitialHealth);
 }
 
 // checkEating()
@@ -428,7 +446,7 @@ function checkEating() {
 
     // lose some health for eating the poisoned cheese
     playerHealth -= 5;
-    playerHealth = constrain(playerHealth, 0, playerMaxHealth);
+    playerHealth = constrain(playerHealth, 0, playerInitialHealth);
   }
 
   // Check if it's an overlap
@@ -441,7 +459,7 @@ function checkEating() {
     // Increase the player health
     playerHealth += eatHealth;
     // Constrain to the possible range
-    playerHealth = constrain(playerHealth, 0, playerMaxHealth);
+    playerHealth = constrain(playerHealth, 0, playerInitialHealth);
 
     // Reduce the prey health
     preyHealth -= eatHealth;
@@ -476,11 +494,13 @@ function checkEating() {
 
       // for each 10 points earned, the prey moving speed will increase and more unpredictable
       // player will have slower speed and bigger body but slightly more health
+      // poisoned cheese will also have faster speed
       if (preyEaten % 10 === 0 && preyEaten >= 10) {
         preySpeedUp += 0.07;
+        pCheeseSpeed += 0.25;
         playerSpeed -= 0.05;
         playerRadius += 1;
-        playerMaxHealth += 10;
+        playerInitialHealth += 10;
       }
     }
   }
@@ -509,7 +529,10 @@ function movePrey() {
     preyY -= height;
   }
 }
-// spawn the poisoned cheese in 3 types randomly
+
+// spawn_PoisonedCheese()
+//
+// spawn the poisoned cheese with randomly decided p1 value
 function spawn_PoisonedCheese() {
   if (p1 < 0.3) {
     image(cheesePImage2, pCheeseX, pCheeseY, preyRadius * 6, preyRadius * 6);
@@ -519,6 +542,9 @@ function spawn_PoisonedCheese() {
     image(cheesePImage0, pCheeseX, pCheeseY, preyRadius * 6, preyRadius * 6);
   }
 }
+
+// move_PoisonedCheese()
+//
 // move the poisoned cheese from the top to the bottom of the screen
 function move_PoisonedCheese() {
   pCheeseY += pCheeseSpeed;
@@ -531,6 +557,7 @@ function move_PoisonedCheese() {
 // drawPrey()
 //
 // Draw the prey as an ellipse with alpha based on health
+// with the randomly decided p value
 function drawPrey() {
   if (p < 0.3) {
     image(cheeseImage2, preyX, preyY, preyRadius * 6, preyRadius * 6);
@@ -540,6 +567,7 @@ function drawPrey() {
     image(cheeseImage0, preyX, preyY, preyRadius * 6, preyRadius * 6);
   }
 }
+
 // drawPlayer()
 //
 // Draw the player as an ellipse with alpha value based on health
@@ -551,6 +579,8 @@ function drawPlayer() {
   }
 }
 
+// showUI()
+//
 // draw the game UI when the gameplay
 function showUI() {
   push();
@@ -561,7 +591,7 @@ function showUI() {
   text("HEALTH", width / 10 - 96, height / 10 - 36);
   // BG of health bar
   fill(100);
-  rect(width / 10 + 48, height / 10 - 32, playerMaxHealth * 1.5, 32, 0, 16, 16, 0);
+  rect(width / 10 + 48, height / 10 - 32, playerInitialHealth * 1.5, 32, 0, 16, 16, 0);
   // content of health bar
   fill(RED);
   rect(width / 10 + 48, height / 10 - 32, playerHealth * 1.5, 32, 0, 16, 16, 0);
@@ -569,7 +599,7 @@ function showUI() {
   stroke(255);
   strokeWeight(4);
   fill(100, 0);
-  rect(width / 10 + 48, height / 10 - 32, playerMaxHealth * 1.5, 32, 0, 16, 16, 0);
+  rect(width / 10 + 48, height / 10 - 32, playerInitialHealth * 1.5, 32, 0, 16, 16, 0);
   noStroke();
   // sprint indicator
   // if SHIFT is pressed down the icon will be lighted up, otherwise it will be dimmed
@@ -618,7 +648,7 @@ function showGameOver() {
     newRecord_Sound.play();
     newRecord_Sound.setVolume(0.75);
     playOnce = false;
-  // if the player does not beat the record, play this once
+    // if the player does not beat the record, play this once
   } else if (playOnce) {
     gameOver_Sound.play();
     gameOver_Sound.setVolume(0.75);
@@ -639,8 +669,10 @@ function showGameOver() {
   pop();
 }
 
+// check_RestartButton()
+//
 // check if the restart button is hovered
-function check_Restart_Button() {
+function check_RestartButton() {
   // determine whether the mouse is hovering the button
   let restartIsHovering = (dist(mouseX, mouseY, width / 2, height / 2 + 164) < 25 ||
     dist(mouseX, mouseY, width / 2 + 72, height / 2 + 164) < 50 ||
@@ -663,7 +695,8 @@ function check_Restart_Button() {
   }
 }
 
-// restart function
+// restartGame()
+//
 // reset the game and reset all the stats
 function restartGame() {
   // reset playOnce
@@ -673,19 +706,20 @@ function restartGame() {
   bg_Music.loop();
 
   // reset player stats
-  playerMaxHealth = 255;
-  playerHealth = playerMaxHealth;
+  playerInitialHealth = 255;
+  playerHealth = playerInitialHealth;
   playerSpeed = playerMaxSpeed;
   playerRadius = 25;
-
-  // reset prey stat
-  preySpeedUp = 1;
-
   // reset poison & sprint stat
   poisoned = false;
   sprintable = true;
-  // reset speed down
+  // reset speed down for player
   speedDown = 1;
+
+  // reset prey stat
+  preySpeedUp = 1;
+  // reset poisoned cheese moving speed
+  pCheeseSpeed = 5;
   // reset score
   preyEaten = 0;
   scoreBeaten = false;
