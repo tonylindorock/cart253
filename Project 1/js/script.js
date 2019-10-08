@@ -123,6 +123,7 @@ let playOnce = true;
 //
 // load all the images, sounds, and the font
 function preload() {
+  // import with approriate sound format accroding to the browser
   soundFormats('ogg','wav');
   // font downloaded from https://www.wfonts.com/font/futura
   Futura_Heavy = loadFont("assets/futura heavy font.ttf");
@@ -148,7 +149,7 @@ function preload() {
   newRecord_Sound = loadSound("assets/sounds/New Record.wav");
   gameOver_Sound = loadSound("assets/sounds/Game Over.wav");
   poisoned_Sound = loadSound("assets/sounds/Poisoned.wav");
-  bg_Music = loadSound("assets/sounds/Chesing.wav");
+  bg_Music = loadSound("assets/sounds/Chesing.wav"); // too large but will work in safari
 }
 // setup()
 //
@@ -436,7 +437,7 @@ function checkEating() {
     // reset poisoned cheese
     setup_PosionedCheese();
 
-    // play the poison warning sound
+    // play the poison warning sound when eat poisoned cheese
     if (!poisoned_Sound.isPlaying() && !poisoned) {
       poisoned_Sound.play();
       poisoned_Sound.setVolume(1);
@@ -625,7 +626,7 @@ function showUI() {
 //
 // Display text about the game being over!
 function showGameOver() {
-  // stop the background music
+  // "stop" the background music (so that it can work in Safari)
   bg_Music.setVolume(0);
   push();
   // Set up the font
