@@ -143,12 +143,12 @@ function preload() {
   poisonIndicator = loadImage("assets/images/Indicator_poisoned.png");
 
   // load sounds
-  bite_Sound = loadSound("assets/sounds/Bite.ogg");
-  swallow_Sound = loadSound("assets/sounds/Swallow.ogg");
-  newRecord_Sound = loadSound("assets/sounds/New Record.ogg");
-  gameOver_Sound = loadSound("assets/sounds/Game Over.ogg");
-  poisoned_Sound = loadSound("assets/sounds/Poisoned.ogg");
-  bg_Music = loadSound("assets/sounds/Chesing.ogg");
+  bite_Sound = loadSound("assets/sounds/Bite.wav");
+  swallow_Sound = loadSound("assets/sounds/Swallow.wav");
+  newRecord_Sound = loadSound("assets/sounds/New Record.wav");
+  gameOver_Sound = loadSound("assets/sounds/Game Over.wav");
+  poisoned_Sound = loadSound("assets/sounds/Poisoned.wav");
+  bg_Music = loadSound("assets/sounds/Chesing.wav");
 }
 // setup()
 //
