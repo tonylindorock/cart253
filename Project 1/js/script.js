@@ -124,7 +124,7 @@ let playOnce = true;
 // load all the images, sounds, and the font
 function preload() {
   // import with approriate sound format accroding to the browser
-  soundFormats('ogg','wav');
+  soundFormats('ogg', 'wav');
   // font downloaded from https://www.wfonts.com/font/futura
   Futura_Heavy = loadFont("assets/futura heavy font.ttf");
 
@@ -164,6 +164,13 @@ function setup() {
 
   // set up the main menu
   setupMainMenu();
+
+  // set volumes to sounds
+  poisoned_Sound.setVolume(1);
+  bite_Sound.setVolume(0.25);
+  swallow_Sound.setVolume(1);
+  newRecord_Sound.setVolume(0.75);
+  gameOver_Sound.setVolume(0.75);
 
   noStroke();
 }
@@ -430,17 +437,14 @@ function checkEating() {
   // if player eat the poisoned cheese
   if (d2 < playerRadius + preyRadius) {
     // play the swallow sound after eating the poisoned cheese
-    if (!swallow_Sound.isPlaying()) {
-      swallow_Sound.play();
-      swallow_Sound.setVolume(1);
-    }
+    swallow_Sound.play();
+
     // reset poisoned cheese
     setup_PosionedCheese();
 
     // play the poison warning sound when eat poisoned cheese
     if (!poisoned_Sound.isPlaying() && !poisoned) {
       poisoned_Sound.play();
-      poisoned_Sound.setVolume(1);
     }
     // get poisoned, slower speed, and unable to sprint
     poisoned = true;
@@ -457,7 +461,6 @@ function checkEating() {
     // play the biting sound when each time touch the cheese
     if (!bite_Sound.isPlaying()) {
       bite_Sound.play();
-      bite_Sound.setVolume(0.25);
     }
     // Increase the player health
     playerHealth += eatHealth;
@@ -484,10 +487,7 @@ function checkEating() {
       preyEaten += 1;
 
       // play the swallow sound after eating the cheese
-      if (!swallow_Sound.isPlaying()) {
-        swallow_Sound.play();
-        swallow_Sound.setVolume(1);
-      }
+      swallow_Sound.play();
 
       // after eating one cheese, poison will be cured
       // be able to sprint again and move normally
@@ -608,13 +608,13 @@ function showUI() {
   // if SHIFT is pressed down the icon will be lighted up, otherwise it will be dimmed
   imageMode(CORNER);
   if (keyIsDown(SHIFT) && !poisoned) {
-    image(sprintIndicator, width / 10 - 105, height / 10, playerRadius * 4, playerRadius * 4);
+    image(sprintIndicator, width / 10 - 105, height / 10, 100, 100);
   } else {
-    image(notSprintIndicator, width / 10 - 105, height / 10, playerRadius * 4, playerRadius * 4);
+    image(notSprintIndicator, width / 10 - 105, height / 10, 100, 100);
   }
   // poisoned indicator will appear when the player is poisoned
   if (poisoned) {
-    image(poisonIndicator, width / 10, height / 10, playerRadius * 4, playerRadius * 4)
+    image(poisonIndicator, width / 10, height / 10, 100, 100)
   }
   // score
   fill(DARK_BLUE);
@@ -649,12 +649,10 @@ function showGameOver() {
   // if the player beats their records, play this once
   if (scoreBeaten && playOnce) {
     newRecord_Sound.play();
-    newRecord_Sound.setVolume(0.75);
     playOnce = false;
     // if the player does not beat the record, play this once
   } else if (playOnce) {
     gameOver_Sound.play();
-    gameOver_Sound.setVolume(0.75);
     playOnce = false;
   }
   fill(RED);
