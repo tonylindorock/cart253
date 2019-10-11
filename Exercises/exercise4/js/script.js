@@ -1,6 +1,6 @@
 "use strict";
 
-// Pong
+// Pong PLUS
 // Modified by Yichen Wang
 //
 // A "simple" implementation of Pong with no scoring system
@@ -12,9 +12,10 @@
 // Whether the game has started
 let playing = false;
 
-// Game colors (using hexadecimal)
-let bgColor = 0;
-let fgColor = 255;
+// colors RGB
+let r;
+let g;
+let b;
 
 // BALL
 
@@ -66,7 +67,8 @@ let beepSFX;
 //
 // Loads the beep audio for the sound of bouncing
 function preload() {
-  beepSFX = new Audio("assets/sounds/beep.wav");
+  beepSFX = loadSound("assets/sounds/beep.wav");
+  beepSFX.setVolume(1);
 }
 
 // setup()
@@ -76,10 +78,14 @@ function preload() {
 // and velocities.
 function setup() {
   // Create canvas and set drawing modes
-  createCanvas(640, 480);
+  createCanvas(windowWidth, windowHeight);
   rectMode(CENTER);
   noStroke();
-  fill(fgColor);
+  fill(255);
+  textFont("Arial");
+
+  setColor();
+  background(r,g,b);
 
   setupPaddles();
   resetBall();
@@ -104,7 +110,7 @@ function setupPaddles() {
 // See how tidy it looks?!
 function draw() {
   // Fill the background
-  background(bgColor);
+  background(r,g,b);
 
   if (playing) {
     // If the game is in play, we handle input and move the elements around
@@ -137,6 +143,12 @@ function draw() {
   displayPaddle(leftPaddle);
   displayPaddle(rightPaddle);
   displayBall();
+}
+
+function setColor(){
+  r = random(74,161);
+  g = random(74,161);
+  b = random(74,161);
 }
 
 // handleInput()
@@ -234,8 +246,10 @@ function checkBallPaddleCollision(paddle) {
       // Reverse its vx so it starts travelling in the opposite direction
       ball.vx = -ball.vx;
       // Play our bouncing sound effect by rewinding and then playing
-      beepSFX.currentTime = 0;
-      beepSFX.play();
+      if (!beepSFX.isPlaying()){
+        beepSFX.currentTime = 0;
+        beepSFX.play();
+      }
     }
   }
 }
@@ -272,9 +286,10 @@ function resetBall() {
 // Shows a message about how to start the game
 function displayStartMessage() {
   push();
+  textStyle(BOLD);
   textAlign(CENTER, CENTER);
-  textSize(32);
-  text("CLICK TO START", width / 2, height / 2);
+  textSize(128);
+  text("CLICK TO START", width / 2, height / 2 + 256);
   pop();
 }
 
@@ -283,5 +298,7 @@ function displayStartMessage() {
 // Here to require a click to start playing the game
 // Which will help us be allowed to play audio in the browser
 function mousePressed() {
-  playing = true;
+  if (!playing){
+    playing = true;
+  }
 }
