@@ -5,9 +5,23 @@
 //
 // A "simple" implementation of Pong with no scoring system
 // just the ability to play the game with the keyboard.
+// By catching the ball, the player will gain 1 bullet to shoot at the component.
+// Get hit by the bullet will disable the player's mobility temporarily.
+// The first player reaches 25 points win.
 //
-// Up and down keys control the right hand paddle, W and S keys control
+// Up, down, left, right keys control the right hand paddle, W A S D keys control
 // the left hand paddle
+// F to fire for the left player while L to fire for the right player
+//
+// Click in starting or restarting screen starts the game in Normal Mode
+// Holding Q while clicking will enable Quick Mode
+//
+// Normal Mode
+// The player gets 1 point each time
+//
+// Quick Mode
+// The player gets 5 points each time
+
 
 // Whether the game has started
 let playing = false;
@@ -41,7 +55,7 @@ let ball = {
 
 // Basic definition of a left paddle object with its key properties of
 // position, size, velocity, and speed
-// score counts and lastScored
+// ammo, getHit, score counts, lastScored, and id
 let leftPaddle = {
   x: 0,
   y: 0,
@@ -62,6 +76,8 @@ let leftPaddle = {
   id: 0
 }
 
+// bullet object for left player
+// position, radius, velocity, and id
 let leftBullet={
   x: 0,
   y: 0,
@@ -74,7 +90,7 @@ let leftBullet={
 
 // Basic definition of a left paddle object with its key properties of
 // position, size, velocity, and speed
-// score counts and lastScored
+// ammo, getHit, score counts, lastScored, and id
 let rightPaddle = {
   x: 0,
   y: 0,
@@ -95,6 +111,8 @@ let rightPaddle = {
   id: 1
 }
 
+// bullet object for right player
+// position, radius, velocity, and id
 let rightBullet={
   x: 0,
   y: 0,
@@ -103,12 +121,17 @@ let rightBullet={
   ID: 1
 }
 
+// remember which side fires
 let fireLeft = false;
 let fireRight = false;
 
+// if the game is in quick mode
 let quickMode = false;
 
+// record the winner
 let winner = "";
+let winnerDir = "";
+// if the game is over
 let gameOver = false;
 
 // A variable to hold the beep sound we will play on bouncing
@@ -140,6 +163,7 @@ function setup() {
   setColor();
   background(r,g,b);
 
+  // setup objects
   setupPaddles();
   resetBall();
   prepareBullet();
@@ -158,6 +182,9 @@ function setupPaddles() {
   rightPaddle.y = height / 2;
 }
 
+// prepareBullet()
+//
+// set up the bullets in their positions
 function prepareBullet(){
   leftBullet.x= leftPaddle.x;
   leftBullet.y=leftPaddle.y;
@@ -205,6 +232,7 @@ function draw() {
       checkWinner(leftPaddle);
       checkWinner(rightPaddle);
     }
+    // show UI of ammo
     showUI(leftPaddle);
     showUI(rightPaddle);
   }else {
@@ -223,6 +251,7 @@ function draw() {
   pop();
   displayBall();
 
+  // if game is over, display this
   if(gameOver){
     background(r,g,b);
     gameOverScreen();
@@ -239,6 +268,9 @@ function draw() {
   }
 }
 
+// setColor()
+//
+// set r, g, b randomly in a range for the background color
 function setColor(){
   // 74 - 161 gives nice slightly dark color
   r = random(74,161);
@@ -273,7 +305,13 @@ function handleInput(paddle) {
     }
 }
 
+// keyPressed()
+//
+// handle firing from both players
+// set position of bullet to the center of paddle
+// record ammo counts
 function keyPressed() {
+  // left player
   if (keyCode === leftPaddle.fireKey) {
     if (!fireLeft && leftPaddle.ammo!=0){
       leftBullet.x = leftPaddle.x;
@@ -284,6 +322,7 @@ function keyPressed() {
       leftPaddle.ammo=constrain(leftPaddle.ammo,0,5);
     }
   }
+  // right player
   if (keyCode === rightPaddle.fireKey){
     if(!fireRight && rightPaddle.ammo!=0){
       rightBullet.x = rightPaddle.x;
@@ -296,6 +335,9 @@ function keyPressed() {
   }
 }
 
+// fireBullet()
+//
+// draw the bullet
 function fireBullet(){
   push();
   fill(0);
@@ -308,12 +350,18 @@ function fireBullet(){
   pop();
 }
 
+// moveBullet(bullet)
+//
+// shoot the bullet
 function moveBullet(bullet){
   if (fireLeft || fireRight){
     bullet.x += bullet.vx;
   }
 }
 
+// checkBulletPath(bullet,paddle)
+//
+// check if the bullet goes off the screen or hit the player
 function checkBulletPath(bullet,paddle){
   let bulletTop = bullet.y - bullet.r / 2;
   let bulletBottom = bullet.y + bullet.r / 2;
@@ -325,10 +373,13 @@ function checkBulletPath(bullet,paddle){
   let paddleLeft = paddle.x - paddle.w / 2;
   let paddleRight = paddle.x + paddle.w / 2;
 
+  // left player's bullet
   if (bullet.ID === 0 && fireLeft){
+    // go off the screen
     if(bullet.x-bullet.r > width){
       fireLeft = false;
       resetBullet("LEFT");
+    // hit the right player
     }else if (bulletBottom > paddleTop && bulletTop < paddleBottom) {
       if (bulletRight > paddleLeft) {
         fireLeft = false;
@@ -339,10 +390,13 @@ function checkBulletPath(bullet,paddle){
     }
   }
 }
+  // right player's bullet
   if (bullet.ID === 1 && fireRight){
+    // go off the screen
     if (bullet.x + bullet.r<0){
       fireRight = false;
       resetBullet("RIGHT");
+    // hit the left player
     }else if(bulletBottom > paddleTop && bulletTop < paddleBottom) {
       if (bulletLeft < paddleRight) {
         fireRight = false;
@@ -355,6 +409,9 @@ function checkBulletPath(bullet,paddle){
   }
 }
 
+// resetBullet(side)
+//
+// reset bullet position with specified side
 function resetBullet(side){
   if(side==="LEFT"){
     leftBullet.x= leftPaddle.x;
@@ -370,6 +427,7 @@ function resetBullet(side){
 // Sets the positions of the paddles and ball based on their velocities
 function updatePaddle(paddle) {
   // Update the paddle position based on its velocity
+  // paddle x movement will be limited
   paddle.x += paddle.vx;
   if (paddle.id === 0){
     paddle.x = constrain(paddle.x,20,80);
@@ -470,9 +528,11 @@ function checkBallPaddleCollision(paddle) {
         beepSFX.currentTime = 0;
         beepSFX.play();
       }
+      // give the player 1 ammo if ammo isn't full
       if (paddle.ammo<5){
         paddle.ammo++;
       }
+      // player mobility will be enabled after the ball goes off their side
       if (paddle.id === 0){
         leftPaddle.getHit = false;
       }
@@ -495,6 +555,10 @@ function displayPaddle(paddle) {
   pop();
 }
 
+// displayPaddleRank(paddle)
+//
+// give players colors to show their ranks/scores
+// white is FINE, green is GOOD, blue is GREAT, yellow is EXCEL, red is PERFECT
 function displayPaddleRank(paddle){
   if (paddle.score<5){
     fill(FINE);
@@ -510,12 +574,18 @@ function displayPaddleRank(paddle){
   }
 }
 
+// checkWinner(paddle)
+//
+// check who is the winner with 25 points
+// handle if the game is over
 function checkWinner(paddle){
   if(paddle.score>=25){
     if(paddle.id === 0){
       winner = "LEFT";
+      winnerDir = "<==";
     }else if (paddle.id === 1){
       winner = "RIGHT";
+      winnerDir = "==>";
     }
     gameOver = true;
     playing = false;
@@ -539,18 +609,24 @@ function resetBall() {
   ball.x = width / 2;
   ball.y = height / 2;
   ball.vx = ball.speed;
+  // let the ball go towards the player who scores last
   if (leftPaddle.lastScored){
     ball.vx = -ball.vx;
   }else if (rightPaddle.lastScored){
     ball.vx = ball.vx;
   }else{
+    // if the game just starts, give the ball a random direction
     if(0.5<=randDir<1){
       ball.vx = -ball.vx;
     }
   }
+  // random speed for the ball
   ball.vy = random(ball.speed,ball.speed*1.5);
 }
 
+// showUI(paddle)
+//
+// display the game model and players' ammo counts
 function showUI(paddle){
   push();
   textStyle(BOLD);
@@ -581,6 +657,7 @@ function showUI(paddle){
 // displayStartMessage()
 //
 // Shows a message about how to start the game
+// Also shows title, rule, controls, and hints
 function displayStartMessage() {
   push();
   textAlign(CENTER, CENTER);
@@ -591,9 +668,9 @@ function displayStartMessage() {
   text("try not to let the ball go off your side of the edge", width / 2, height / 2 - 256);
   textSize(28);
   fill(25);
-  text("+\nhit the ball to gain bullets to shoot at your component"+
-  "\nget hit by a bullet will disable your mobility"+
-  "\nthe first player reaches 20 points wins", width / 2, height / 2 - 164);
+  text("+\ncatch the ball to gain bullets to shoot at your component"+
+  "\nget hit by a bullet will disable your mobility temporarily"+
+  "\nthe first player reaches 25 points wins", width / 2, height / 2 - 164);
   fill(255);
   textSize(32);
   textAlign(LEFT, CENTER);
@@ -609,6 +686,9 @@ function displayStartMessage() {
   pop();
 }
 
+// gameOverScreen()
+//
+// display who wins the game if the game is over
 function gameOverScreen(){
   push();
   textAlign(CENTER, CENTER);
@@ -618,7 +698,7 @@ function gameOverScreen(){
   textSize(32);
   text("one shall stand, one shall fall", width / 2, height / 2 - 256);
   textSize(48);
-  text("THE PLAYER OF THE "+winner+" WON!",width / 2, height / 2);
+  text("THE PLAYER OF THE "+winner+" WON!\n"+winnerDir,width / 2, height / 2);
   textSize(32);
   fill(25);
   text("While pressing Q to play in Quick Mode (optional)", width / 2, height / 2 + 186);
@@ -635,6 +715,7 @@ function gameOverScreen(){
 function mousePressed() {
   if (!playing && !gameOver){
     playing = true;
+    // if Q is holding down while clicking, quick mode will be played
     if (keyIsDown(81)){
       quickMode = true;
     }
@@ -646,11 +727,15 @@ function mousePressed() {
     playing = true;
     gameOver = false;
     console.log("Game restarted");
+    // reset player stats
     resetStats(leftPaddle);
     resetStats(rightPaddle);
   }
 }
 
+// resetStats(paddle)
+//
+// reset player stats
 function resetStats(paddle){
   paddle.score = 0;
   paddle.ammo= 0;
