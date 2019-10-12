@@ -56,6 +56,7 @@ let leftPaddle = {
   rightKey: 68,
   fireKey: 70,
   ammo: 0,
+  getHit: false,
   score: 0,
   lastScored: false,
   id: 0
@@ -64,9 +65,9 @@ let leftPaddle = {
 let leftBullet={
   x: 0,
   y: 0,
-  r: 10,
+  r: 12,
   vx: 10,
-  id: 0
+  ID: 0
 }
 
 // RIGHT PADDLE
@@ -88,6 +89,7 @@ let rightPaddle = {
   rightKey: 39,
   fireKey: 76,
   ammo: 0,
+  getHit: false,
   score: 0,
   lastScored: false,
   id: 1
@@ -96,13 +98,15 @@ let rightPaddle = {
 let rightBullet={
   x: 0,
   y: 0,
-  r: 10,
+  r: 12,
   vx: -10,
-  id: 1
+  ID: 1
 }
 
 let fireLeft = false;
 let fireRight = false;
+
+let quickMode = false;
 
 let winner = "";
 let gameOver = false;
@@ -183,6 +187,9 @@ function draw() {
 
     updateBall();
 
+    checkBulletPath(leftBullet,rightPaddle);
+    checkBulletPath(rightBullet,leftPaddle);
+
     checkBallWallCollision();
     checkBallPaddleCollision(leftPaddle);
     checkBallPaddleCollision(rightPaddle);
@@ -200,8 +207,6 @@ function draw() {
     }
     showUI(leftPaddle);
     showUI(rightPaddle);
-  }else if(gameOver){
-    gameOverScreen();
   }else {
     // Otherwise we display the message to start the game
     displayStartMessage();
@@ -217,6 +222,21 @@ function draw() {
   displayPaddle(rightPaddle);
   pop();
   displayBall();
+
+  if(gameOver){
+    background(r,g,b);
+    gameOverScreen();
+
+    setupPaddles();
+    push();
+    displayPaddleRank(leftPaddle);
+    displayPaddle(leftPaddle);
+    pop();
+    push();
+    displayPaddleRank(rightPaddle);
+    displayPaddle(rightPaddle);
+    pop();
+  }
 }
 
 function setColor(){
@@ -233,41 +253,46 @@ function setColor(){
 function handleInput(paddle) {
   // Move the paddle based on its up and down keys
   // If the up key is being pressed
-  if (keyIsDown(paddle.upKey)) {
-    // Move up
-    paddle.vy = -paddle.speed;
-  }
-  // Otherwise if the down key is being pressed
-  else if (keyIsDown(paddle.downKey)) {
-    // Move down
-    paddle.vy = paddle.speed;
-  }
-  else if (keyIsDown(paddle.leftKey)){
-    paddle.vx = -paddle.speed;
-  }else if (keyIsDown(paddle.rightKey)){
-    paddle.vx = paddle.speed;
-  }else{
-    // Otherwise stop moving
-    paddle.vx = 0;
-    paddle.vy = 0;
-  }
-
+    if (keyIsDown(paddle.upKey) && !paddle.getHit) {
+      // Move up
+      paddle.vy = -paddle.speed;
+    }
+    // Otherwise if the down key is being pressed
+    else if (keyIsDown(paddle.downKey) && !paddle.getHit) {
+      // Move down
+      paddle.vy = paddle.speed;
+    }
+    else if (keyIsDown(paddle.leftKey) && !paddle.getHit){
+      paddle.vx = -paddle.speed;
+    }else if (keyIsDown(paddle.rightKey) && !paddle.getHit){
+      paddle.vx = paddle.speed;
+    }else{
+      // Otherwise stop moving
+      paddle.vx = 0;
+      paddle.vy = 0;
+    }
 }
+
 function keyPressed() {
   if (keyCode === leftPaddle.fireKey) {
-    leftBullet.x= leftPaddle.x;
-    leftBullet.y=leftPaddle.y;
+    if (!fireLeft && leftPaddle.ammo!=0){
+      leftBullet.x = leftPaddle.x;
+      leftBullet.y = leftPaddle.y;
 
-    fireLeft = true;
-    leftPaddle.ammo--;
-    leftPaddle.ammo=constrain(leftPaddle.ammo,0,5);
-  }else if (keyCode === rightPaddle.fireKey){
-    rightBullet.x=rightPaddle.x;
-    rightBullet.y=rightPaddle.y;
+      fireLeft = true;
+      leftPaddle.ammo--;
+      leftPaddle.ammo=constrain(leftPaddle.ammo,0,5);
+    }
+  }
+  if (keyCode === rightPaddle.fireKey){
+    if(!fireRight && rightPaddle.ammo!=0){
+      rightBullet.x = rightPaddle.x;
+      rightBullet.y = rightPaddle.y;
 
-    fireRight = true;
-    rightPaddle.ammo--;
-    rightPaddle.ammo=constrain(rightPaddle.ammo,0,5);
+      fireRight = true;
+      rightPaddle.ammo--;
+      rightPaddle.ammo=constrain(rightPaddle.ammo,0,5);
+    }
   }
 }
 
@@ -276,7 +301,8 @@ function fireBullet(){
   fill(0);
   if (fireLeft){
     ellipse(leftBullet.x,leftBullet.y,leftBullet.r);
-  }else if (fireRight){
+  }
+  if (fireRight){
     ellipse(rightBullet.x,rightBullet.y,rightBullet.r);
   }
   pop();
@@ -285,6 +311,57 @@ function fireBullet(){
 function moveBullet(bullet){
   if (fireLeft || fireRight){
     bullet.x += bullet.vx;
+  }
+}
+
+function checkBulletPath(bullet,paddle){
+  let bulletTop = bullet.y - bullet.r / 2;
+  let bulletBottom = bullet.y + bullet.r / 2;
+  let bulletLeft = bullet.x - bullet.r / 2;
+  let bulletRight = bullet.x + bullet.r / 2;
+
+  let paddleTop = paddle.y - paddle.h / 2;
+  let paddleBottom = paddle.y + paddle.h / 2;
+  let paddleLeft = paddle.x - paddle.w / 2;
+  let paddleRight = paddle.x + paddle.w / 2;
+
+  if (bullet.ID === 0 && fireLeft){
+    if(bullet.x-bullet.r > width){
+      fireLeft = false;
+      resetBullet("LEFT");
+    }else if (bulletBottom > paddleTop && bulletTop < paddleBottom) {
+      if (bulletRight > paddleLeft) {
+        fireLeft = false;
+        resetBullet("LEFT");
+
+        rightPaddle.getHit = true;
+        console.log("right got hit");
+    }
+  }
+}
+  if (bullet.ID === 1 && fireRight){
+    if (bullet.x + bullet.r<0){
+      fireRight = false;
+      resetBullet("RIGHT");
+    }else if(bulletBottom > paddleTop && bulletTop < paddleBottom) {
+      if (bulletLeft < paddleRight) {
+        fireRight = false;
+        resetBullet("RIGHT");
+
+        leftPaddle.getHit = true;
+        console.log("left got hit");
+      }
+    }
+  }
+}
+
+function resetBullet(side){
+  if(side==="LEFT"){
+    leftBullet.x= leftPaddle.x;
+    leftBullet.y=leftPaddle.y;
+  }else if (side==="RIGHT"){
+    rightBullet.x=rightPaddle.x;
+    rightBullet.y=rightPaddle.y;
   }
 }
 
@@ -319,13 +396,25 @@ function ballIsOutOfBounds() {
   // Check for ball going off the sides
   if (ball.x < 0 || ball.x > width) {
     if (ball.x < 0){
-      rightPaddle.score += 1;
+      if (quickMode){
+        rightPaddle.score += 5;
+      }else{
+        rightPaddle.score += 1;
+      }
       rightPaddle.lastScored = true;
       leftPaddle.lastScored = false;
+
+      leftPaddle.getHit = false;
     }else if(ball.x > width){
-      leftPaddle.score += 1;
+      if (quickMode){
+        leftPaddle.score += 5;
+      }else{
+        leftPaddle.score += 1;
+      }
       leftPaddle.lastScored = true;
       rightPaddle.lastScored = false;
+
+      rightPaddle.getHit = false;
     }
     console.log("left: "+leftPaddle.score+"\nright: "+rightPaddle.score);
     return true;
@@ -366,7 +455,7 @@ function checkBallPaddleCollision(paddle) {
 
   let paddleTop = paddle.y - paddle.h / 2;
   let paddleBottom = paddle.y + paddle.h / 2;
-  let paddleLeft = paddle.x - leftPaddle.w / 2;
+  let paddleLeft = paddle.x - paddle.w / 2;
   let paddleRight = paddle.x + paddle.w / 2;
 
   // First check the ball is in the vertical range of the paddle
@@ -383,6 +472,12 @@ function checkBallPaddleCollision(paddle) {
       }
       if (paddle.ammo<5){
         paddle.ammo++;
+      }
+      if (paddle.id === 0){
+        leftPaddle.getHit = false;
+      }
+      if (paddle.id === 1){
+        rightPaddle.getHit = false;
       }
     }
   }
@@ -416,11 +511,11 @@ function displayPaddleRank(paddle){
 }
 
 function checkWinner(paddle){
-  if(paddle.score>=20){
+  if(paddle.score>=25){
     if(paddle.id === 0){
-      winner = "left";
+      winner = "LEFT";
     }else if (paddle.id === 1){
-      winner = "right";
+      winner = "RIGHT";
     }
     gameOver = true;
     playing = false;
@@ -459,13 +554,26 @@ function resetBall() {
 function showUI(paddle){
   push();
   textStyle(BOLD);
+  textSize(32);
+  textAlign(CENTER,CENTER);
+  fill(25);
+  if (!quickMode){
+    text("Normal Mode", width / 2, height / 2 - 300);
+  }else{
+    text("Quick Mode", width / 2, height / 2 - 300);
+  }
   textSize(24);
+  fill(255);
   if(paddle.id === 0){
     textAlign(LEFT,CENTER);
-    text("AMMO\n"+paddle.ammo, width / 2-564, height / 2 - 300);
+    text("AMMO", width / 2-564, height / 2 - 300);
+    textSize(48);
+    text(paddle.ammo,width / 2-564, height / 2 - 264);
   }else if (paddle.id === 1){
     textAlign(RIGHT,CENTER);
-    text("AMMO\n"+paddle.ammo, width / 2+564, height / 2 - 300);
+    text("AMMO", width / 2+564, height / 2 - 300);
+    textSize(48);
+    text(paddle.ammo,width / 2+564, height / 2 - 264);
   }
   pop();
 }
@@ -493,6 +601,9 @@ function displayStartMessage() {
   textAlign(RIGHT, CENTER);
   text("ARROWKEYS to move\nL to fire",width / 2+500,height / 2);
   textAlign(CENTER, CENTER);
+  fill(25);
+  text("While pressing Q to play in Quick Mode (optional)", width / 2, height / 2 + 186);
+  fill(255);
   textSize(100);
   text("CLICK TO START", width / 2, height / 2 + 256);
   pop();
@@ -500,12 +611,19 @@ function displayStartMessage() {
 
 function gameOverScreen(){
   push();
-  background(r,g,b);
   textAlign(CENTER, CENTER);
   textStyle(BOLD);
   textSize(48);
+  text("PONG PLUS", width / 2, height / 2 - 300);
+  textSize(32);
+  text("one shall stand, one shall fall", width / 2, height / 2 - 256);
+  textSize(48);
   text("THE PLAYER OF THE "+winner+" WON!",width / 2, height / 2);
+  textSize(32);
+  fill(25);
+  text("While pressing Q to play in Quick Mode (optional)", width / 2, height / 2 + 186);
   textSize(100);
+  fill(255);
   text("CLICK TO RESTART", width / 2, height / 2 + 256);
   pop();
 }
@@ -517,8 +635,25 @@ function gameOverScreen(){
 function mousePressed() {
   if (!playing && !gameOver){
     playing = true;
+    if (keyIsDown(81)){
+      quickMode = true;
+    }
   }else if (gameOver){
+    quickMode = false;
+    if (keyIsDown(81)){
+      quickMode = true;
+    }
     playing = true;
     gameOver = false;
+    console.log("Game restarted");
+    resetStats(leftPaddle);
+    resetStats(rightPaddle);
   }
+}
+
+function resetStats(paddle){
+  paddle.score = 0;
+  paddle.ammo= 0;
+  paddle.getHit= false;
+  paddle.lastScored= false;
 }
