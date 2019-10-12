@@ -12,10 +12,17 @@
 // Whether the game has started
 let playing = false;
 
-// colors RGB
+// colors RGB for background
 let r;
 let g;
 let b;
+
+// paddle score rank (colors)
+let FINE = "#FFFFFF"; // white
+let GOOD = "#45ff4e"; // green
+let GREAT = "#00eaff"; // blue
+let EXCEL = " #ffde38"; // gold
+let PERFECT = "#ff7373"; // red
 
 // BALL
 
@@ -34,6 +41,7 @@ let ball = {
 
 // Basic definition of a left paddle object with its key properties of
 // position, size, velocity, and speed
+// score counts and lastScored
 let leftPaddle = {
   x: 0,
   y: 0,
@@ -42,13 +50,17 @@ let leftPaddle = {
   vy: 0,
   speed: 5,
   upKey: 87,
-  downKey: 83
+  downKey: 83,
+  score: 0,
+  lastScored: false,
+  id: 0
 }
 
 // RIGHT PADDLE
 
 // Basic definition of a left paddle object with its key properties of
 // position, size, velocity, and speed
+// score counts and lastScored
 let rightPaddle = {
   x: 0,
   y: 0,
@@ -57,8 +69,14 @@ let rightPaddle = {
   vy: 0,
   speed: 5,
   upKey: 38,
-  downKey: 40
+  downKey: 40,
+  score: 0,
+  lastScored: false,
+  id: 1
 }
+
+let winner = "";
+let gameOver = false;
 
 // A variable to hold the beep sound we will play on bouncing
 let beepSFX;
@@ -68,7 +86,7 @@ let beepSFX;
 // Loads the beep audio for the sound of bouncing
 function preload() {
   beepSFX = loadSound("assets/sounds/beep.wav");
-  beepSFX.setVolume(1);
+  beepSFX.setVolume(0.25);
 }
 
 // setup()
@@ -80,10 +98,12 @@ function setup() {
   // Create canvas and set drawing modes
   createCanvas(windowWidth, windowHeight);
   rectMode(CENTER);
+  ellipseMode(CENTER);
   noStroke();
   fill(255);
   textFont("Arial");
 
+  // give r, g, b random values and set them as background
   setColor();
   background(r,g,b);
 
@@ -112,7 +132,7 @@ function draw() {
   // Fill the background
   background(r,g,b);
 
-  if (playing) {
+  if (playing && !gameOver) {
     // If the game is in play, we handle input and move the elements around
     handleInput(leftPaddle);
     handleInput(rightPaddle);
@@ -132,20 +152,30 @@ function draw() {
       resetBall();
       // This is where we would likely count points, depending on which side
       // the ball went off...
+      checkWinner(leftPaddle);
+      checkWinner(rightPaddle);
     }
-  }
-  else {
+  }else if(gameOver){
+    gameOverScreen();
+  }else {
     // Otherwise we display the message to start the game
     displayStartMessage();
   }
 
   // We always display the paddles and ball so it looks like Pong!
+  push();
+  displayPaddleRank(leftPaddle);
   displayPaddle(leftPaddle);
+  pop();
+  push();
+  displayPaddleRank(rightPaddle);
   displayPaddle(rightPaddle);
+  pop();
   displayBall();
 }
 
 function setColor(){
+  // 74 - 161 gives nice slightly dark color
   r = random(74,161);
   g = random(74,161);
   b = random(74,161);
@@ -197,6 +227,16 @@ function updateBall() {
 function ballIsOutOfBounds() {
   // Check for ball going off the sides
   if (ball.x < 0 || ball.x > width) {
+    if (ball.x < 0){
+      rightPaddle.score += 1;
+      rightPaddle.lastScored = true;
+      leftPaddle.lastScored = false;
+    }else if(ball.x > width){
+      leftPaddle.score += 1;
+      leftPaddle.lastScored = true;
+      rightPaddle.lastScored = false;
+    }
+    console.log("left: "+leftPaddle.score+"\nright: "+rightPaddle.score);
     return true;
   }
   else {
@@ -259,7 +299,38 @@ function checkBallPaddleCollision(paddle) {
 // Draws the specified paddle
 function displayPaddle(paddle) {
   // Draw the paddles
-  rect(paddle.x, paddle.y, paddle.w, paddle.h);
+  push();
+  stroke(255);
+  strokeWeight(4);
+  rect(paddle.x, paddle.y, paddle.w, paddle.h,32,32,32,32);
+  pop();
+}
+
+function displayPaddleRank(paddle){
+  if (paddle.score<5){
+    fill(FINE);
+  }
+  else if (paddle.score>=5 && paddle.score<10){
+    fill(GOOD);
+  }else if(paddle.score>= 10 && paddle.score<15){
+    fill(GREAT);
+  }else if(paddle.score>=15 && paddle.score<20){
+    fill(EXCEL);
+  }else if(paddle.score>=20){
+    fill(PERFECT);
+  }
+}
+
+function checkWinner(paddle){
+  if(paddle.score>=20){
+    if(paddle.id === 0){
+      winner = "left";
+    }else if (paddle.id === 1){
+      winner = "right";
+    }
+    gameOver = true;
+    playing = false;
+  }
 }
 
 // displayBall()
@@ -267,18 +338,28 @@ function displayPaddle(paddle) {
 // Draws the ball on screen as a square
 function displayBall() {
   // Draw the ball
-  rect(ball.x, ball.y, ball.size, ball.size);
+  ellipse(ball.x, ball.y, ball.size);
 }
 
 // resetBall()
 //
 // Sets the starting position and velocity of the ball
 function resetBall() {
+  let randDir = random();
   // Initialise the ball's position and velocity
   ball.x = width / 2;
   ball.y = height / 2;
   ball.vx = ball.speed;
-  ball.vy = ball.speed;
+  if (leftPaddle.lastScored){
+    ball.vx = -ball.vx;
+  }else if (rightPaddle.lastScored){
+    ball.vx = ball.vx;
+  }else{
+    if(0.5<=randDir<1){
+      ball.vx = -ball.vx;
+    }
+  }
+  ball.vy = random(ball.speed,ball.speed*1.5);
 }
 
 // displayStartMessage()
@@ -286,10 +367,34 @@ function resetBall() {
 // Shows a message about how to start the game
 function displayStartMessage() {
   push();
-  textStyle(BOLD);
   textAlign(CENTER, CENTER);
-  textSize(128);
+  textStyle(BOLD);
+  textSize(48);
+  text("PONG PLUS", width / 2, height / 2 - 300);
+  textSize(32);
+  text("try not to let the ball go off your side of the edge", width / 2, height / 2 - 256);
+  textSize(28);
+  text("the first player reaches 20 points win", width / 2, height / 2 - 216);
+  textSize(32);
+  textAlign(LEFT, CENTER);
+  text("WASD",width / 2-500,height / 2);
+  textAlign(RIGHT, CENTER);
+  text("ARROWKEYS",width / 2+500,height / 2);
+  textAlign(CENTER, CENTER);
+  textSize(100);
   text("CLICK TO START", width / 2, height / 2 + 256);
+  pop();
+}
+
+function gameOverScreen(){
+  push();
+  background(r,g,b);
+  textAlign(CENTER, CENTER);
+  textStyle(BOLD);
+  textSize(48);
+  text("THE PLAYER OF THE "+winner+" WON!",width / 2, height / 2);
+  textSize(100);
+  text("CLICK TO RESTART", width / 2, height / 2 + 256);
   pop();
 }
 
@@ -298,7 +403,10 @@ function displayStartMessage() {
 // Here to require a click to start playing the game
 // Which will help us be allowed to play audio in the browser
 function mousePressed() {
-  if (!playing){
+  if (!playing && !gameOver){
     playing = true;
+  }else if (gameOver){
+    playing = true;
+    gameOver = false;
   }
 }
