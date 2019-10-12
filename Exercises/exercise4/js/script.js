@@ -47,12 +47,25 @@ let leftPaddle = {
   y: 0,
   w: 20,
   h: 70,
+  vx: 0,
   vy: 0,
   speed: 5,
   upKey: 87,
   downKey: 83,
+  leftKey: 65,
+  rightKey: 68,
+  fireKey: 70,
+  ammo: 0,
   score: 0,
   lastScored: false,
+  id: 0
+}
+
+let leftBullet={
+  x: 0,
+  y: 0,
+  r: 10,
+  vx: 10,
   id: 0
 }
 
@@ -66,14 +79,30 @@ let rightPaddle = {
   y: 0,
   w: 20,
   h: 70,
+  vx: 0,
   vy: 0,
   speed: 5,
   upKey: 38,
   downKey: 40,
+  leftKey: 37,
+  rightKey: 39,
+  fireKey: 76,
+  ammo: 0,
   score: 0,
   lastScored: false,
   id: 1
 }
+
+let rightBullet={
+  x: 0,
+  y: 0,
+  r: 10,
+  vx: -10,
+  id: 1
+}
+
+let fireLeft = false;
+let fireRight = false;
 
 let winner = "";
 let gameOver = false;
@@ -109,6 +138,7 @@ function setup() {
 
   setupPaddles();
   resetBall();
+  prepareBullet();
 }
 
 // setupPaddles()
@@ -124,6 +154,13 @@ function setupPaddles() {
   rightPaddle.y = height / 2;
 }
 
+function prepareBullet(){
+  leftBullet.x= leftPaddle.x;
+  leftBullet.y=leftPaddle.y;
+  rightBullet.x=rightPaddle.x;
+  rightBullet.y=rightPaddle.y;
+}
+
 // draw()
 //
 // Calls the appropriate functions to run the game
@@ -136,8 +173,14 @@ function draw() {
     // If the game is in play, we handle input and move the elements around
     handleInput(leftPaddle);
     handleInput(rightPaddle);
+
+    fireBullet();
+    moveBullet(leftBullet);
+    moveBullet(rightBullet);
+
     updatePaddle(leftPaddle);
     updatePaddle(rightPaddle);
+
     updateBall();
 
     checkBallWallCollision();
@@ -155,6 +198,8 @@ function draw() {
       checkWinner(leftPaddle);
       checkWinner(rightPaddle);
     }
+    showUI(leftPaddle);
+    showUI(rightPaddle);
   }else if(gameOver){
     gameOverScreen();
   }else {
@@ -197,9 +242,49 @@ function handleInput(paddle) {
     // Move down
     paddle.vy = paddle.speed;
   }
-  else {
+  else if (keyIsDown(paddle.leftKey)){
+    paddle.vx = -paddle.speed;
+  }else if (keyIsDown(paddle.rightKey)){
+    paddle.vx = paddle.speed;
+  }else{
     // Otherwise stop moving
+    paddle.vx = 0;
     paddle.vy = 0;
+  }
+
+}
+function keyPressed() {
+  if (keyCode === leftPaddle.fireKey) {
+    leftBullet.x= leftPaddle.x;
+    leftBullet.y=leftPaddle.y;
+
+    fireLeft = true;
+    leftPaddle.ammo--;
+    leftPaddle.ammo=constrain(leftPaddle.ammo,0,5);
+  }else if (keyCode === rightPaddle.fireKey){
+    rightBullet.x=rightPaddle.x;
+    rightBullet.y=rightPaddle.y;
+
+    fireRight = true;
+    rightPaddle.ammo--;
+    rightPaddle.ammo=constrain(rightPaddle.ammo,0,5);
+  }
+}
+
+function fireBullet(){
+  push();
+  fill(0);
+  if (fireLeft){
+    ellipse(leftBullet.x,leftBullet.y,leftBullet.r);
+  }else if (fireRight){
+    ellipse(rightBullet.x,rightBullet.y,rightBullet.r);
+  }
+  pop();
+}
+
+function moveBullet(bullet){
+  if (fireLeft || fireRight){
+    bullet.x += bullet.vx;
   }
 }
 
@@ -208,6 +293,12 @@ function handleInput(paddle) {
 // Sets the positions of the paddles and ball based on their velocities
 function updatePaddle(paddle) {
   // Update the paddle position based on its velocity
+  paddle.x += paddle.vx;
+  if (paddle.id === 0){
+    paddle.x = constrain(paddle.x,20,80);
+  }else if (paddle.id === 1){
+    paddle.x = constrain(paddle.x,width-80,width - 20);
+  }
   paddle.y += paddle.vy;
 }
 
@@ -290,6 +381,9 @@ function checkBallPaddleCollision(paddle) {
         beepSFX.currentTime = 0;
         beepSFX.play();
       }
+      if (paddle.ammo<5){
+        paddle.ammo++;
+      }
     }
   }
 }
@@ -362,6 +456,20 @@ function resetBall() {
   ball.vy = random(ball.speed,ball.speed*1.5);
 }
 
+function showUI(paddle){
+  push();
+  textStyle(BOLD);
+  textSize(24);
+  if(paddle.id === 0){
+    textAlign(LEFT,CENTER);
+    text("AMMO\n"+paddle.ammo, width / 2-564, height / 2 - 300);
+  }else if (paddle.id === 1){
+    textAlign(RIGHT,CENTER);
+    text("AMMO\n"+paddle.ammo, width / 2+564, height / 2 - 300);
+  }
+  pop();
+}
+
 // displayStartMessage()
 //
 // Shows a message about how to start the game
@@ -374,12 +482,16 @@ function displayStartMessage() {
   textSize(32);
   text("try not to let the ball go off your side of the edge", width / 2, height / 2 - 256);
   textSize(28);
-  text("the first player reaches 20 points win", width / 2, height / 2 - 216);
+  fill(25);
+  text("+\nhit the ball to gain bullets to shoot at your component"+
+  "\nget hit by a bullet will disable your mobility"+
+  "\nthe first player reaches 20 points wins", width / 2, height / 2 - 164);
+  fill(255);
   textSize(32);
   textAlign(LEFT, CENTER);
-  text("WASD",width / 2-500,height / 2);
+  text("WASD to move\nF to fire",width / 2-500,height / 2);
   textAlign(RIGHT, CENTER);
-  text("ARROWKEYS",width / 2+500,height / 2);
+  text("ARROWKEYS to move\nL to fire",width / 2+500,height / 2);
   textAlign(CENTER, CENTER);
   textSize(100);
   text("CLICK TO START", width / 2, height / 2 + 256);
