@@ -82,7 +82,7 @@ let leftBullet={
   x: 0,
   y: 0,
   r: 12,
-  vx: 10,
+  vx: 20,
   ID: 0
 }
 
@@ -117,7 +117,7 @@ let rightBullet={
   x: 0,
   y: 0,
   r: 12,
-  vx: -10,
+  vx: -20,
   ID: 1
 }
 
@@ -136,13 +136,33 @@ let gameOver = false;
 
 // A variable to hold the beep sound we will play on bouncing
 let beepSFX;
+// other sound effects
+let fire_SFX;
+let cheer_SFX;
+let fail_SFX;
+
+// let the sound play only once
+let playOnce = true;
 
 // preload()
 //
-// Loads the beep audio for the sound of bouncing
+// load the sounds
 function preload() {
+  // Loads the beep audio for the sound of bouncing
   beepSFX = loadSound("assets/sounds/beep.wav");
   beepSFX.setVolume(0.25);
+
+  // the sound to play when the player fires
+  fire_SFX = loadSound("assets/sounds/laser.wav");
+  fire_SFX.setVolume(1);
+
+  // the sound to play when the game is over
+  cheer_SFX = loadSound("assets/sounds/cheer.wav");
+  cheer_SFX.setVolume(1);
+
+  // the sound to play when the ball goes off the edge
+  fail_SFX = loadSound("assets/sounds/fail.wav");
+  fail_SFX.setVolume(0.5);
 }
 
 // setup()
@@ -320,6 +340,8 @@ function keyPressed() {
       fireLeft = true;
       leftPaddle.ammo--;
       leftPaddle.ammo=constrain(leftPaddle.ammo,0,5);
+
+      fire_SFX.play();
     }
   }
   // right player
@@ -331,6 +353,8 @@ function keyPressed() {
       fireRight = true;
       rightPaddle.ammo--;
       rightPaddle.ammo=constrain(rightPaddle.ammo,0,5);
+
+      fire_SFX.play();
     }
   }
 }
@@ -453,6 +477,7 @@ function updateBall() {
 function ballIsOutOfBounds() {
   // Check for ball going off the sides
   if (ball.x < 0 || ball.x > width) {
+    fail_SFX.play();
     if (ball.x < 0){
       if (quickMode){
         rightPaddle.score += 5;
@@ -690,6 +715,11 @@ function displayStartMessage() {
 //
 // display who wins the game if the game is over
 function gameOverScreen(){
+  // play the sound only once
+  if (!cheer_SFX.isPlaying() && playOnce){
+    cheer_SFX.play();
+    playOnce = false;
+  }
   push();
   textAlign(CENTER, CENTER);
   textStyle(BOLD);
@@ -724,8 +754,10 @@ function mousePressed() {
     if (keyIsDown(81)){
       quickMode = true;
     }
+    // reset
     playing = true;
     gameOver = false;
+    playOnce = true;
     console.log("Game restarted");
     // reset player stats
     resetStats(leftPaddle);
