@@ -10,7 +10,7 @@ class Predator {
   //
   // Sets the initial values for the Predator's properties
   // Either sets default values or uses the arguments provided
-  constructor(x, y, speed, fillColor, radius) {
+  constructor(x, y, speed, strokeColor, radius, upKey,downKey,leftKey,rightKey) {
     // Position
     this.x = x;
     this.y = y;
@@ -24,13 +24,13 @@ class Predator {
     this.healthLossPerMove = 0.1;
     this.healthGainPerEat = 1;
     // Display properties
-    this.fillColor = fillColor;
+    this.strokeColor = strokeColor;
     this.radius = this.health; // Radius is defined in terms of health
     // Input properties
-    this.upKey = UP_ARROW;
-    this.downKey = DOWN_ARROW;
-    this.leftKey = LEFT_ARROW;
-    this.rightKey = RIGHT_ARROW;
+    this.upKey = upKey;
+    this.downKey = downKey;
+    this.leftKey = leftKey;
+    this.rightKey = rightKey;
   }
 
   // handleInput
@@ -113,7 +113,7 @@ class Predator {
       // Decrease prey health by the same amount
       prey.health -= this.healthGainPerEat;
       // Check if the prey died and reset it if so
-      if (prey.health < 0) {
+      if (prey.health < 2) {
         prey.reset();
       }
     }
@@ -125,8 +125,9 @@ class Predator {
   // with a radius the same size as its current health.
   display() {
     push();
-    noStroke();
-    fill(this.fillColor);
+    strokeWeight(8);
+    stroke(this.strokeColor);
+    fill(255);
     this.radius = this.health;
     ellipse(this.x, this.y, this.radius * 2);
     pop();
