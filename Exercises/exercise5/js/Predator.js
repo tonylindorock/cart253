@@ -10,7 +10,7 @@ class Predator {
   //
   // Sets the initial values for the Predator's properties
   // Either sets default values or uses the arguments provided
-  constructor(x, y, speed, strokeColor, radius, upKey,downKey,leftKey,rightKey) {
+  constructor(x, y, speed, strokeColor, radius, upKey,downKey,leftKey,rightKey,sprintKey) {
     // Position
     this.x = x;
     this.y = y;
@@ -18,6 +18,7 @@ class Predator {
     this.vx = 0;
     this.vy = 0;
     this.speed = speed;
+    this.speedUp = 2; // when sprint
     // Health properties
     this.maxHealth = radius;
     this.health = this.maxHealth; // Must be AFTER defining this.maxHealth
@@ -31,6 +32,9 @@ class Predator {
     this.downKey = downKey;
     this.leftKey = leftKey;
     this.rightKey = rightKey;
+    this.sprintKey = sprintKey;
+    // record score
+    this.score = 0;
   }
 
   // handleInput
@@ -39,24 +43,38 @@ class Predator {
   // velocity appropriately.
   handleInput() {
     // Horizontal movement
-    if (keyIsDown(this.leftKey)) {
-      this.vx = -this.speed;
-    }
-    else if (keyIsDown(this.rightKey)) {
-      this.vx = this.speed;
-    }
-    else {
-      this.vx = 0;
-    }
-    // Vertical movement
-    if (keyIsDown(this.upKey)) {
-      this.vy = -this.speed;
-    }
-    else if (keyIsDown(this.downKey)) {
-      this.vy = this.speed;
-    }
-    else {
-      this.vy = 0;
+    if (keyIsDown(this.sprintKey)){ // when sprinting multiply speedUp to the speed
+      if (keyIsDown(this.leftKey)) {
+        this.vx = -this.speed*this.speedUp;
+      }else if (keyIsDown(this.rightKey)) {
+        this.vx = this.speed*this.speedUp;
+      }else {
+        this.vx = 0;
+      }
+      // Vertical movement
+      if (keyIsDown(this.upKey)) {
+        this.vy = -this.speed*this.speedUp;
+      }else if (keyIsDown(this.downKey)) {
+        this.vy = this.speed*this.speedUp;
+      }else {
+        this.vy = 0;
+      }
+    }else{
+      if (keyIsDown(this.leftKey)) {
+        this.vx = -this.speed;
+      }else if (keyIsDown(this.rightKey)) {
+        this.vx = this.speed;
+      }else {
+        this.vx = 0;
+      }
+      // Vertical movement
+      if (keyIsDown(this.upKey)) {
+        this.vy = -this.speed;
+      }else if (keyIsDown(this.downKey)) {
+        this.vy = this.speed;
+      }else {
+        this.vy = 0;
+      }
     }
   }
 
@@ -115,6 +133,7 @@ class Predator {
       // Check if the prey died and reset it if so
       if (prey.health < 2) {
         prey.reset();
+        this.score ++;
       }
     }
   }

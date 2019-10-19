@@ -56,12 +56,18 @@ function setup() {
     player2Color = COLORS[int(random(0,7))];
   }
 
-  preyColor = color(random(128,255),random(128,255),random(128,255));
+  setRandomPreyColor();
 
-  player1 = new Predator(100, 100, 5,player1Color, 40, 87, 83, 65, 68);
-  antelope = new Prey(100, 100, 10, color(random(128,255),random(128,255),random(128,255)), 50);
-  zebra = new Prey(100, 100, 8, color(random(128,255),random(128,255),random(128,255)), 60);
-  bee = new Prey(100, 100, 20, color(random(128,255),random(128,255),random(128,255)), 10);
+  player1 = new Predator(100, 100, 5,player1Color, 40, 87, 83, 65, 68, 70);
+  antelope = new Prey(100, 100, 10, preyColor, 50);
+  setRandomPreyColor();
+  zebra = new Prey(100, 100, 8, preyColor, 60);
+  setRandomPreyColor();
+  bee = new Prey(100, 100, 20, preyColor, 10);
+}
+
+function setRandomPreyColor(){
+  preyColor = color(random(128,255),random(128,255),random(128,255));
 }
 
 // draw()
@@ -183,7 +189,7 @@ function checkMainMenuButtons(){
     if (mouseIsPressed){
       playing = true;
       singlePlayer = false;
-      player2 = new Predator(width-100, 100, 5, player2Color, 40, UP_ARROW, DOWN_ARROW, LEFT_ARROW, RIGHT_ARROW);
+      player2 = new Predator(width-100, 100, 5, player2Color, 40, UP_ARROW, DOWN_ARROW, LEFT_ARROW, RIGHT_ARROW,76);
     }
   }
 }
