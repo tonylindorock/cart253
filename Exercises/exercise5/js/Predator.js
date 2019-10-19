@@ -35,6 +35,7 @@ class Predator {
     this.sprintKey = sprintKey;
     // record score
     this.score = 0;
+    this.dead = false;
   }
 
   // handleInput
@@ -90,6 +91,10 @@ class Predator {
     // Update health
     this.health = this.health - this.healthLossPerMove;
     this.health = constrain(this.health, 0, this.maxHealth);
+
+    if (this.health<= 0){
+      this.dead = true;
+    }
     // Handle wrapping
     this.handleWrapping();
   }
@@ -149,6 +154,10 @@ class Predator {
     fill(255);
     this.radius = this.health;
     ellipse(this.x, this.y, this.radius * 2);
+    noStroke();
+    textAlign(CENTER,CENTER);
+    textSize(16);
+    text("score: "+this.score,this.x, this.y+this.radius+10);
     pop();
   }
 }

@@ -50,24 +50,32 @@ function setup() {
   textFont("Arial");
   ellipseMode(CENTER);
 
+  setRandomPlayerColor();
+
+  player1 = new Predator(100, 100, 5,player1Color, 40, 87, 83, 65, 68, 70);
+
+  setUpPrey();
+}
+
+function setRandomPlayerColor(){
   player1Color = COLORS[int(random(0,7))];
   player2Color = COLORS[int(random(0,7))];
   while(player2Color === player1Color){
     player2Color = COLORS[int(random(0,7))];
   }
-
-  setRandomPreyColor();
-
-  player1 = new Predator(100, 100, 5,player1Color, 40, 87, 83, 65, 68, 70);
-  antelope = new Prey(100, 100, 10, preyColor, 50);
-  setRandomPreyColor();
-  zebra = new Prey(100, 100, 8, preyColor, 60);
-  setRandomPreyColor();
-  bee = new Prey(100, 100, 20, preyColor, 10);
 }
 
 function setRandomPreyColor(){
   preyColor = color(random(128,255),random(128,255),random(128,255));
+}
+
+function setUpPrey(){
+  setRandomPreyColor();
+  antelope = new Prey(random(0,width), random(0,height), 10, preyColor, 50);
+  setRandomPreyColor();
+  zebra = new Prey(random(0,width), random(0,height), 8, preyColor, 60);
+  setRandomPreyColor();
+  bee = new Prey(random(0,width), random(0,height), 20, preyColor, 10);
 }
 
 // draw()
@@ -88,7 +96,8 @@ function draw() {
     showMainMenu();
     checkMainMenuButtons();
 
-  }else if (playing && !gameOver){
+  }else if (playing){
+    checkGameOver();
 
     // Handle input for the tiger
     if (singlePlayer){
@@ -101,18 +110,22 @@ function draw() {
 
       player1.display();
     }else{
-      player1.handleInput();
-      player1.move();
-      player2.handleInput();
-      player2.move();
-
-      player1.handleEating(antelope);
-      player1.handleEating(zebra);
-      player1.handleEating(bee);
-
-      player2.handleEating(antelope);
-      player2.handleEating(zebra);
-      player2.handleEating(bee);
+      if (!player1.dead){
+        player1.handleInput();
+        player1.move();
+        player1.handleEating(antelope);
+        player1.handleEating(zebra);
+        player1.handleEating(bee);
+      }
+      if (!singlePlayer){
+        if (!player2.dead){
+          player2.handleInput();
+          player2.move();
+          player2.handleEating(antelope);
+          player2.handleEating(zebra);
+          player2.handleEating(bee);
+        }
+      }
 
       player1.display();
       player2.display();
@@ -127,8 +140,92 @@ function draw() {
     antelope.display();
     zebra.display();
     bee.display();
-  }else if (gameOver){
 
+    if (gameOver){
+      displayGameOver();
+    }
+  }
+
+}
+
+function checkGameOver(){
+  if (singlePlayer){
+    if (player1.dead){
+      gameOver = true;
+    }
+  }else {
+    if (player1.dead && player2.dead){
+    gameOver = true;
+  }
+}
+}
+
+function displayGameOver(){
+  push();
+  fill(255);
+  textStyle(BOLD);
+  textAlign(CENTER,CENTER);
+  textSize(64);
+  text("GAME OVER", width/2,height/2);
+  textSize(32);
+  fill(0);
+  textAlign(RIGHT,CENTER);
+  text("player 1",width/2-100,height/2+100);
+  text("WASD KEYS",width/2-100,height/2+150);
+  textAlign(LEFT,CENTER);
+  text("player 2",width/2+100,height/2+100);
+  text("ARROWKEYS",width/2+100,height/2+150);
+  pop();
+  checkGameOverButtons();
+}
+
+function checkGameOverButtons(){
+  push();
+  textSize(32);
+  textStyle(BOLD);
+  if(mouseX<width/2){
+    fill(255);
+    textAlign(RIGHT,CENTER);
+    text("player 1",width/2-100,height/2+100);
+    fill(255);
+    stroke(player1Color);
+    strokeWeight(8);
+    ellipse(width/2,height/2+250,player1.radius*2);
+    noStroke();
+    fill(0);
+    textAlign(LEFT,CENTER);
+    text("player 2",width/2+100,height/2+100);
+    if (mouseIsPressed){
+      background(100);
+      setRandomPlayerColor();
+      player1 = new Predator(100, 100, 5,player1Color, 40, 87, 83, 65, 68, 70);
+      setUpPrey();
+      gameOver = false;
+      singlePlayer = true;
+    }
+  }else{
+    fill(0);
+    textAlign(RIGHT,CENTER);
+    text("player 1",width/2-100,height/2+100);
+    fill(255);
+    textAlign(LEFT,CENTER);
+    text("player 2",width/2+100,height/2+100);
+    fill(255);
+    stroke(player1Color);
+    strokeWeight(8);
+    ellipse(width/2-50,height/2+250,player1.radius*2);
+    fill(255);
+    stroke(player2Color);
+    ellipse(width/2+50,height/2+250,player1.radius*2);
+    noStroke();
+    if (mouseIsPressed){
+      setRandomPlayerColor();
+      player1 = new Predator(100, 100, 5,player1Color, 40, 87, 83, 65, 68, 70);
+      player2 = new Predator(width-100, 100, 5, player2Color, 40, UP_ARROW, DOWN_ARROW, LEFT_ARROW, RIGHT_ARROW,76);
+      setUpPrey();
+      gameOver = false;
+      singlePlayer = false;
+    }
   }
 }
 
@@ -138,16 +235,16 @@ function showMainMenu(){
   textStyle(BOLD);
   textAlign(CENTER,CENTER);
   textSize(32);
-  text("You are the predator(s)\nEat those preys to stay alive\nand avoid black ones from eating you", width/2,height/2-150);
+  text("You are the predator(s)\nEat those preys to stay alive", width/2,height/2-150);
   fill(0);
   textSize(64);
   text("PREDATOR-PREY SIM", width/2,height/2);
   textSize(32);
   textAlign(RIGHT,CENTER);
-  text("1 player",width/2-100,height/2+100);
+  text("player 1",width/2-100,height/2+100);
   text("WASD KEYS",width/2-100,height/2+150);
   textAlign(LEFT,CENTER);
-  text("2 players",width/2+100,height/2+100);
+  text("player 2",width/2+100,height/2+100);
   text("ARROWKEYS",width/2+100,height/2+150);
   pop();
 }
@@ -159,7 +256,7 @@ function checkMainMenuButtons(){
   if(mouseX<width/2){
     fill(255);
     textAlign(RIGHT,CENTER);
-    text("1 player",width/2-100,height/2+100);
+    text("player 1",width/2-100,height/2+100);
     fill(255);
     stroke(player1Color);
     strokeWeight(8);
@@ -167,17 +264,18 @@ function checkMainMenuButtons(){
     noStroke();
     fill(0);
     textAlign(LEFT,CENTER);
-    text("2 players",width/2+100,height/2+100);
+    text("player 2",width/2+100,height/2+100);
     if (mouseIsPressed){
       playing = true;
+      singlePlayer = true;
     }
   }else{
     fill(0);
     textAlign(RIGHT,CENTER);
-    text("1 player",width/2-100,height/2+100);
+    text("player 1",width/2-100,height/2+100);
     fill(255);
     textAlign(LEFT,CENTER);
-    text("2 players",width/2+100,height/2+100);
+    text("player 2",width/2+100,height/2+100);
     fill(255);
     stroke(player1Color);
     strokeWeight(8);
