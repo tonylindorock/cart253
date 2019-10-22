@@ -5,10 +5,10 @@
 // the screen and be consumed by Predator objects.
 
 /////////////////////////
-// ~10 ERRORS IN HERE
+// ~9 ERRORS IN HERE
 /////////////////////////
 
-glass Prey {
+class Prey { //////////////// FIXED
 
   // constructor
   //
