@@ -8,7 +8,7 @@
 // The predator loses health over time, so must keep eating to survive.
 
 ////////////////////
-// 6 ERRORS IN HERE
+// 5 ERRORS IN HERE
 ////////////////////
 
 // Our predator
@@ -23,7 +23,7 @@ let bee;
 //
 // Sets up a canvas
 // Creates objects for the predator and three prey
-functionsetup() {
+function setup() { //////////////// FIXED
   createCanvas(windowWidth, windowHeight);
   tiger = new Predator(100, 100, 5, color(200, 200, 0), 40); //////////////// FIXED
   antelope = new Prey(100, 100, 10, color(255, 100, 10), 50);
