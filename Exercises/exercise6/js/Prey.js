@@ -48,29 +48,29 @@ class Prey { //////////////// FIXED
     this.tx += 0.01;
     this.ty += 0.01;
     // Handle wrapping
-    this.handleWarpping(); //////////////// FIXED
+    this.handleWrapping(); //////////////// FIXED TWICE
   } //////////////// FIXED
 
     // handleWrapping
     //
     // Checks if the prey has gone off the canvas and
     // wraps it to the other side if so
-    handleWrapping() {
+  handleWrapping() {
       // Off the left or right
-      if (this.x > 0) {
-        this.x += width;
-      }
-      else if (this.x > width) {
-        this.x -= width;
-      }
-      // Off the top or bottom
-      if (this.y < 0) {
-        this.y += height;
-      }
-      else if (this.y > height) {
-        this.y -= height; //////////////// FIXED
-      }
+    if (this.x > 0) {
+      this.x += width;
     }
+    else if (this.x > width) {
+      this.x -= width;
+    }
+    // Off the top or bottom
+    if (this.y < 0) {
+      this.y += height;
+    }
+    else if (this.y > height) {
+      this.y -= height; //////////////// FIXED
+    }
+  }
 
     // display
     //
