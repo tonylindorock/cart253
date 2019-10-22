@@ -5,7 +5,7 @@
 // the screen and be consumed by Predator objects.
 
 /////////////////////////
-// ~3 ERRORS IN HERE
+// ~2 ERRORS IN HERE
 /////////////////////////
 
 class Prey { //////////////// FIXED
@@ -57,7 +57,7 @@ class Prey { //////////////// FIXED
     // wraps it to the other side if so
   handleWrapping() {
       // Off the left or right
-    if (this.x > 0) {
+    if (this.x < 0) { //////////////// FIXED
       this.x += width;
     }
     else if (this.x > width) {
