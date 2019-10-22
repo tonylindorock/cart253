@@ -1,7 +1,7 @@
 // Predator-Prey Sim
 // by Yichen Wang
 //
-// Creates a predator or two and three prey (of different sizes and speeds)
+// Creates a predator or two and three prey (of different sizes, color, and speeds)
 // The predator chases the prey using the arrow keys or WASD and consumes them.
 // The predator loses health over time, so must keep eating to survive.
 
@@ -45,11 +45,13 @@ let gameOver = false;
 // Sets up a canvas
 // Creates objects for the predator and three prey
 function setup() {
+  // set up style for the game
   createCanvas(windowWidth, windowHeight);
   textAlign(CENTER, CENTER);
   textFont("Arial");
   ellipseMode(CENTER);
 
+  // give player random colored strokes
   setRandomPlayerColor();
 
   // create player1 object
@@ -63,8 +65,11 @@ function setup() {
 //
 // give players two random but different colored strokes
 function setRandomPlayerColor() {
+  // randomly select a number from 0 to 6
+  // the number will be used as an index for determining which color in the array
   player1Color = COLORS[int(random(0, 7))];
   player2Color = COLORS[int(random(0, 7))];
+  // if the player strokes are the same, repeat randomly selecting a different number for player2
   while (player2Color === player1Color) {
     player2Color = COLORS[int(random(0, 7))];
   }
@@ -74,6 +79,7 @@ function setRandomPlayerColor() {
 //
 // set or reset prey color randomly
 function setRandomPreyColor() {
+  // set RGB randomly from 128 to 255 for a bright, consistant color
   preyColor = color(random(128, 255), random(128, 255), random(128, 255));
 }
 
@@ -81,8 +87,11 @@ function setRandomPreyColor() {
 //
 // set up the prey objects with different random colors
 function setUpPrey() {
+  // set prey color
   setRandomPreyColor();
+  // create a prey object
   antelope = new Prey(random(0, width), random(0, height), 10, preyColor, 50);
+  // reset prey color
   setRandomPreyColor();
   zebra = new Prey(random(0, width), random(0, height), 8, preyColor, 60);
   setRandomPreyColor();
@@ -95,6 +104,7 @@ function setUpPrey() {
 function draw() {
   // Clear the background to black
   background(100);
+  // if the game is not started, display the moving preys in the background
   if (!playing && !gameOver) {
     antelope.move();
     zebra.move();
@@ -104,15 +114,18 @@ function draw() {
     zebra.display();
     bee.display();
 
+    // start buttons
     showMainMenu();
     checkMainMenuButtons();
 
+    // during gameplay
   } else if (playing) {
-    checkGameOver();
+    checkGameOver(); // check if the player(s) is dead
 
     // Handle input for the tiger
     // if players are dead, they can not be able to move anymore
     if (singlePlayer) {
+      // if the player is dead, it cannot move anymore
       if (!player1.dead) {
         player1.handleInput();
         player1.move();
@@ -187,6 +200,8 @@ function displayGameOver() {
   textAlign(CENTER, CENTER);
   textSize(64);
   text("GAME OVER", width / 2, height / 2);
+
+  // buttons
   textSize(32);
   fill(0);
   textAlign(RIGHT, CENTER);
@@ -197,6 +212,7 @@ function displayGameOver() {
   text("ARROWKEYS", width / 2 + 100, height / 2 + 150);
   pop();
 
+  // check which button is pressed
   checkGameOverButtons();
 }
 
@@ -208,6 +224,7 @@ function checkGameOverButtons() {
   push();
   textSize(32);
   textStyle(BOLD);
+  // left button
   if (mouseX < width / 2) {
     fill(255);
     textAlign(RIGHT, CENTER);
@@ -230,6 +247,7 @@ function checkGameOverButtons() {
       gameOver = false;
       singlePlayer = true;
     }
+    // right button
   } else {
     fill(0);
     textAlign(RIGHT, CENTER);
@@ -265,12 +283,16 @@ function showMainMenu() {
   push();
   fill(255);
   textStyle(BOLD);
+  // rule
   textAlign(CENTER, CENTER);
   textSize(32);
   text("You are the predator(s)\nEat those preys to stay alive", width / 2, height / 2 - 150);
+  // title
   fill(0);
   textSize(64);
   text("PREDATOR-PREY SIM", width / 2, height / 2);
+
+  // buttons
   textSize(32);
   textAlign(RIGHT, CENTER);
   text("player 1", width / 2 - 100, height / 2 + 100);
@@ -322,6 +344,7 @@ function checkMainMenuButtons() {
     stroke(player2Color);
     ellipse(width / 2 + 50, height / 2 + 250, player1.radius * 2);
     noStroke();
+    // if two-player is selected, a second player object will be created
     if (mouseIsPressed) {
       playing = true;
       singlePlayer = false;
