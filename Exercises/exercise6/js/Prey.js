@@ -5,7 +5,7 @@
 // the screen and be consumed by Predator objects.
 
 /////////////////////////
-// ~1 ERRORS IN HERE
+// ~0 ERRORS IN HERE
 /////////////////////////
 
 class Prey { //////////////// FIXED
@@ -21,7 +21,7 @@ class Prey { //////////////// FIXED
     // Velocity and speed
     this.vx = 0;
     this.vy = 0;
-    this.sped = speed;
+    this.speed = speed; //////////////// FIXED
     // Time properties for noise() function
     //////////////// FIXED
     this.tx = random(0, 100); // To make x and y noise different
