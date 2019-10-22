@@ -1,7 +1,7 @@
 // Predator
 //
 // A class that represents a simple predator
-// controlled by the arrow keys. It can move around
+// controlled by the arrow keys and/or WASD. It can move around
 // the screen and consume Prey objects to maintain its health.
 
 class Predator {
@@ -147,6 +147,7 @@ class Predator {
   //
   // Draw the predator as an ellipse on the canvas
   // with a radius the same size as its current health.
+  // Also print the score underneath
   display() {
     push();
     strokeWeight(8);
