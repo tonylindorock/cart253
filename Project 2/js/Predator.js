@@ -5,12 +5,11 @@
 // the screen and consume Prey objects to maintain its health.
 
 class Predator {
-
   // constructor
   //
   // Sets the initial values for the Predator's properties
   // Either sets default values or uses the arguments provided
-  constructor(x, y, speed, strokeColor, radius, upKey,downKey,leftKey,rightKey,sprintKey) {
+  constructor(x, y, speed, radius, texture, upKey,downKey,leftKey,rightKey,sprintKey) {
     // Position
     this.x = x;
     this.y = y;
@@ -24,9 +23,10 @@ class Predator {
     this.health = this.maxHealth; // Must be AFTER defining this.maxHealth
     this.healthLossPerMove = 0.1;
     this.healthGainPerEat = 1;
-    // Display properties
-    this.strokeColor = strokeColor;
+
     this.radius = this.health; // Radius is defined in terms of health
+    this.texture = texture;
+
     // Input properties
     this.upKey = upKey;
     this.downKey = downKey;
@@ -149,12 +149,10 @@ class Predator {
   // with a radius the same size as its current health.
   display() {
     push();
-    strokeWeight(8);
-    stroke(this.strokeColor);
-    fill(255);
-    this.radius = this.health;
-    ellipse(this.x, this.y, this.radius * 2);
     noStroke();
+    imageMode(CENTER);
+    this.radius = this.health;
+    image(texture, this.x, this.y, this.radius * 2);
     textAlign(CENTER,CENTER);
     textSize(16);
     text("score: "+this.score,this.x, this.y+this.radius+10);
