@@ -18,15 +18,15 @@ class Predator {
     this.vy = 0;
     this.speed = speed;
     this.speedUp = 2; // when sprint
+
+    this.radius = radius;
     // Health properties
-    this.maxHealth = radius;
+    this.maxHealth = this.radius;
     this.health = this.maxHealth; // Must be AFTER defining this.maxHealth
     this.healthLossPerMove = 0.1;
     this.healthGainPerEat = 1;
-
-    this.radius = this.health; // Radius is defined in terms of health
     this.texture = texture;
-    this.texture_fliped = texture_flipped;
+    this.texture_flipped = texture_flipped;
     this.faceLeft = true;
     // Input properties
     this.upKey = upKey;
@@ -52,7 +52,7 @@ class Predator {
       }else if (keyIsDown(this.rightKey)) {
         this.faceLeft = false;
         this.vx = this.speed*this.speedUp;
-      }else {
+      }else{
         this.vx = 0;
       }
       // Vertical movement
@@ -93,6 +93,7 @@ class Predator {
     // Update position
     this.x += this.vx;
     this.y += this.vy;
+
     // Update health
     this.health = this.health - this.healthLossPerMove;
     this.health = constrain(this.health, 0, this.maxHealth);
@@ -154,9 +155,9 @@ class Predator {
   // with a radius the same size as its current health.
   display() {
     push();
-    noStroke();
     imageMode(CENTER);
-    this.radius = this.health;
+    rectMode(CENTER);
+    fill(255);
     if (this.faceLeft){
       image(this.texture, this.x, this.y, this.radius * 2,this.radius * 2);
     }else{

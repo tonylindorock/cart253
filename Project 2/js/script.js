@@ -12,6 +12,16 @@ let player2_texture;
 // if single player
 let singlePlayer = true;
 
+const NUM_TREE=10;
+// the number of animals
+const NUM_RABBIT = 20;
+const NUM_BOAR = 10;
+const NUM_ZEBRA = 10;
+const NUM_ANTELOPE = 10;
+const NUM_BISON = 10;
+const NUM_ANIMALS = [NUM_RABBIT,NUM_BOAR,NUM_ZEBRA,NUM_ANTELOPE,NUM_BISON];
+let num_human = 1;
+
 // game state
 let playing = false;
 let gameOver = false;
@@ -57,6 +67,7 @@ let wolf_flipped;
 let leopard_flipped;
 let human_flipped;
 
+let trees = [];
 let prey = [];
 let players = [];
 let predatorPro = [];
@@ -79,7 +90,19 @@ function preload() {
   lion = loadImage("assets/images/Lion.png");
   wolf = loadImage("assets/images/Wolf.png");
   leopard = loadImage("assets/images/Leopard.png");
+
   human = loadImage("assets/images/Man.png");
+  rabbit_white_flipped = loadImage("assets/images/Rabbit_W_flipped.png");
+  rabbit_brown_flipped = loadImage("assets/images/Rabbit_B_flipped.png");
+  boar_flipped = loadImage("assets/images/Boar_flipped.png");
+  zebra_flipped = loadImage("assets/images/Zebra_flipped.png");
+  antelope_flipped = loadImage("assets/images/Antelope_flipped.png");
+  bison_flipped = loadImage("assets/images/Bison_flipped.png");
+  lion_flipped = loadImage("assets/images/Lion_flipped.png");
+  wolf_flipped = loadImage("assets/images/Wolf_flipped.png");
+  leopard_flipped = loadImage("assets/images/Leopard_flipped.png");
+  human_flipped = loadImage("assets/images/Man_flipped.png");
+
   tree_spring = loadImage("assets/images/Tree_Spring.png");
   tree_summer = loadImage("assets/images/Tree_Summer.png");
   tree_fall = loadImage("assets/images/Tree_Fall.png");
@@ -102,6 +125,7 @@ function setup() {
 
   currentSeason = int(random(0, 4));
   randomizeElementsPos();
+  setupBG();
 
   append(players,lion);
   append(players,wolf);
@@ -111,7 +135,7 @@ function setup() {
   append(players,leopard_flipped);
   setupPlayer();
   // create player1 object
-  player1 = new Predator(100, 100, 5, 30, player1_texture,player1_texture_flipped, 87, 83, 65, 68, 70);
+  player1 = new Predator(100, 100, 3, 30, player1_texture,player1_texture_flipped, 87, 83, 65, 68, 70);
 
   // set up prey objects
   setUpPrey();
@@ -119,9 +143,58 @@ function setup() {
 
 // setUpPrey()
 //
-// set up the prey objects with different random colors
+// set up the prey objects
 function setUpPrey() {
-
+  prey=[];
+  for(let i=0;i<5;i++){
+    let num_animal = NUM_ANIMALS[i];
+    let animal_id = i;
+    for(let j=0;j<num_animal;j++){
+      let preyX = random(0, width);
+      let preyY = random(0, height);
+      let preySpeed=0;
+      let preyRadius=0;
+      let texture;
+      let texture_flipped;
+      // rabbit
+      if (animal_id===0){
+        preySpeed = random(3,5);
+        preyRadius = random(10,15);
+        if (currentSeason===3){
+          texture=rabbit_brown;
+          texture_flipped=rabbit_brown_flipped;
+        }else{
+          texture=rabbit_white;
+          texture_flipped=rabbit_white_flipped;
+        }
+      // boar
+      }else if(animal_id===1){
+        preySpeed = random(0.5,3);
+        preyRadius = random(20,25);
+        texture=boar;
+        texture_flipped=boar_flipped;
+      // zebra, antelope, and bison
+      }else if(animal_id>=2){
+        preySpeed = random(1,3);
+        preyRadius = random(25,30);
+        // zebra
+        if (animal_id===2){
+          texture=zebra;
+          texture_flipped=zebra_flipped;
+        // antelope
+        }else if(animal_id===3){
+          texture=antelope;
+          texture_flipped=antelope_flipped;
+        //bison
+        }else if(animal_id===4){
+          texture=bison;
+          texture_flipped=bison_flipped;
+        }
+      }
+      let preyObj = new Prey(preyX,preyY,preySpeed,preyRadius,texture, texture_flipped);
+      prey.push(preyObj);
+  }
+}
 }
 
 function setupPlayer(){
@@ -138,23 +211,34 @@ function setupPlayer(){
 // set up the background of the game by randomly selecting a season in an array
 // and display certain other BG elements
 function setupBG() {
-  background(SEASONS[currentSeason]);
+  trees=[];
   if (currentSeason === 0) {
-    for (let i = 0; i < 10; i++) {
-      image(tree_spring, ElementsPosX[i], ElementsPosY[i], 60, 60);
+    for (let i = 0; i < NUM_TREE; i++) {
+      let treeObj = new Tree(ElementsPosX[i], ElementsPosY[i], 60,tree_spring);
+      trees.push(treeObj);
     }
   } else if (currentSeason === 1) {
-    for (let i = 0; i < 10; i++) {
-      image(tree_summer, ElementsPosX[i], ElementsPosY[i], 60, 60);
+    for (let i = 0; i < NUM_TREE; i++) {
+      let treeObj = new Tree(ElementsPosX[i], ElementsPosY[i], 60,tree_summer);
+      trees.push(treeObj);
     }
   } else if (currentSeason === 2) {
-    for (let i = 0; i < 10; i++) {
-      image(tree_fall, ElementsPosX[i], ElementsPosY[i], 60, 60);
+    for (let i = 0; i < NUM_TREE; i++) {
+      let treeObj = new Tree(ElementsPosX[i], ElementsPosY[i], 60,tree_fall);
+      trees.push(treeObj);
     }
   } else if (currentSeason === 3) {
-    for (let i = 0; i < 10; i++) {
-      image(tree_winter, ElementsPosX[i], ElementsPosY[i], 60, 60);
+    for (let i = 0; i < NUM_TREE; i++) {
+      let treeObj = new Tree(ElementsPosX[i], ElementsPosY[i], 60,tree_winter);
+      trees.push(treeObj);
     }
+  }
+}
+
+function drawBG(){
+  background(SEASONS[currentSeason]);
+  for(let i=0;i<trees.length;i++){
+    trees[i].display();
   }
 }
 
@@ -177,8 +261,14 @@ function randomizeElementsPos() {
 // Handles input, movement, eating, and displaying for the system's objects
 function draw() {
   // Clear the background to black
-  setupBG();
+  drawBG();
   if (!playing && !gameOver) {
+
+    for(let i=0;i<prey.length;i++){
+      prey[i].move();
+      prey[i].display();
+    }
+
     fill(0,50);
     rect(width/2,height/2,width,height);
     showMainMenu();
@@ -186,6 +276,10 @@ function draw() {
 
   } else if (playing) {
     checkGameOver();
+    for(let i=0;i<prey.length;i++){
+      prey[i].move();
+      prey[i].display();
+    }
 
     // Handle input for the tiger
     // if players are dead, they can not be able to move anymore
@@ -193,8 +287,6 @@ function draw() {
       if (!player1.dead) {
         player1.handleInput();
         player1.move();
-
-        player1.handleEating(antelope);
       }
       // leave player's score on the screen
       player1.display();
@@ -202,12 +294,10 @@ function draw() {
       if (!player1.dead) {
         player1.handleInput();
         player1.move();
-        player1.handleEating(antelope);
       }
       if (!player2.dead) {
           player2.handleInput();
           player2.move();
-          player2.handleEating(antelope);
       }
 
       player1.display();
@@ -215,16 +305,14 @@ function draw() {
     }
 
     // Move all the "animals"
-    antelope.move();
-    zebra.move();
-    bee.move();
+
 
     // Display all the "animals"
-    antelope.display();
-    zebra.display();
-    bee.display();
+
 
     if (gameOver) {
+      fill(0,50);
+      rect(width/2,height/2,width,height);
       displayGameOver();
     }
   }
@@ -254,10 +342,9 @@ function displayGameOver() {
   fill(255);
   textStyle(BOLD);
   textAlign(CENTER, CENTER);
-  textSize(64);
+  textSize(128);
   text("GAME OVER", width / 2, height / 2);
   textSize(32);
-  fill(0);
   textAlign(RIGHT, CENTER);
   text("play as one", width / 2 - 100, height / 2 + 100);
   text("WASD KEYS", width / 2 - 100, height / 2 + 150);
@@ -276,38 +363,38 @@ function displayGameOver() {
 function checkGameOverButtons() {
   push();
   textSize(32);
+  fill(255);
+  textStyle(BOLD);
   if (mouseX < width / 2) {
-    fill(255);
     textAlign(RIGHT, CENTER);
+    fill(SELECTED);
     text("play as one", width / 2 - 100, height / 2 + 100);
+    image(player1_texture,width / 2, height / 2 + 250, player1.radius * 2,player1.radius * 2);
     fill(255);
-    image(player1_texture,width / 2, height / 2 + 250, player1.radius * 2);
-    fill(0);
     textAlign(LEFT, CENTER);
     text("play as two", width / 2 + 100, height / 2 + 100);
     // reset all colors of prey and player
     // reset game stats
     if (mouseIsPressed) {
       background(100);
-      player1 = new Predator(100, 100, 5, 30, player1_texture,player1_texture_flipped, 87, 83, 65, 68, 70);
+      player1 = new Predator(100, 100, 3, 30, player1_texture,player1_texture_flipped, 87, 83, 65, 68, 70);
       setUpPrey();
       gameOver = false;
       singlePlayer = true;
     }
   } else {
-    fill(0);
     textAlign(RIGHT, CENTER);
     text("play as one", width / 2 - 100, height / 2 + 100);
-    fill(255);
+    fill(SELECTED);
     textAlign(LEFT, CENTER);
     text("play as two", width / 2 + 100, height / 2 + 100);
-    image(player1_texture,width / 2 - 50, height / 2 + 250, player1.radius * 2);
-    image(player2_texture,width / 2 + 50, height / 2 + 250, player1.radius * 2);
+    image(player1_texture,width / 2 - 50, height / 2 + 250, player1.radius * 2,player1.radius * 2);
+    image(player2_texture,width / 2 + 50, height / 2 + 250, player1.radius * 2,player1.radius * 2);
     // reset all colors of prey and two players
     // reset game stats
     if (mouseIsPressed) {
-      player1 = new Predator(100, 100, 5, 30, player1_texture,player1_texture_flipped, 87, 83, 65, 68, 70);
-      player2 = new Predator(width - 100, 100, 5, 30, player2_texture,player2_texture_flipped, UP_ARROW, DOWN_ARROW, LEFT_ARROW, RIGHT_ARROW, 76);
+      player1 = new Predator(100, 100, 3, 30, player1_texture,player1_texture_flipped, 87, 83, 65, 68, 70);
+      player2 = new Predator(width - 100, 100, 3, 30, player2_texture,player2_texture_flipped, UP_ARROW, DOWN_ARROW, LEFT_ARROW, RIGHT_ARROW, 76);
       setUpPrey();
       gameOver = false;
       singlePlayer = false;
@@ -332,10 +419,10 @@ function showMainMenu() {
   textSize(32);
   textAlign(RIGHT, CENTER);
   text("play as one", width / 2 - 100, height / 2 + 120);
-  text("WASD KEYS", width / 2 - 100, height / 2 + 170);
+  text("WASD KEYS\nF to sprint", width / 2 - 100, height / 2 + 180);
   textAlign(LEFT, CENTER);
   text("play as two", width / 2 + 100, height / 2 + 120);
-  text("ARROWKEYS", width / 2 + 100, height / 2 + 170);
+  text("ARROWKEYS\nL to sprint", width / 2 + 100, height / 2 + 180);
   pop();
 }
 
@@ -374,7 +461,7 @@ function checkMainMenuButtons() {
     if (mouseIsPressed) {
       playing = true;
       singlePlayer = false;
-      player2 = new Predator(width - 100, 100, 5, 30,player2_texture,player2_texture_flipped, UP_ARROW, DOWN_ARROW, LEFT_ARROW, RIGHT_ARROW, 76);
+      player2 = new Predator(width - 100, 100, 3, 30,player2_texture,player2_texture_flipped, UP_ARROW, DOWN_ARROW, LEFT_ARROW, RIGHT_ARROW, 76);
     }
   }
   pop();

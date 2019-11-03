@@ -10,7 +10,7 @@ class Prey {
   //
   // Sets the initial values for the Predator's properties
   // Either sets default values or uses the arguments provided
-  constructor(x, y, speed, fillColor, radius) {
+  constructor(x, y, speed, radius, texture, texture_flipped) {
     // Position
     this.x = x;
     this.y = y;
@@ -25,7 +25,10 @@ class Prey {
     this.maxHealth = radius;
     this.health = this.maxHealth; // Must be AFTER defining this.maxHealth
     // Display properties
-    this.fillColor = fillColor;
+    this.texture = texture;
+    this.texture_flipped = texture_flipped;
+    this.faceLeft = true;
+
     this.radius = this.health;
   }
 
@@ -37,6 +40,12 @@ class Prey {
     // Set velocity via noise()
     this.vx = map(noise(this.tx), 0, 1, -this.speed, this.speed);
     this.vy = map(noise(this.ty), 0, 1, -this.speed, this.speed);
+    if(this.vx < 0){
+      this.faceLeft = true;
+    }
+    if (this.vx > 0){
+      this.faceLeft = false;
+    }
     // Update position
     this.x += this.vx;
     this.y += this.vy;
@@ -74,10 +83,12 @@ class Prey {
   // with a radius the same size as its current health.
   display() {
     push();
-    noStroke();
-    fill(this.fillColor);
-    this.radius = this.health;
-    ellipse(this.x, this.y, this.radius * 2);
+    imageMode(CENTER);
+    if (this.faceLeft){
+      image(this.texture, this.x, this.y, this.radius * 2,this.radius * 2);
+    }else{
+      image(this.texture_flipped, this.x, this.y, this.radius * 2,this.radius * 2);
+    }
     pop();
   }
 
