@@ -16,26 +16,62 @@ let gameOver = false;
 
 // grass colors for different seasons
 const SPRING = "#a0cc83";
-const SUMMER = "#64b360";
+const SUMMER = "#6fa36a";
 const FALL = "#dbbf72";
 const WINTER = "#a8bab4";
 
-const SEASONS = [SPRING,SUMMER,FALL,WINTER];
-
+const SEASONS = [SPRING, SUMMER, FALL, WINTER];
+// index for SEASONS array
 let currentSeason;
 
 // BG objects locations
 let ElementsPosX = [];
 let ElementsPosY = [];
 
-const RULES = "You are the predator of the Earth."+
-"\nYou are constantly hungry so you must feast."+
-"\nEat as much prey as you can before human hunt you down.";
+const RULES = "You are the predator of the Earth." +
+  "\nYou are constantly hungry so you must feast." +
+  "\nEat as much prey as you can before human hunt you down.";
+
+// all the images
+let rabbit_white;
+let rabbit_brown;
+let boar;
+let zebra;
+let antelope;
+let bison;
+let lion;
+let wolf;
+let leopard;
+let human;
+
+let prey = [];
+let players = [];
+let predatorPro = [];
+
+let tree_spring;
+let tree_summer;
+let tree_fall;
+let tree_winter;
 
 // preload()
 //
 // Load all the image and sound sources
-function preload(){
+function preload() {
+  rabbit_white = loadImage("assets/images/Rabbit_W.png");
+  rabbit_brown = loadImage("assets/images/Rabbit_B.png");
+  boar = loadImage("assets/images/Boar.png");
+  zebra = loadImage("assets/images/Zebra.png");
+  antelope = loadImage("assets/images/Antelope.png");
+  bison = loadImage("assets/images/Bison.png");
+  lion = loadImage("assets/images/Lion.png");
+  wolf = loadImage("assets/images/Wolf.png");
+  leopard = loadImage("assets/images/Leopard.png");
+  human = loadImage("assets/images/Man.png");
+  tree_spring = loadImage("assets/images/Tree_Spring.png");
+  tree_summer = loadImage("assets/images/Tree_Summer.png");
+  tree_fall = loadImage("assets/images/Tree_Fall.png");
+  tree_winter = loadImage("assets/images/Tree_Winter.png");
+
 
 }
 
@@ -46,10 +82,10 @@ function preload(){
 function setup() {
   createCanvas(windowWidth, windowHeight);
   textAlign(CENTER, CENTER);
-  textFont("Arial");
+  textFont('Helvetica');
   imageMode(CENTER);
 
-  currentSeason = int(random(0,4));
+  currentSeason = int(random(0, 4));
   randomizeElementsPos();
   // create player1 object
   player1 = new Predator(100, 100, 5, color(0), 40, 87, 83, 65, 68, 70);
@@ -69,38 +105,38 @@ function setUpPrey() {
 //
 // set up the background of the game by randomly selecting a season in an array
 // and display certain other BG elements
-function setupBG(){
+function setupBG() {
   background(SEASONS[currentSeason]);
-  if(currentSeason===0){
-    for(let i=0;i<10;i++){
-      rect(ElementsPosX[i],ElementsPosY[i],50,50);
+  if (currentSeason === 0) {
+    for (let i = 0; i < 10; i++) {
+      image(tree_spring, ElementsPosX[i], ElementsPosY[i], 100, 100);
     }
-  }else if(currentSeason===1){
-    for(let i=0;i<10;i++){
-      rect(ElementsPosX[i],ElementsPosY[i],50,50);
+  } else if (currentSeason === 1) {
+    for (let i = 0; i < 10; i++) {
+      image(tree_summer, ElementsPosX[i], ElementsPosY[i], 100, 100);
     }
-  }else if(currentSeason===2){
-    for(let i=0;i<10;i++){
-      rect(ElementsPosX[i],ElementsPosY[i],50,50);
+  } else if (currentSeason === 2) {
+    for (let i = 0; i < 10; i++) {
+      image(tree_fall, ElementsPosX[i], ElementsPosY[i], 100, 100);
     }
-  }else if(currentSeason===3){
-    for(let i=0;i<10;i++){
-      rect(ElementsPosX[i],ElementsPosY[i],50,50);
+  } else if (currentSeason === 3) {
+    for (let i = 0; i < 10; i++) {
+      image(tree_winter, ElementsPosX[i], ElementsPosY[i], 100, 100);
     }
   }
 }
 
-function nextSeason(){
+function nextSeason() {
   currentSeason += 1;
-  if (currentSeason > 3){
+  if (currentSeason > 3) {
     currentSeason = 0;
   }
 }
 
-function randomizeElementsPos(){
-  for(let i=0;i<10;i++){
-    ElementsPosX[i] = random(0,width);
-    ElementsPosY[i] = random(0,height);
+function randomizeElementsPos() {
+  for (let i = 0; i < 10; i++) {
+    ElementsPosX[i] = random(0, width);
+    ElementsPosY[i] = random(0, height);
   }
 }
 
