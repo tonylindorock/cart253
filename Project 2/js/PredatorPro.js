@@ -27,8 +27,12 @@ class PredatorPro {
     this.texture_flipped = texture_flipped;
     this.faceLeft = true;
 
+    this.healthLossPerMove = 0.05;
+    this.healthGainPerEat = 0.5;
+
     this.radius = radius;
-    this.dead = false;
+    this.campfirePosX = x;
+    this.campfirePosY = y;
   }
 
   // move
@@ -46,6 +50,8 @@ class PredatorPro {
     } else if (this.vx > 0) {
       this.faceLeft = false;
     }
+    this.health -= this.healthLossPerMove;
+    this.health = constrain(this.health, 0, this.maxHealth);
     // Update position
     this.x += this.vx;
     this.y += this.vy;
@@ -54,6 +60,9 @@ class PredatorPro {
     this.ty += 0.01;
     // Handle wrapping
     this.handleWrapping();
+    if (this.health<=0){
+      this.reset();
+    }
   }
 
   // handleWrapping
@@ -75,21 +84,48 @@ class PredatorPro {
     }
   }
 
-  // handleEating
+  handleEating(prey){
+    // Calculate distance from this predator to the prey
+    let d = dist(this.x, this.y, prey.x, prey.y);
+    // Check if the distance is less than their two radii (an overlap)
+    if (d<50){
+      this.x = lerp(this.x, prey.x, 0.025);
+      this.y = lerp(this.y, prey.y, 0.025);
+      if (d < this.radius + prey.radius) {
+        this.health += this.healthGainPerEat;
+        this.health = constrain(this.health, 0, this.maxHealth);
+        // Decrease prey health by the same amount
+        prey.health -= this.healthGainPerEat;
+        if (prey.health < prey.maxHealth / 2) {
+          if (prey.speed > prey.originalSpeed / 4) {
+            prey.speed = prey.speed / 2;
+          }
+        }
+        // Check if the prey died and reset it if so
+        if (prey.health < 2) {
+          prey.reset();
+          }
+      }
+    }
+  }
+  // hunting
   //
   // Takes a Prey object as an argument and checks if the predator
   // overlaps it. If so, reduces the prey's health and increases
   // the predator's. If the prey dies, it gets reset.
-  handleEating(predator) {
+  hunting(predator) {
     // Calculate distance from this predator to the prey
     let d = dist(this.x, this.y, predator.x, predator.y);
     // Check if the distance is less than their two radii (an overlap)
-    if (d < this.radius + predator.radius) {
-      // Increase predator health and constrain it to its possible range
-      this.health += this.healthGainPerEat;
-      this.health = constrain(this.health, 0, this.maxHealth);
-      // Decrease prey health by the same amount
-      predator.health -= this.healthGainPerEat;
+    if (d<150){
+      this.x = lerp(this.x, predator.x, 0.025);
+      this.y = lerp(this.y, predator.y, 0.025);
+      if (d < this.radius + predator.radius) {
+        this.health += this.healthGainPerEat;
+        this.health = constrain(this.health, 0, this.maxHealth);
+        // Decrease prey health by the same amount
+        predator.health -= this.healthGainPerEat;
+      }
     }
   }
 
@@ -100,8 +136,8 @@ class PredatorPro {
   display(inGame) {
     push();
     fill(255);
+    imageMode(CENTER);
     rectMode(CORNER);
-    this.radius = this.health;
     if (this.faceLeft) {
       image(this.texture, this.x, this.y, this.radius * 2, this.radius * 2);
     } else {
@@ -115,4 +151,16 @@ class PredatorPro {
     }
     pop();
   }
+// reset
+//
+// Set the position to a random location and reset health
+// and radius back to default
+reset(){
+  // Random position
+  this.x = this.campfirePosX;
+  this.y = this.campfirePosY;
+
+  // Default health
+  this.health = this.maxHealth;
+}
 }

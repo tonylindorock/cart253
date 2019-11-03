@@ -44,6 +44,9 @@ let currentSeason;
 let ElementsPosX = [];
 let ElementsPosY = [];
 
+let campfirePosX = 0;
+let campfirePosY = 0;
+
 const RULES = "You are the predator of the Earth." +
   "\nYou are constantly hungry so you must feast." +
   "\nEat as much prey as you can before human hunt you down.";
@@ -207,6 +210,8 @@ function setupHuman() {
   for (let i = 0; i < num_human; i++) {
     let humanX = random(0, width);
     let humanY = random(0, height);
+    campfirePosX = humanX;
+    campfirePosY = humanY;
     let humanSpeed = 3;
     let humanRadius = random(25, 30);
     let humanObj = new PredatorPro(humanX, humanY, humanSpeed, humanRadius, human, human_flipped);
@@ -215,11 +220,9 @@ function setupHuman() {
 }
 
 function addHuman() {
-  let humanX = random(0, width);
-  let humanY = random(0, height);
   let humanSpeed = 3;
   let humanRadius = random(25, 30);
-  let humanObj = new PredatorPro(humanX, humanY, humanSpeed, humanRadius, human, human_flipped);
+  let humanObj = new PredatorPro(campfirePosX, campfirePosY, humanSpeed, humanRadius, human, human_flipped);
   num_human++;
   predatorPro.push(humanObj);
 }
@@ -294,6 +297,7 @@ function draw() {
     for (let i = 0; i < prey.length; i++) {
       prey[i].move();
       prey[i].display(playing);
+      predatorPro[0].handleEating(prey[i]);
     }
     for (let j = 0; j < predatorPro.length; j++) {
       predatorPro[j].move();
@@ -318,6 +322,9 @@ function draw() {
         if (!player2.dead) {
           player2.handleEating(prey[i]);
         }
+      }
+      for (let j = 0; j < num_human; j++) {
+        predatorPro[j].handleEating(prey[i]);
       }
     }
     // Handle input for the tiger
@@ -347,6 +354,10 @@ function draw() {
     for (let j = 0; j < num_human; j++) {
       predatorPro[j].move();
       predatorPro[j].display(playing);
+      predatorPro[j].hunting(player1);
+      if (!singlePlayer){
+        predatorPro[j].hunting(player2);
+      }
     }
 
     if (gameOver) {
@@ -462,6 +473,7 @@ function checkGameOverButtons() {
       player1 = new Predator(100, 100, 2, 30, player1_texture, player1_texture_flipped, 87, 83, 65, 68, 70);
       player2 = new Predator(width - 100, 100, 2, 30, player2_texture, player2_texture_flipped, UP_ARROW, DOWN_ARROW, LEFT_ARROW, RIGHT_ARROW, 76);
       setUpPrey();
+      setupHuman();
       gameOver = false;
       singlePlayer = false;
       addHuman();
