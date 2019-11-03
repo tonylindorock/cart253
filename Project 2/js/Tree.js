@@ -1,5 +1,5 @@
-class Tree{
-  constructor(x,y,radius,texture){
+class Tree {
+  constructor(x, y, radius, texture) {
     this.x = x;
     this.y = y;
     this.radius = radius;
@@ -7,7 +7,7 @@ class Tree{
 
   }
 
-  display(){
+  display() {
     push();
     imageMode(CENTER);
     rectMode(CENTER);

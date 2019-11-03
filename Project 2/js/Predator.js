@@ -9,7 +9,7 @@ class Predator {
   //
   // Sets the initial values for the Predator's properties
   // Either sets default values or uses the arguments provided
-  constructor(x, y, speed, radius, texture, texture_flipped, upKey,downKey,leftKey,rightKey,sprintKey) {
+  constructor(x, y, speed, radius, texture, texture_flipped, upKey, downKey, leftKey, rightKey, sprintKey) {
     // Position
     this.x = x;
     this.y = y;
@@ -23,8 +23,8 @@ class Predator {
     // Health properties
     this.maxHealth = this.radius;
     this.health = this.maxHealth; // Must be AFTER defining this.maxHealth
-    this.healthLossPerMove = 0.1;
-    this.healthGainPerEat = 1;
+    this.healthLossPerMove = 0.2;
+    this.healthGainPerEat = 0.5;
     this.texture = texture;
     this.texture_flipped = texture_flipped;
     this.faceLeft = true;
@@ -34,6 +34,8 @@ class Predator {
     this.leftKey = leftKey;
     this.rightKey = rightKey;
     this.sprintKey = sprintKey;
+
+    this.sprinting = false;
     // record score
     this.score = 0;
     this.dead = false;
@@ -45,40 +47,42 @@ class Predator {
   // velocity appropriately.
   handleInput() {
     // Horizontal movement
-    if (keyIsDown(this.sprintKey)){ // when sprinting multiply speedUp to the speed
+    if (keyIsDown(this.sprintKey)) { // when sprinting multiply speedUp to the speed
+      this.sprinting = true;
       if (keyIsDown(this.leftKey)) {
         this.faceLeft = true;
-        this.vx = -this.speed*this.speedUp;
-      }else if (keyIsDown(this.rightKey)) {
+        this.vx = -this.speed * this.speedUp;
+      } else if (keyIsDown(this.rightKey)) {
         this.faceLeft = false;
-        this.vx = this.speed*this.speedUp;
-      }else{
+        this.vx = this.speed * this.speedUp;
+      } else {
         this.vx = 0;
       }
       // Vertical movement
       if (keyIsDown(this.upKey)) {
-        this.vy = -this.speed*this.speedUp;
-      }else if (keyIsDown(this.downKey)) {
-        this.vy = this.speed*this.speedUp;
-      }else {
+        this.vy = -this.speed * this.speedUp;
+      } else if (keyIsDown(this.downKey)) {
+        this.vy = this.speed * this.speedUp;
+      } else {
         this.vy = 0;
       }
-    }else{
+    } else {
+      this.sprinting = false;
       if (keyIsDown(this.leftKey)) {
         this.faceLeft = true;
         this.vx = -this.speed;
-      }else if (keyIsDown(this.rightKey)) {
+      } else if (keyIsDown(this.rightKey)) {
         this.faceLeft = false;
         this.vx = this.speed;
-      }else {
+      } else {
         this.vx = 0;
       }
       // Vertical movement
       if (keyIsDown(this.upKey)) {
         this.vy = -this.speed;
-      }else if (keyIsDown(this.downKey)) {
+      } else if (keyIsDown(this.downKey)) {
         this.vy = this.speed;
-      }else {
+      } else {
         this.vy = 0;
       }
     }
@@ -95,10 +99,13 @@ class Predator {
     this.y += this.vy;
 
     // Update health
-    this.health = this.health - this.healthLossPerMove;
+    this.health -= this.healthLossPerMove;
+    if (this.sprinting) {
+      this.health -= this.healthLossPerMove * 1.5;
+    }
     this.health = constrain(this.health, 0, this.maxHealth);
 
-    if (this.health<= 0){
+    if (this.health <= 0) {
       this.dead = true;
     }
     // Handle wrapping
@@ -113,15 +120,13 @@ class Predator {
     // Off the left or right
     if (this.x < 0) {
       this.x += width;
-    }
-    else if (this.x > width) {
+    } else if (this.x > width) {
       this.x -= width;
     }
     // Off the top or bottom
     if (this.y < 0) {
       this.y += height;
-    }
-    else if (this.y > height) {
+    } else if (this.y > height) {
       this.y -= height;
     }
   }
@@ -141,10 +146,19 @@ class Predator {
       this.health = constrain(this.health, 0, this.maxHealth);
       // Decrease prey health by the same amount
       prey.health -= this.healthGainPerEat;
+      if (prey.health < prey.maxHealth / 2) {
+        if (prey.speed > prey.originalSpeed / 4) {
+          prey.speed = prey.speed / 2;
+        }
+      }
       // Check if the prey died and reset it if so
       if (prey.health < 2) {
         prey.reset();
-        this.score ++;
+        this.score++;
+        if (this.score % 10 === 0 && this.score >= 10) {
+          this.healthLossPerMove -= 0.015;
+          this.healthLossPerMove = constrain(this.healthLossPerMove, 0.05, 0.2)
+        }
       }
     }
   }
@@ -155,13 +169,19 @@ class Predator {
   // with a radius the same size as its current health.
   display() {
     push();
+    rectMode(CORNER);
     imageMode(CENTER);
-    rectMode(CENTER);
-    fill(255);
-    if (this.faceLeft){
-      image(this.texture, this.x, this.y, this.radius * 2,this.radius * 2);
-    }else{
-      image(this.texture_flipped, this.x, this.y, this.radius * 2,this.radius * 2);
+    noStroke();
+    if (!this.dead) {
+      if (this.faceLeft) {
+        image(this.texture, this.x, this.y, this.radius * 2, this.radius * 2);
+      } else {
+        image(this.texture_flipped, this.x, this.y, this.radius * 2, this.radius * 2);
+      }
+      fill(100);
+      rect(this.x - this.radius, this.y - 40, this.radius * 2, 5);
+      fill(255);
+      rect(this.x - this.radius, this.y - 40, this.health * 2, 5);
     }
     pop();
   }
