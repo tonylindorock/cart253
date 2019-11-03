@@ -9,7 +9,7 @@ class Predator {
   //
   // Sets the initial values for the Predator's properties
   // Either sets default values or uses the arguments provided
-  constructor(x, y, speed, radius, texture, upKey,downKey,leftKey,rightKey,sprintKey) {
+  constructor(x, y, speed, radius, texture, texture_flipped, upKey,downKey,leftKey,rightKey,sprintKey) {
     // Position
     this.x = x;
     this.y = y;
@@ -26,7 +26,8 @@ class Predator {
 
     this.radius = this.health; // Radius is defined in terms of health
     this.texture = texture;
-
+    this.texture_fliped = texture_flipped;
+    this.faceLeft = true;
     // Input properties
     this.upKey = upKey;
     this.downKey = downKey;
@@ -46,8 +47,10 @@ class Predator {
     // Horizontal movement
     if (keyIsDown(this.sprintKey)){ // when sprinting multiply speedUp to the speed
       if (keyIsDown(this.leftKey)) {
+        this.faceLeft = true;
         this.vx = -this.speed*this.speedUp;
       }else if (keyIsDown(this.rightKey)) {
+        this.faceLeft = false;
         this.vx = this.speed*this.speedUp;
       }else {
         this.vx = 0;
@@ -62,8 +65,10 @@ class Predator {
       }
     }else{
       if (keyIsDown(this.leftKey)) {
+        this.faceLeft = true;
         this.vx = -this.speed;
       }else if (keyIsDown(this.rightKey)) {
+        this.faceLeft = false;
         this.vx = this.speed;
       }else {
         this.vx = 0;
@@ -152,10 +157,11 @@ class Predator {
     noStroke();
     imageMode(CENTER);
     this.radius = this.health;
-    image(texture, this.x, this.y, this.radius * 2);
-    textAlign(CENTER,CENTER);
-    textSize(16);
-    text("score: "+this.score,this.x, this.y+this.radius+10);
+    if (this.faceLeft){
+      image(this.texture, this.x, this.y, this.radius * 2,this.radius * 2);
+    }else{
+      image(this.texture_flipped, this.x, this.y, this.radius * 2,this.radius * 2);
+    }
     pop();
   }
 }

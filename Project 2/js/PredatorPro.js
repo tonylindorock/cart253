@@ -9,7 +9,7 @@ class PredatorPro {
   //
   // Sets the initial values for the Predator's properties
   // Either sets default values or uses the arguments provided
-  constructor(x, y, speed, strokeColor, radius) {
+  constructor(x, y, speed, radius,texture,texture_flipped) {
     // Position
     this.x = x;
     this.y = y;
@@ -17,14 +17,14 @@ class PredatorPro {
     this.vx = 0;
     this.vy = 0;
     this.speed = speed;
-    this.speedUp = 2; // when sprint
-    // Health properties
-    this.maxHealth = radius;
-    this.health = this.maxHealth; // Must be AFTER defining this.maxHealth
-    this.healthLossPerMove = 0.1;
-    this.healthGainPerEat = 1;
+    // Time properties for noise() function
+    this.tx = random(0, 1000); // To make x and y noise different
+    this.ty = random(0, 1000); // we use random starting values
     // Display properties
-    this.strokeColor = strokeColor;
+    this.texture = texture;
+    this.texture_fliped = texture_fliped;
+    this.faceLeft = true;
+
     this.radius = this.health; // Radius is defined in terms of health
     this.dead = false;
   }
@@ -35,16 +35,21 @@ class PredatorPro {
   // Lowers health (as a cost of living)
   // Handles wrapping
   move() {
+    // Set velocity via noise()
+    this.vx = map(noise(this.tx), 0, 1, -this.speed, this.speed);
+    this.vy = map(noise(this.ty), 0, 1, -this.speed, this.speed);
+
+    if (this.vx>0){
+      faceLeft = true;
+    }else if (this.vx<0){
+      faceLeft = false;
+    }
     // Update position
     this.x += this.vx;
     this.y += this.vy;
-    // Update health
-    this.health = this.health - this.healthLossPerMove;
-    this.health = constrain(this.health, 0, this.maxHealth);
-
-    if (this.health<= 0){
-      this.dead = true;
-    }
+    // Update time properties
+    this.tx += 0.01;
+    this.ty += 0.01;
     // Handle wrapping
     this.handleWrapping();
   }
@@ -99,15 +104,13 @@ class PredatorPro {
   // with a radius the same size as its current health.
   display() {
     push();
-    strokeWeight(8);
-    stroke(this.strokeColor);
     fill(255);
     this.radius = this.health;
-    ellipse(this.x, this.y, this.radius * 2);
-    noStroke();
-    textAlign(CENTER,CENTER);
-    textSize(16);
-    text("score: "+this.score,this.x, this.y+this.radius+10);
+    if (faceLeft){
+      image(texture,this.x, this.y, this.radius * 2);
+    }else{
+      image(texture_flipped,this.x, this.y, this.radius * 2);
+    }
     pop();
   }
 }
