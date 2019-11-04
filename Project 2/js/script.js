@@ -83,6 +83,10 @@ let tree_summer;
 let tree_fall;
 let tree_winter;
 
+let campfire0;
+let campfire1;
+let campfire2;
+
 // preload()
 //
 // Load all the image and sound sources
@@ -114,7 +118,10 @@ function preload() {
   tree_fall = loadImage("assets/images/Tree_Fall.png");
   tree_winter = loadImage("assets/images/Tree_Winter.png");
 
-
+  campfire0 = loadImage("assets/images/Campfire0.png");
+  campfire1= loadImage("assets/images/Campfire1.png");
+  campfire2 = loadImage("assets/images/Campfire2.png");
+  campfire = loadAnimation(campfire0,campfire1,campfire2);
 }
 
 // setup()
@@ -292,8 +299,8 @@ function randomizeElementsPos() {
 function draw() {
   // Clear the background to black
   drawBG();
+  animation(campfire,campfirePosX,campfirePosY);
   if (!playing && !gameOver) {
-
     for (let i = 0; i < prey.length; i++) {
       prey[i].move();
       prey[i].display(playing);
