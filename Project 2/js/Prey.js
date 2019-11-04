@@ -88,7 +88,7 @@ class Prey {
     // Calculate distance from this predator to the prey
     let d = dist(this.x, this.y, plant.x, plant.y);
     // Check if the distance is less than their two radii (an overlap)
-    if (d < 100 && this.health<=this.maxHealth/2 && !this.chased){
+    if (d < 100 && this.health<=this.maxHealth/2){
       this.x = lerp(this.x, plant.x, 0.01);
       this.y = lerp(this.y, plant.y, 0.01);
     }
@@ -140,7 +140,5 @@ class Prey {
     this.speed = this.originalSpeed;
     // Default health
     this.health = this.maxHealth;
-    // Default radius
-    this.radius = this.health;
   }
 }

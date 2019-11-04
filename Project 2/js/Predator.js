@@ -22,7 +22,7 @@ class Predator {
 
     this.radius = radius;
     // Health properties
-    this.maxHealth = radius;
+    this.maxHealth = 1000;
     this.health = this.maxHealth; // Must be AFTER defining this.maxHealth
     this.healthLossPerMove = 0.2;
     this.originalHealthPerEat = 0.5;
@@ -141,28 +141,40 @@ class Predator {
   handleEating(prey) {
     // Calculate distance from this predator to the prey
     let d = dist(this.x, this.y, prey.x, prey.y);
-    // Check if the distance is less than their two radii (an overlap)
-    if (d < this.radius + prey.radius) {
-      // Increase predator health and constrain it to its possible range
-      this.health += this.healthGainPerEat;
-      this.health = constrain(this.health, 0, this.maxHealth);
-      // Decrease prey health by the same amount
-      prey.health -= this.healthGainPerEat;
+    let dx = prey.x-this.x;
+    let dy = prey.y-this.y;
+    let angle = atan2(dy, dx);
+    if (d<=100){
+      prey.chased = true;
+      prey.x += prey.speed/3.5 * Math.cos(angle);
+      prey.y += prey.speed/3.5 * Math.sin(angle);
 
-      if (prey.health < prey.maxHealth / 2) {
-        if (prey.speed > prey.originalSpeed / 4) {
-          prey.speed = prey.speed / 2;
+
+      // Check if the distance is less than their two radii (an overlap)
+      if (d < this.radius + prey.radius) {
+        // Increase predator health and constrain it to its possible range
+        this.health += this.healthGainPerEat;
+        this.health = constrain(this.health, 0, this.maxHealth);
+        // Decrease prey health by the same amount
+        prey.health -= this.healthGainPerEat;
+
+        if (prey.health < prey.maxHealth / 2) {
+          if (prey.speed > prey.originalSpeed / 4) {
+            prey.speed = prey.speed / 2;
+          }
+        }
+        // Check if the prey died and reset it if so
+        if (prey.health < 2) {
+          prey.reset();
+          this.score+=0.5;
+          if (this.score % 10 === 0 && this.score >= 10) {
+            this.healthLossPerMove -= 0.005;
+            this.healthLossPerMove = constrain(this.healthLossPerMove, 0.1, 0.2)
+          }
         }
       }
-      // Check if the prey died and reset it if so
-      if (prey.health < 2) {
-        prey.reset();
-        this.score+=0.5;
-        if (this.score % 10 === 0 && this.score >= 10) {
-          this.healthLossPerMove -= 0.005;
-          this.healthLossPerMove = constrain(this.healthLossPerMove, 0.05, 0.2)
-        }
-      }
+    }else{
+      prey.chased = false;
     }
 }
 
@@ -182,7 +194,7 @@ class Predator {
         this.score++;
         if (this.score % 10 === 0 && this.score >= 10) {
           this.healthLossPerMove -= 0.015;
-          this.healthLossPerMove = constrain(this.healthLossPerMove, 0.05, 0.2)
+          this.healthLossPerMove = constrain(this.healthLossPerMove, 0.1, 0.2)
         }
       }
     }

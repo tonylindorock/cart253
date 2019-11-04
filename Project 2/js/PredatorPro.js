@@ -87,8 +87,9 @@ class PredatorPro {
   handleEating(prey){
     // Calculate distance from this predator to the prey
     let d = dist(this.x, this.y, prey.x, prey.y);
+
     // Check if the distance is less than their two radii (an overlap)
-    if (d<50){
+    if (d<=50){
       this.x = lerp(this.x, prey.x, 0.025);
       this.y = lerp(this.y, prey.y, 0.025);
       if (d < this.radius + prey.radius) {
@@ -121,10 +122,10 @@ class PredatorPro {
       this.x = lerp(this.x, predator.x, 0.025);
       this.y = lerp(this.y, predator.y, 0.025);
       if (d < this.radius + predator.radius) {
-        this.health += (this.healthGainPerEat+0.15);
+        this.health += (this.healthGainPerEat);
         this.health = constrain(this.health, 0, this.maxHealth);
         // Decrease prey health by the same amount
-        predator.health -= this.healthGainPerEat;
+        predator.health -= this.healthGainPerEat+0.25;
       }
     }
   }
