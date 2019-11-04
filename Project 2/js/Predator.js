@@ -21,7 +21,7 @@ class Predator {
 
     this.radius = radius;
     // Health properties
-    this.maxHealth = 1000;
+    this.maxHealth = radius;
     this.health = this.maxHealth; // Must be AFTER defining this.maxHealth
     this.healthLossPerMove = 0.2;
     this.healthGainPerEat = 0.5;
@@ -146,6 +146,7 @@ class Predator {
       this.health = constrain(this.health, 0, this.maxHealth);
       // Decrease prey health by the same amount
       prey.health -= this.healthGainPerEat;
+
       if (prey.health < prey.maxHealth / 2) {
         if (prey.speed > prey.originalSpeed / 4) {
           prey.speed = prey.speed / 2;
@@ -154,6 +155,28 @@ class Predator {
       // Check if the prey died and reset it if so
       if (prey.health < 2) {
         prey.reset();
+        this.score+=0.5;
+        if (this.score % 10 === 0 && this.score >= 10) {
+          this.healthLossPerMove -= 0.005;
+          this.healthLossPerMove = constrain(this.healthLossPerMove, 0.05, 0.2)
+        }
+      }
+    }
+}
+
+  attacking(human){
+    // Calculate distance from this predator to the prey
+    let d = dist(this.x, this.y, human.x, human.y);
+    // Check if the distance is less than their two radii (an overlap)
+    if (d < this.radius + human.radius) {
+      // Increase predator health and constrain it to its possible range
+      this.health += this.healthGainPerEat;
+      this.health = constrain(this.health, 0, this.maxHealth);
+      // Decrease prey health by the same amount
+      human.health -= 0.75;
+      // Check if the prey died and reset it if so
+      if (human.health < 2) {
+        human.reset();
         this.score++;
         if (this.score % 10 === 0 && this.score >= 10) {
           this.healthLossPerMove -= 0.015;

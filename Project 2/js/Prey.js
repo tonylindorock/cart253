@@ -25,12 +25,15 @@ class Prey {
     // Health properties
     this.maxHealth = radius;
     this.health = this.maxHealth; // Must be AFTER defining this.maxHealth
+    this.healthLossPerMove = 0.01;
+    this.healthGainPerEat = 0.025;
     // Display properties
     this.texture = texture;
     this.texture_flipped = texture_flipped;
     this.faceLeft = true;
 
     this.radius = radius;
+    this.chased = false;
   }
 
   // move
@@ -47,6 +50,8 @@ class Prey {
     if (this.vx > 0) {
       this.faceLeft = false;
     }
+    this.health -= this.healthLossPerMove;
+    this.health = constrain(this.health, 0, this.maxHealth);
     // Update position
     this.x += this.vx;
     this.y += this.vy;
@@ -55,6 +60,9 @@ class Prey {
     this.ty += 0.01;
     // Handle wrapping
     this.handleWrapping();
+    if (this.health<=0){
+      this.reset();
+    }
   }
 
   // handleWrapping
@@ -75,6 +83,28 @@ class Prey {
       this.y -= height;
     }
   }
+
+  handleEating(plant){
+    // Calculate distance from this predator to the prey
+    let d = dist(this.x, this.y, plant.x, plant.y);
+    // Check if the distance is less than their two radii (an overlap)
+    if (d < 100 && this.health<=this.maxHealth/2 && !this.chased){
+      this.x = lerp(this.x, plant.x, 0.01);
+      this.y = lerp(this.y, plant.y, 0.01);
+    }
+    if (d < this.radius + plant.radius) {
+      this.health += this.healthGainPerEat;
+      this.health = constrain(this.health, 0, this.maxHealth);
+      // Decrease prey health by the same amount
+      plant.health -= this.healthGainPerEat;
+      // Check if the prey died and reset it if so
+      if (plant.health <= 0) {
+        plant.reset();
+      }
+    }
+
+  }
+
   // display
   //
   // Draw the prey as an ellipse on the canvas

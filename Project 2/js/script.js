@@ -13,6 +13,7 @@ let player2_texture;
 let singlePlayer = true;
 
 const NUM_TREE = 10;
+let num_plant = 100;
 // the number of animals
 const NUM_RABBIT = 20;
 const NUM_BOAR = 10;
@@ -40,9 +41,12 @@ const SEASONS = [SPRING, SUMMER, FALL, WINTER];
 // index for SEASONS array
 let currentSeason;
 
-// BG objects locations
-let ElementsPosX = [];
-let ElementsPosY = [];
+// tree objects locations
+let TreesPosX = [];
+let TreesPosY = [];
+
+let PlantsPosX = [];
+let PlantsPosY = [];
 
 let campfirePosX = 0;
 let campfirePosY = 0;
@@ -74,6 +78,7 @@ let leopard_flipped;
 let human_flipped;
 
 let trees = [];
+let plants = [];
 let prey = [];
 let players = [];
 let predatorPro = [];
@@ -82,6 +87,11 @@ let tree_spring;
 let tree_summer;
 let tree_fall;
 let tree_winter;
+
+let plant_spring;
+let plant_summer;
+let plant_fall;
+let plant_winter;
 
 let campfire0;
 let campfire1;
@@ -118,6 +128,11 @@ function preload() {
   tree_fall = loadImage("assets/images/Tree_Fall.png");
   tree_winter = loadImage("assets/images/Tree_Winter.png");
 
+  plant_spring = loadImage("assets/images/Plant_Spring.png");
+  plant_summer = loadImage("assets/images/Plant_Summer.png");
+  plant_fall = loadImage("assets/images/Plant_Fall.png");
+  plant_winter = loadImage("assets/images/Plant_Winter.png");
+
   campfire0 = loadImage("assets/images/Campfire0.png");
   campfire1= loadImage("assets/images/Campfire1.png");
   campfire2 = loadImage("assets/images/Campfire2.png");
@@ -138,7 +153,8 @@ function setup() {
   noStroke();
 
   currentSeason = int(random(0, 4));
-  randomizeElementsPos();
+  randomizeTreesPos();
+  randomizePlantsPos();
   setupBG();
 
   append(players, lion);
@@ -249,34 +265,57 @@ function setupPlayer() {
 // and display certain other BG elements
 function setupBG() {
   trees = [];
+  plants = [];
+  num_plant = 100;
   if (currentSeason === 0) {
     for (let i = 0; i < NUM_TREE; i++) {
-      let treeObj = new Tree(ElementsPosX[i], ElementsPosY[i], 60, tree_spring);
+      let treeObj = new Tree(TreesPosX[i], TreesPosY[i], 60, tree_spring);
       trees.push(treeObj);
+    }
+    for (let j = 0; j < num_plant; j++) {
+      let plantObj = new Plant(PlantsPosX[j], PlantsPosY[j], 30, plant_spring);
+      plants.push(plantObj);
     }
   } else if (currentSeason === 1) {
     for (let i = 0; i < NUM_TREE; i++) {
-      let treeObj = new Tree(ElementsPosX[i], ElementsPosY[i], 60, tree_summer);
+      let treeObj = new Tree(TreesPosX[i], TreesPosY[i], 60, tree_summer);
       trees.push(treeObj);
+    }
+    for (let j = 0; j < num_plant; j++) {
+      let plantObj = new Plant(PlantsPosX[j], PlantsPosY[j], 30, plant_summer);
+      plants.push(plantObj);
     }
   } else if (currentSeason === 2) {
     for (let i = 0; i < NUM_TREE; i++) {
-      let treeObj = new Tree(ElementsPosX[i], ElementsPosY[i], 60, tree_fall);
+      let treeObj = new Tree(TreesPosX[i], TreesPosY[i], 60, tree_fall);
       trees.push(treeObj);
     }
+    for (let j = 0; j < num_plant; j++) {
+      let plantObj = new Plant(PlantsPosX[j], PlantsPosY[j], 30, plant_fall);
+      plants.push(plantObj);
+    }
   } else if (currentSeason === 3) {
+    num_plant = 50;
     for (let i = 0; i < NUM_TREE; i++) {
-      let treeObj = new Tree(ElementsPosX[i], ElementsPosY[i], 60, tree_winter);
+      let treeObj = new Tree(TreesPosX[i], TreesPosY[i], 60, tree_winter);
       trees.push(treeObj);
+    }
+    for (let j = 0; j < num_plant; j++) {
+      let plantObj = new Plant(PlantsPosX[j], PlantsPosY[j], 30, plant_winter);
+      plants.push(plantObj);
     }
   }
 }
 
 function drawBG() {
   background(SEASONS[currentSeason]);
+  for (let j = 0; j < plants.length; j++) {
+    plants[j].display();
+  }
   for (let i = 0; i < trees.length; i++) {
     trees[i].display();
   }
+  animation(campfire,campfirePosX,campfirePosY);
 }
 
 function nextSeason() {
@@ -284,12 +323,20 @@ function nextSeason() {
   if (currentSeason > 3) {
     currentSeason = 0;
   }
+  setupBG();
 }
 
-function randomizeElementsPos() {
-  for (let i = 0; i < 10; i++) {
-    ElementsPosX[i] = random(0, width);
-    ElementsPosY[i] = random(0, height);
+function randomizeTreesPos() {
+  for (let i = 0; i < NUM_TREE; i++) {
+    TreesPosX[i] = random(0, width);
+    TreesPosY[i] = random(0, height);
+  }
+}
+
+function randomizePlantsPos() {
+  for (let i = 0; i < num_plant; i++) {
+    PlantsPosX[i] = random(0, width);
+    PlantsPosY[i] = random(0, height);
   }
 }
 
@@ -299,12 +346,14 @@ function randomizeElementsPos() {
 function draw() {
   // Clear the background to black
   drawBG();
-  animation(campfire,campfirePosX,campfirePosY);
   if (!playing && !gameOver) {
     for (let i = 0; i < prey.length; i++) {
       prey[i].move();
       prey[i].display(playing);
       predatorPro[0].handleEating(prey[i]);
+      for(let j=0;j<num_plant;j++){
+        prey[i].handleEating(plants[j]);
+      }
     }
     for (let j = 0; j < predatorPro.length; j++) {
       predatorPro[j].move();
@@ -322,6 +371,9 @@ function draw() {
     for (let i = 0; i < prey.length; i++) {
       prey[i].move();
       prey[i].display(playing);
+      for(let j=0;j<num_plant;j++){
+        prey[i].handleEating(plants[j]);
+      }
       if (!player1.dead) {
         player1.handleEating(prey[i]);
       }
@@ -334,7 +386,7 @@ function draw() {
         predatorPro[j].handleEating(prey[i]);
       }
     }
-    // Handle input for the tiger
+    // Handle input for the player
     // if players are dead, they can not be able to move anymore
     if (singlePlayer) {
       displayScore(player1, null);
@@ -361,12 +413,17 @@ function draw() {
     for (let j = 0; j < num_human; j++) {
       predatorPro[j].move();
       predatorPro[j].display(playing);
-      predatorPro[j].hunting(player1);
+      if (!player1.dead) {
+        predatorPro[j].hunting(player1);
+        player1.attacking(predatorPro[j]);
+      }
       if (!singlePlayer){
-        predatorPro[j].hunting(player2);
+        if (!player2.dead) {
+          predatorPro[j].hunting(player2);
+          player2.attacking(predatorPro[j]);
+        }
       }
     }
-
     if (gameOver) {
       fill(0, 50);
       rect(width / 2, height / 2, width, height);
@@ -383,10 +440,10 @@ function displayScore(player1, player2) {
   textSize(64);
   let prevScore = totalScore;
   if (singlePlayer) {
-    totalScore = player1.score;
+    totalScore = int(player1.score);
     text(totalScore, width / 2, 50);
   } else {
-    totalScore = player1.score + player2.score;
+    totalScore = int(player1.score + player2.score);
     text(totalScore, width / 2, 50);
   }
   if (prevScore < totalScore) {
@@ -398,6 +455,9 @@ function displayScore(player1, player2) {
 function checkScore() {
   if (totalScore % 10 === 0 && totalScore >= 10 && runOnce) {
     addHuman();
+    if (totalScore % 20 === 0 && totalScore >= 20) {
+      nextSeason();
+    }
     runOnce = false;
   }
 }
@@ -480,10 +540,10 @@ function checkGameOverButtons() {
       player1 = new Predator(100, 100, 2, 30, player1_texture, player1_texture_flipped, 87, 83, 65, 68, 70);
       player2 = new Predator(width - 100, 100, 2, 30, player2_texture, player2_texture_flipped, UP_ARROW, DOWN_ARROW, LEFT_ARROW, RIGHT_ARROW, 76);
       setUpPrey();
+      num_human=2;
       setupHuman();
       gameOver = false;
       singlePlayer = false;
-      addHuman();
     }
   }
   pop();

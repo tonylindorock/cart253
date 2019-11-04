@@ -121,7 +121,7 @@ class PredatorPro {
       this.x = lerp(this.x, predator.x, 0.025);
       this.y = lerp(this.y, predator.y, 0.025);
       if (d < this.radius + predator.radius) {
-        this.health += this.healthGainPerEat;
+        this.health += (this.healthGainPerEat+0.15);
         this.health = constrain(this.health, 0, this.maxHealth);
         // Decrease prey health by the same amount
         predator.health -= this.healthGainPerEat;
