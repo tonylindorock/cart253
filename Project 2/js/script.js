@@ -55,7 +55,7 @@ let campfirePosY = 0;
 const RULES = "You are the predator of the Earth." +
   "\nYou are constantly hungry so you must feast." +
   "\nEat as much prey as you can before human hunt you down." +
-  "\nEat the red mushroom to boost your chance of survival.";
+  "\n(eat the red mushroom to boost your chance of survival)";
 
 const STARTOVER = "This is not the end." +
   "\nYou may be dead, but your race lives on." +
@@ -99,14 +99,7 @@ let plant_summer;
 let plant_fall;
 let plant_winter;
 
-let mushroom = {
-  x: 0,
-  y: 0,
-  texture: null,
-  inEffect: false,
-  effectPlayerId: 0,
-  prevScore: 0
-}
+let mushroomTexture;
 
 let camp;
 
@@ -146,7 +139,8 @@ function preload() {
   plant_fall = loadImage("assets/images/Plant_Fall.png");
   plant_winter = loadImage("assets/images/Plant_Winter.png");
 
-  mushroom.texture = loadImage("assets/images/Mushroom.png");
+  mushroomTexture = loadImage("assets/images/Mushroom.png");
+  camp = loadImage("assets/images/Camp.png");
 }
 
 // setup()
@@ -162,7 +156,7 @@ function setup() {
   rectMode(CENTER);
   noStroke();
 
-  setupMushroom();
+  mushroom = new Mushroom(random(0, width),random(0, height),30,mushroomTexture);
   currentSeason = int(random(0, 4));
   randomizeTreesPos();
   randomizePlantsPos();
@@ -181,11 +175,6 @@ function setup() {
   // set up prey objects
   setUpPrey();
   setupHuman();
-}
-
-function setupMushroom() {
-  mushroom.x = random(0, width);
-  mushroom.y = random(0, height);
 }
 
 // setUpPrey()
@@ -207,7 +196,7 @@ function setUpPrey() {
       if (animal_id === 0) {
         preySpeed = random(3, 5);
         preyRadius = random(10, 15);
-        if (currentSeason === 3) {
+        if (currentSeason === 2 || currentSeason === 3) {
           texture = rabbit_brown;
           texture_flipped = rabbit_brown_flipped;
         } else {
@@ -247,8 +236,8 @@ function setUpPrey() {
 function setupHuman() {
   predatorPro = [];
   for (let i = 0; i < num_human; i++) {
-    let humanX = random(0, width);
-    let humanY = random(0, height);
+    let humanX = random(50, width-50);
+    let humanY = random(50, height-50);
     campfirePosX = humanX;
     campfirePosY = humanY;
     let humanSpeed = 3;
@@ -325,19 +314,17 @@ function setupBG() {
   }
 }
 
-function displayMushroom() {
-  image(mushroom.texture, mushroom.x, mushroom.y, 30, 30);
-}
-
 function drawBG() {
   background(SEASONS[currentSeason]);
   for (let j = 0; j < plants.length; j++) {
     plants[j].display();
   }
+  image(camp,campfirePosX,campfirePosY,60,60);
   for (let i = 0; i < trees.length; i++) {
     trees[i].display();
   }
-  displayMushroom();
+  mushroom.display();
+
 }
 
 function nextSeason() {
@@ -476,6 +463,15 @@ function displayScore(player1, player2) {
   if (prevScore < totalScore) {
     runOnce = true;
   }
+  if (mushroom.inEffect){
+    textSize(32);
+    fill(random(255),random(255),random(255));
+    if(mushroom.effectId===0){
+      text("SUPER RUNNER",width / 2, 100);
+    }else{
+      text("SUPER HUNTER",width / 2, 100);
+    }
+  }
   pop();
 }
 
@@ -500,12 +496,14 @@ function checkEatingMushroom(player) {
       playerId = 2;
     }
     if (!mushroom.inEffect) {
-      setupMushroom();
+      mushroom.reset();
       p = random(0, 1);
       if (p < 0.5) {
         player.speed *= 2;
+        mushroom.effectId = 0;
       } else {
         player.healthGainPerEat *= 2;
+        mushroom.effectId = 1;
       }
       mushroom.inEffect = true;
       mushroom.effectPlayerId = playerId;
@@ -534,10 +532,12 @@ function checkGameOver() {
   if (singlePlayer) {
     if (player1.dead) {
       gameOver = true;
+      mushroom.inEffect = false;
     }
   } else {
     if (player1.dead && player2.dead) {
       gameOver = true;
+      mushroom.inEffect = false;
     }
   }
 }
@@ -567,6 +567,9 @@ function displayGameOver() {
     fill(255);
     text("YOUR BEST SCORE: " + bestScore, width / 2, height / 2 - 150);
   }
+  fill(255,100);
+  ellipse(100,100,120);
+  image(player1_texture, 100, 100, player1.radius * 2, player1.radius * 2);
   fill(255);
   textSize(32);
   text(STARTOVER, width / 2, height / 2 - 25);
@@ -613,6 +616,9 @@ function checkGameOverButtons() {
       singlePlayer = true;
     }
   } else {
+    fill(255,100);
+    ellipse(width-100,100,120);
+    image(player2_texture, width-100, 100, player1.radius * 2, player1.radius * 2);
     textAlign(RIGHT, CENTER);
     text("play as one", width / 2 - 100, height / 2 + 100);
     fill(SELECTED);
@@ -657,6 +663,10 @@ function showMainMenu() {
   textAlign(LEFT, CENTER);
   text("play as two", width / 2 + 100, height / 2 + 120);
   text("ARROWKEYS\nL to sprint", width / 2 + 100, height / 2 + 190);
+
+  fill(255,100);
+  ellipse(100,100,120);
+  image(player1_texture, 100, 100, player1.radius * 2, player1.radius * 2);
   pop();
 }
 
@@ -673,7 +683,6 @@ function checkMainMenuButtons() {
     fill(SELECTED);
     textAlign(RIGHT, CENTER);
     text("play as one", width / 2 - 100, height / 2 + 120);
-    image(player1_texture, width / 2, height / 2 + 250, player1.radius * 2, player1.radius * 2);
     fill(255);
     textAlign(LEFT, CENTER);
     text("play as two", width / 2 + 100, height / 2 + 120);
@@ -683,14 +692,15 @@ function checkMainMenuButtons() {
     }
     // two players
   } else {
+    fill(255,100);
+    ellipse(width-100,100,120);
+    image(player2_texture, width-100, 100, player1.radius * 2, player1.radius * 2);
     fill(255);
     textAlign(RIGHT, CENTER);
     text("play as one", width / 2 - 100, height / 2 + 120);
     fill(SELECTED);
     textAlign(LEFT, CENTER);
     text("play as two", width / 2 + 100, height / 2 + 120);
-    image(player1_texture, width / 2 - 50, height / 2 + 250, player1.radius * 2, player1.radius * 2);
-    image(player2_texture, width / 2 + 50, height / 2 + 250, player1.radius * 2, player1.radius * 2);
     if (mouseIsPressed) {
       playing = true;
       singlePlayer = false;

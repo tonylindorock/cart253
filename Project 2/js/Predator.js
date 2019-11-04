@@ -22,7 +22,7 @@ class Predator {
 
     this.radius = radius;
     // Health properties
-    this.maxHealth = 1000;
+    this.maxHealth = this.radius;
     this.health = this.maxHealth; // Must be AFTER defining this.maxHealth
     this.healthLossPerMove = 0.2;
     this.originalHealthPerEat = 0.5;

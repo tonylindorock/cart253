@@ -89,7 +89,7 @@ class Prey {
     let d = dist(this.x, this.y, plant.x, plant.y);
     // Check if the distance is less than their two radii (an overlap)
     if (d < 100 && this.health<=this.maxHealth/2){
-      this.x = lerp(this.x, plant.x, 0.01);
+      this.x = lerp(this.x, plant.x, 0.005);
       this.y = lerp(this.y, plant.y, 0.01);
     }
     if (d < this.radius + plant.radius) {
