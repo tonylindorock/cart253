@@ -27,6 +27,7 @@ let num_human = 1;
 let playing = false;
 let gameOver = false;
 
+let prevScore=0;
 let totalScore = 0;
 let runOnce = true;
 
@@ -53,7 +54,12 @@ let campfirePosY = 0;
 
 const RULES = "You are the predator of the Earth." +
   "\nYou are constantly hungry so you must feast." +
-  "\nEat as much prey as you can before human hunt you down.";
+  "\nEat as much prey as you can before human hunt you down."+
+  "\nEat the red mushroom to boost your chance of survival.";
+
+const STARTOVER ="This is not the end."+
+"\nYou are dead but your race lives on."+
+"\nYou can start over again.";
 
 // all the images
 let rabbit_white;
@@ -92,6 +98,15 @@ let plant_spring;
 let plant_summer;
 let plant_fall;
 let plant_winter;
+
+let mushroom={
+  x:0,
+  y:0,
+  texture:null,
+  inEffect:false,
+  effectPlayerId:0,
+  prevScore:0
+}
 
 let campfire0;
 let campfire1;
@@ -133,6 +148,8 @@ function preload() {
   plant_fall = loadImage("assets/images/Plant_Fall.png");
   plant_winter = loadImage("assets/images/Plant_Winter.png");
 
+  mushroom.texture=loadImage("assets/images/Mushroom.png");
+
   campfire0 = loadImage("assets/images/Campfire0.png");
   campfire1= loadImage("assets/images/Campfire1.png");
   campfire2 = loadImage("assets/images/Campfire2.png");
@@ -152,6 +169,7 @@ function setup() {
   rectMode(CENTER);
   noStroke();
 
+  setupMushroom();
   currentSeason = int(random(0, 4));
   randomizeTreesPos();
   randomizePlantsPos();
@@ -170,6 +188,11 @@ function setup() {
   // set up prey objects
   setUpPrey();
   setupHuman();
+}
+
+function setupMushroom(){
+  mushroom.x=random(0,width);
+  mushroom.y=random(0,height);
 }
 
 // setUpPrey()
@@ -307,6 +330,10 @@ function setupBG() {
   }
 }
 
+function displayMushroom(){
+  image(mushroom.texture,mushroom.x,mushroom.y,30,30);
+}
+
 function drawBG() {
   background(SEASONS[currentSeason]);
   for (let j = 0; j < plants.length; j++) {
@@ -315,6 +342,7 @@ function drawBG() {
   for (let i = 0; i < trees.length; i++) {
     trees[i].display();
   }
+  displayMushroom();
   animation(campfire,campfirePosX,campfirePosY);
 }
 
@@ -396,6 +424,8 @@ function draw() {
       }
       // leave player's score on the screen
       player1.display();
+      checkEatingMushroom(player1);
+      removeMushroomEffect();
     } else {
       displayScore(player1, player2);
       if (!player1.dead) {
@@ -409,6 +439,9 @@ function draw() {
 
       player1.display();
       player2.display();
+      checkEatingMushroom(player1);
+      checkEatingMushroom(player2);
+      removeMushroomEffect();
     }
     for (let j = 0; j < num_human; j++) {
       predatorPro[j].move();
@@ -462,6 +495,44 @@ function checkScore() {
   }
 }
 
+function checkEatingMushroom(player){
+  let d=dist(player.x,player.y,mushroom.x,mushroom.y);
+  let playerId = 0;
+  let p=0;
+  if (d<player.radius+15){
+    if (player.sprintKey === 70){
+      playerId = 1;
+    }else{
+      playerId = 2;
+    }
+    if(!mushroom.inEffect){
+      setupMushroom();
+      p=random(0,1);
+      if(p<0.5){
+        player.speed*=2;
+      }else{
+        player.healthGainPerEat*=2;
+      }
+      mushroom.inEffect=true;
+      mushroom.effectPlayerId=playerId;
+      mushroom.prevScore = totalScore;
+    }
+  }
+}
+
+function removeMushroomEffect(){
+  if(mushroom.prevScore===totalScore-5 && mushroom.inEffect){
+    mushroom.inEffect = false;
+    if(mushroom.effectPlayerId===1){
+      player1.speed = player1.originalSpeed;
+      player1.healthGainPerEat = player1.originalHealthPerEat;
+    }else if(mushroom.effectPlayerId===2){
+      player2.speed = player2.originalSpeed;
+      player2.healthGainPerEat = player2.originalHealthPerEat;
+    }
+  }
+}
+
 // checkGameOver()
 //
 // check if the players are dead
@@ -484,8 +555,27 @@ function displayGameOver() {
   push();
   fill(255);
   textAlign(CENTER, CENTER);
-  textSize(128);
-  text("GAME OVER", width / 2, height / 2);
+  textSize(64);
+  if (prevScore<totalScore){
+    fill(SELECTED);
+    text("YOU GOT A NEW RECORD!", width / 2, height / 2-200);
+    textSize(64);
+    text(totalScore, width / 2, 50);
+    textSize(32);
+    fill(255);
+    text("YOUR LAST SCORE: "+prevScore, width / 2, height / 2-150);
+  }else{
+    fill(SELECTED);
+    text("YOU CAN DO BETTER!", width / 2, height / 2-200);
+    textSize(64);
+    text(totalScore, width / 2, 50);
+    textSize(32);
+    fill(255);
+    text("YOUR LAST SCORE: "+prevScore, width / 2, height / 2-150);
+  }
+  fill(255);
+  textSize(32);
+  text(STARTOVER,width / 2, height / 2-25);
   textSize(32);
   textAlign(RIGHT, CENTER);
   text("play as one", width / 2 - 100, height / 2 + 100);
@@ -518,13 +608,13 @@ function checkGameOverButtons() {
     // reset game stats
     if (mouseIsPressed) {
       background(100);
+      prevScore = totalScore;
       player1 = new Predator(100, 100, 2, 30, player1_texture, player1_texture_flipped, 87, 83, 65, 68, 70);
       num_human = 1;
       setUpPrey();
       setupHuman();
       gameOver = false;
       singlePlayer = true;
-
     }
   } else {
     textAlign(RIGHT, CENTER);
@@ -537,6 +627,7 @@ function checkGameOverButtons() {
     // reset all colors of prey and two players
     // reset game stats
     if (mouseIsPressed) {
+      prevScore = totalScore;
       player1 = new Predator(100, 100, 2, 30, player1_texture, player1_texture_flipped, 87, 83, 65, 68, 70);
       player2 = new Predator(width - 100, 100, 2, 30, player2_texture, player2_texture_flipped, UP_ARROW, DOWN_ARROW, LEFT_ARROW, RIGHT_ARROW, 76);
       setUpPrey();

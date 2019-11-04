@@ -16,7 +16,8 @@ class Predator {
     // Velocity and speed
     this.vx = 0;
     this.vy = 0;
-    this.speed = speed;
+    this.originalSpeed = speed;
+    this.speed = this.originalSpeed;
     this.speedUp = 2; // when sprint
 
     this.radius = radius;
@@ -24,7 +25,8 @@ class Predator {
     this.maxHealth = radius;
     this.health = this.maxHealth; // Must be AFTER defining this.maxHealth
     this.healthLossPerMove = 0.2;
-    this.healthGainPerEat = 0.5;
+    this.originalHealthPerEat = 0.5;
+    this.healthGainPerEat = this.originalHealthPerEat;
     this.texture = texture;
     this.texture_flipped = texture_flipped;
     this.faceLeft = true;
