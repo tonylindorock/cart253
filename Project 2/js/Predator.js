@@ -41,6 +41,8 @@ class Predator {
     // record score
     this.score = 0;
     this.dead = false;
+
+    this.eaten_sound = loadSound("assets/sounds/Eaten.mp3");
   }
 
   // handleInput

@@ -54,7 +54,7 @@ let campfirePosY = 0;
 
 const RULES = "You are the predator of the Earth." +
   "\nYou are constantly hungry so you must feast." +
-  "\nEat as much prey as you can before human hunt you down." +
+  "\nEat as much prey as you can before humans hunt you down." +
   "\n(eat the red mushroom to boost your chance of survival)";
 
 const STARTOVER = "This is not the end." +
@@ -103,6 +103,18 @@ let mushroomTexture;
 
 let camp;
 
+// all the sounds
+let spring_bg;
+let summer_bg;
+let fall_bg;
+let winter_bg;
+let bg_music = [];
+let eaten_sound;
+let newRecord_sound;
+let noNewRecord_sound;
+
+let playOnce = true;
+
 // preload()
 //
 // Load all the image and sound sources
@@ -141,6 +153,15 @@ function preload() {
 
   mushroomTexture = loadImage("assets/images/Mushroom.png");
   camp = loadImage("assets/images/Camp.png");
+
+  spring_bg = loadSound("assets/sounds/Spring.mp3");
+  summer_bg = loadSound("assets/sounds/Summer.mp3");
+  fall_bg = loadSound("assets/sounds/Fall.mp3");
+  winter_bg = loadSound("assets/sounds/Winter.mp3");
+  bg_music = [spring_bg,summer_bg,fall_bg,winter_bg];
+  eaten_sound = loadSound("assets/sounds/Eaten.mp3");
+  newRecord_sound = loadSound("assets/sounds/Lion_Roar.mp3");
+  noNewRecord_sound = loadSound("assets/sounds/Wolf_Cry.mp3");
 }
 
 // setup()
@@ -375,6 +396,15 @@ function draw() {
     checkMainMenuButtons();
 
   } else if (playing) {
+    if(!bg_music[currentSeason].isPlaying()){
+      if(currentSeason===0){
+        bg_music[3].setVolume(0);
+      }else{
+        bg_music[(currentSeason-1)].setVolume(0);
+      }
+      bg_music[currentSeason].setVolume(0.2);
+      bg_music[currentSeason].play();
+    }
     checkGameOver();
     checkScore();
     for (let i = 0; i < prey.length; i++) {
@@ -558,6 +588,12 @@ function displayGameOver() {
     textSize(32);
     fill(255);
     text("YOUR PREV BEST SCORE: " + bestScore, width / 2, height / 2 - 150);
+
+    if(!newRecord_sound.isPlaying() && playOnce){
+      newRecord_sound.setVolume(0.2);
+      newRecord_sound.play();
+      playOnce = false;
+    }
   } else {
     fill(SELECTED);
     text("YOU CAN DO BETTER!", width / 2, height / 2 - 200);
@@ -566,6 +602,12 @@ function displayGameOver() {
     textSize(32);
     fill(255);
     text("YOUR BEST SCORE: " + bestScore, width / 2, height / 2 - 150);
+
+    if(!noNewRecord_sound.isPlaying() && playOnce){
+      noNewRecord_sound.setVolume(0.2);
+      noNewRecord_sound.play();
+      playOnce = false;
+    }
   }
   fill(255,100);
   ellipse(100,100,120);
@@ -614,6 +656,8 @@ function checkGameOverButtons() {
       setupHuman();
       gameOver = false;
       singlePlayer = true;
+
+      playOnce = true;
     }
   } else {
     fill(255,100);
@@ -639,6 +683,8 @@ function checkGameOverButtons() {
       setupHuman();
       gameOver = false;
       singlePlayer = false;
+
+      playOnce = true;
     }
   }
   pop();
