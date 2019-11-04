@@ -413,6 +413,9 @@ function draw() {
       for (let j = 0; j < num_plant; j++) {
         prey[i].handleEating(plants[j]);
       }
+      for (let j = 0; j < NUM_TREE; j++) {
+        prey[i].collide(trees[j]);
+      }
       if (!player1.dead) {
         player1.handleEating(prey[i]);
       }
@@ -423,6 +426,9 @@ function draw() {
       }
       for (let j = 0; j < num_human; j++) {
         predatorPro[j].handleEating(prey[i]);
+        for (let k = 0; k < NUM_TREE; k++) {
+          predatorPro[j].collide(trees[k]);
+        }
       }
     }
     // Handle input for the player
@@ -432,6 +438,9 @@ function draw() {
       if (!player1.dead) {
         player1.handleInput();
         player1.move();
+        for (let k = 0; k < NUM_TREE; k++) {
+          player1.collide(trees[k]);
+        }
       }
       // leave player's score on the screen
       player1.display();
@@ -442,10 +451,16 @@ function draw() {
       if (!player1.dead) {
         player1.handleInput();
         player1.move();
+        for (let k = 0; k < NUM_TREE; k++) {
+          player1.collide(trees[k]);
+        }
       }
       if (!player2.dead) {
         player2.handleInput();
         player2.move();
+        for (let k = 0; k < NUM_TREE; k++) {
+          player2.collide(trees[k]);
+        }
       }
 
       player1.display();
@@ -639,7 +654,6 @@ function checkGameOverButtons() {
     textAlign(RIGHT, CENTER);
     fill(SELECTED);
     text("play as one", width / 2 - 100, height / 2 + 100);
-    image(player1_texture, width / 2, height / 2 + 250, player1.radius * 2, player1.radius * 2);
     fill(255);
     textAlign(LEFT, CENTER);
     text("play as two", width / 2 + 100, height / 2 + 100);
@@ -668,8 +682,6 @@ function checkGameOverButtons() {
     fill(SELECTED);
     textAlign(LEFT, CENTER);
     text("play as two", width / 2 + 100, height / 2 + 100);
-    image(player1_texture, width / 2 - 50, height / 2 + 250, player1.radius * 2, player1.radius * 2);
-    image(player2_texture, width / 2 + 50, height / 2 + 250, player1.radius * 2, player1.radius * 2);
     // reset all colors of prey and two players
     // reset game stats
     if (mouseIsPressed) {

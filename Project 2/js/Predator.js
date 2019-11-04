@@ -116,6 +116,17 @@ class Predator {
     this.handleWrapping();
   }
 
+  collide(tree){
+    let d = dist(this.x, this.y, tree.x, tree.y);
+    let dx = tree.x-this.x;
+    let dy = tree.y-this.y;
+    let angle = atan2(dy, dx);
+    if (d<60){
+      this.x -= this.speed/3.5 * Math.cos(angle);
+      this.y -= this.speed/3.5 * Math.sin(angle);
+    }
+  }
+
   // handleWrapping
   //
   // Checks if the predator has gone off the canvas and
