@@ -1,9 +1,17 @@
 // Earth
-// by Yichen Wang
+// A game by Yichen Wang
 //
+// Modified from Predator-Prey Sim
 //
+// The Earth is a simple game but with a complexed simulated-ecosystem.
+// Every animals will need to consume something.
+// Rabbits, boars, antelopes, and bisons will eat grass on the ground.
+// Lion, leopard, or wolf (the player) will eat prey (animals above).
+// Humans will hunt all the other animals.
+// Some will live, some will strave, and some will be eaten.
+// So this is the Earth.
 
-// Our players
+// Our players and player textures
 let player1;
 let player2;
 let player1_texture;
@@ -12,9 +20,10 @@ let player2_texture;
 // if single player
 let singlePlayer = true;
 
-const NUM_TREE = 10;
-let num_plant = 100;
-// the number of animals
+const NUM_TREE = 10; // the number of trees in the game
+let num_plant = 100; // the number of plants (grass)
+
+// the number of animals and put them in an array
 const NUM_RABBIT = 20;
 const NUM_BOAR = 10;
 const NUM_ZEBRA = 10;
@@ -23,40 +32,43 @@ const NUM_BISON = 10;
 const NUM_ANIMALS = [NUM_RABBIT, NUM_BOAR, NUM_ZEBRA, NUM_ANTELOPE, NUM_BISON];
 let num_human = 1;
 
-// game state
+// game states
 let playing = false;
 let gameOver = false;
 
+// scores
 let bestScore = 0;
 let totalScore = 0;
-let runOnce = true;
+let runOnce = true; // run once for adding a new human
 
-let SELECTED = "#ffd342";
-// grass colors for different seasons
+const SELECTED = "#ffd342"; // highlighted color
+// ground colors for different seasons
 const SPRING = "#a0cc83";
-const SUMMER = "#6fa36a";
+const SUMMER = "#61a65b";
 const FALL = "#dbbf72";
 const WINTER = "#a8bab4";
-
-const SEASONS = [SPRING, SUMMER, FALL, WINTER];
-// index for SEASONS array
-let currentSeason;
+const SEASONS = [SPRING, SUMMER, FALL, WINTER]; // colors in an array
+let currentSeason; // index for current season
 
 // tree objects locations
 let TreesPosX = [];
 let TreesPosY = [];
 
+// plant objects locations
 let PlantsPosX = [];
 let PlantsPosY = [];
 
+// human camp location
 let campfirePosX = 0;
 let campfirePosY = 0;
 
+// the rule
 const RULES = "You are the predator of the Earth." +
   "\nYou are constantly hungry so you must feast." +
   "\nEat as much prey as you can before humans hunt you down." +
   "\n(eat the red mushroom to boost your chance of survival)";
 
+// display when game ends
 const STARTOVER = "This is not the end." +
   "\nYou may be dead, but your race lives on." +
   "\nYou can start over again.";
@@ -83,12 +95,6 @@ let wolf_flipped;
 let leopard_flipped;
 let human_flipped;
 
-let trees = [];
-let plants = [];
-let prey = [];
-let players = [];
-let predatorPro = [];
-
 let tree_spring;
 let tree_summer;
 let tree_fall;
@@ -100,24 +106,30 @@ let plant_fall;
 let plant_winter;
 
 let mushroomTexture;
-
 let camp;
+
+// arrays for containing objects
+let trees = [];
+let plants = [];
+let prey = [];
+let players = [];
+let predatorPro = [];
 
 // all the sounds
 let spring_bg;
 let summer_bg;
 let fall_bg;
 let winter_bg;
-let bg_music = [];
+let bg_music = []; // sound array
 let eaten_sound;
 let newRecord_sound;
 let noNewRecord_sound;
 
-let playOnce = true;
+let playOnce = true; // play once for sound effect
 
 // preload()
 //
-// Load all the image and sound sources
+// Load all the image and sound resources
 function preload() {
   rabbit_white = loadImage("assets/images/Rabbit_W.png");
   rabbit_brown = loadImage("assets/images/Rabbit_B.png");
@@ -158,7 +170,7 @@ function preload() {
   summer_bg = loadSound("assets/sounds/Summer.mp3");
   fall_bg = loadSound("assets/sounds/Fall.mp3");
   winter_bg = loadSound("assets/sounds/Winter.mp3");
-  bg_music = [spring_bg,summer_bg,fall_bg,winter_bg];
+  bg_music = [spring_bg,summer_bg,fall_bg,winter_bg]; // bg music in an array
   eaten_sound = loadSound("assets/sounds/Eaten.mp3");
   newRecord_sound = loadSound("assets/sounds/Lion_Roar.mp3");
   noNewRecord_sound = loadSound("assets/sounds/Wolf_Cry.mp3");
@@ -269,7 +281,7 @@ function setupHuman() {
 }
 
 function addHuman() {
-  if(num_human<50){
+  if(num_human<25){
     let humanSpeed = 3;
     let humanRadius = random(25, 30);
     let humanObj = new PredatorPro(campfirePosX, campfirePosY, humanSpeed, humanRadius, human, human_flipped);

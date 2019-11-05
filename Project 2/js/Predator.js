@@ -1,8 +1,6 @@
 // Predator
 //
-// A class that represents a simple predator
-// controlled by the arrow keys. It can move around
-// the screen and consume Prey objects to maintain its health.
+// 
 
 class Predator {
   // constructor
