@@ -33,7 +33,6 @@ class Prey {
     this.faceLeft = true;
 
     this.radius = radius;
-    this.chased = false;
   }
 
   // move
@@ -70,7 +69,7 @@ class Prey {
     let dx = tree.x-this.x;
     let dy = tree.y-this.y;
     let angle = atan2(dy, dx);
-    if (d<60){
+    if (d<this.radius+tree.radius/2){
       this.x -= this.speed/3.5 * Math.cos(angle);
       this.y -= this.speed/3.5 * Math.sin(angle);
     }
@@ -100,7 +99,7 @@ class Prey {
     let d = dist(this.x, this.y, plant.x, plant.y);
     // Check if the distance is less than their two radii (an overlap)
     if (d < 100 && this.health<=this.maxHealth/2){
-      this.x = lerp(this.x, plant.x, 0.005);
+      this.x = lerp(this.x, plant.x, 0.01);
       this.y = lerp(this.y, plant.y, 0.01);
     }
     if (d < this.radius + plant.radius) {
@@ -125,6 +124,7 @@ class Prey {
     rectMode(CORNER);
     noStroke();
     imageMode(CENTER);
+    //ellipse(this.x,this.y,100);
     if (this.faceLeft) {
       image(this.texture, this.x, this.y, this.radius * 2, this.radius * 2);
     } else {

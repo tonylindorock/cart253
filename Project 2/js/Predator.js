@@ -1,6 +1,6 @@
 // Predator
 //
-// 
+//
 
 class Predator {
   // constructor
@@ -119,7 +119,7 @@ class Predator {
     let dx = tree.x-this.x;
     let dy = tree.y-this.y;
     let angle = atan2(dy, dx);
-    if (d<60){
+    if (d<this.radius+tree.radius/2){
       this.x -= this.speed/3.5 * Math.cos(angle);
       this.y -= this.speed/3.5 * Math.sin(angle);
     }
@@ -155,8 +155,7 @@ class Predator {
     let dx = prey.x-this.x;
     let dy = prey.y-this.y;
     let angle = atan2(dy, dx);
-    if (d<=100){
-      prey.chased = true;
+    if (d<=100 && !this.dead){
       prey.x += prey.speed/3.5 * Math.cos(angle);
       prey.y += prey.speed/3.5 * Math.sin(angle);
 
@@ -175,7 +174,7 @@ class Predator {
           }
         }
         // Check if the prey died and reset it if so
-        if (prey.health < 2) {
+        if (prey.health <= 0) {
           prey.reset();
           this.score+=0.5;
           if (this.score % 10 === 0 && this.score >= 10) {
@@ -184,8 +183,6 @@ class Predator {
           }
         }
       }
-    }else{
-      prey.chased = false;
     }
 }
 
@@ -200,7 +197,7 @@ class Predator {
       // Decrease prey health by the same amount
       human.health -= 0.75;
       // Check if the prey died and reset it if so
-      if (human.health < 2) {
+      if (human.health <= 0) {
         human.reset();
         this.score++;
         if (this.score % 10 === 0 && this.score >= 10) {

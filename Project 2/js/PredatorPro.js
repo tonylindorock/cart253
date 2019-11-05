@@ -70,7 +70,7 @@ class PredatorPro {
     let dx = tree.x-this.x;
     let dy = tree.y-this.y;
     let angle = atan2(dy, dx);
-    if (d<60){
+    if (d<this.radius+tree.radius/2){
       this.x -= this.speed/3.5 * Math.cos(angle);
       this.y -= this.speed/3.5 * Math.sin(angle);
     }
@@ -104,11 +104,8 @@ class PredatorPro {
     // Check if the distance is less than their two radii (an overlap)
     if (d<50){
       if (d<=45){
-        prey.chased = true;
         prey.x += prey.speed/3.5 * Math.cos(angle);
         prey.y += prey.speed/3.5 * Math.sin(angle);
-      }else{
-        prey.chased = false;
       }
       this.x = lerp(this.x, prey.x, 0.025);
       this.y = lerp(this.y, prey.y, 0.025);
@@ -123,7 +120,7 @@ class PredatorPro {
           }
         }
         // Check if the prey died and reset it if so
-        if (prey.health < 2) {
+        if (prey.health <= 0) {
           prey.reset();
           }
       }
