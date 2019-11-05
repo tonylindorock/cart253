@@ -1,7 +1,7 @@
 // PredatorPro
 //
 // A class that represents a simple predator controlled by the computer
-//
+// 
 
 class PredatorPro {
 

@@ -4,7 +4,7 @@
 // Modified from Predator-Prey Sim
 //
 // The Earth is a simple game but with a complexed simulated-ecosystem.
-// Every animals will need to consume something.
+// Every animals will need to consume something because they will get hungry.
 // Rabbits, boars, antelopes, and bisons will eat plants on the ground.
 // Lion, leopard, or wolf (the player) will eat prey (animals above).
 // Humans will hunt all the other animals.
