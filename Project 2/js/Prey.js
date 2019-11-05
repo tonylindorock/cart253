@@ -9,7 +9,7 @@
 class Prey {
   // constructor
   //
-  // Sets the initial values for the Predator's properties
+  // Sets the initial values for the Prey's properties
   // Either sets default values or uses the arguments provided
   constructor(x, y, speed, radius, texture, texture_flipped) {
     // Position

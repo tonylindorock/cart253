@@ -1,4 +1,11 @@
+// Tree
+//
+// A background element object
+
 class Tree {
+  // constructor
+  //
+  // takes in x y positions, radius, and image
   constructor(x, y, radius, texture) {
     this.x = x;
     this.y = y;
@@ -6,6 +13,9 @@ class Tree {
     this.texture = texture;
   }
 
+  // display
+  //
+  // display the tree
   display() {
     push();
     imageMode(CENTER);

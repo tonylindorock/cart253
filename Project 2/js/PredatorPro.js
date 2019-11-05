@@ -1,13 +1,14 @@
 // PredatorPro
 //
-// A class that represents a simple predator controlled by the computer
-// 
+// A class that represents a simple predator (human) controlled by the computer
+// Will hunt prey constantly
+// When the player is close, it will follow and hunt the player instead
+// Can be hurt by the player as well
 
 class PredatorPro {
-
   // constructor
   //
-  // Sets the initial values for the Predator's properties
+  // Sets the initial values for the PredatorPro's properties
   // Either sets default values or uses the arguments provided
   constructor(x, y, speed, radius, texture, texture_flipped) {
     // Position
@@ -26,7 +27,7 @@ class PredatorPro {
     this.texture = texture;
     this.texture_flipped = texture_flipped;
     this.faceLeft = true;
-
+    // health
     this.healthLossPerMove = 0.05;
     this.healthGainPerEat = 0.5;
 
@@ -50,6 +51,7 @@ class PredatorPro {
     } else if (this.vx > 0) {
       this.faceLeft = false;
     }
+    // lose health
     this.health -= this.healthLossPerMove;
     this.health = constrain(this.health, 0, this.maxHealth);
     // Update position
@@ -60,19 +62,25 @@ class PredatorPro {
     this.ty += 0.01;
     // Handle wrapping
     this.handleWrapping();
-    if (this.health<=0){
+    // reset when dies
+    if (this.health <= 0) {
       this.reset();
     }
   }
-
-  collide(tree){
+  // collide
+  //
+  // collide with trees in the game
+  // generate an invisible, gentle force field around the tree
+  // will stop the human from moving
+  // but same as other collide functions
+  collide(tree) {
     let d = dist(this.x, this.y, tree.x, tree.y);
-    let dx = tree.x-this.x;
-    let dy = tree.y-this.y;
+    let dx = tree.x - this.x;
+    let dy = tree.y - this.y;
     let angle = atan2(dy, dx);
-    if (d<this.radius+tree.radius/2){
-      this.x -= this.speed/3.5 * Math.cos(angle);
-      this.y -= this.speed/3.5 * Math.sin(angle);
+    if (d < this.radius + tree.radius / 2) {
+      this.x -= this.speed / 3.5 * Math.cos(angle);
+      this.y -= this.speed / 3.5 * Math.sin(angle);
     }
   }
 
@@ -95,25 +103,34 @@ class PredatorPro {
     }
   }
 
-  handleEating(prey){
-    // Calculate distance from this predator to the prey
+  // handleEating
+  //
+  // hunt the prey
+  handleEating(prey) {
+    // Calculate distance from this human to the prey
     let d = dist(this.x, this.y, prey.x, prey.y);
-    let dx = prey.x-this.x;
-    let dy = prey.y-this.y;
+    let dx = prey.x - this.x;
+    let dy = prey.y - this.y;
     let angle = atan2(dy, dx);
-    // Check if the distance is less than their two radii (an overlap)
-    if (d<50){
-      if (d<=45){
-        prey.x += prey.speed/3.5 * Math.cos(angle);
-        prey.y += prey.speed/3.5 * Math.sin(angle);
+    // if close enough
+    if (d < 50) {
+      // prey will keep a distance from the human
+      if (d <= 45) {
+        // move away from the human!
+        prey.x += prey.speed / 3.5 * Math.cos(angle);
+        prey.y += prey.speed / 3.5 * Math.sin(angle);
       }
+      // approach the prey
       this.x = lerp(this.x, prey.x, 0.025);
       this.y = lerp(this.y, prey.y, 0.025);
+      // if overlap
       if (d < this.radius + prey.radius) {
+        // restore health
         this.health += this.healthGainPerEat;
         this.health = constrain(this.health, 0, this.maxHealth);
         // Decrease prey health by the same amount
         prey.health -= this.healthGainPerEat;
+        // lower prey speed
         if (prey.health < prey.maxHealth / 2) {
           if (prey.speed > prey.originalSpeed / 4) {
             prey.speed = prey.speed / 2;
@@ -122,37 +139,38 @@ class PredatorPro {
         // Check if the prey died and reset it if so
         if (prey.health <= 0) {
           prey.reset();
-          }
+        }
       }
+    } else {
+      prey.speed = prey.originalSpeed; // reset prey speed
     }
   }
   // hunting
   //
-  // Takes a Prey object as an argument and checks if the predator
-  // overlaps it. If so, reduces the prey's health and increases
-  // the predator's. If the prey dies, it gets reset.
+  // hunt the player!
   hunting(predator) {
-    // Calculate distance from this predator to the prey
+    // Calculate distance from this human to the player
     let d = dist(this.x, this.y, predator.x, predator.y);
-    // Check if the distance is less than their two radii (an overlap)
-    if (d<150){
-      if(this.health>this.maxHealth/2){
+    // winthin a radius
+    if (d < 150) {
+      // if human has over 50% health, chase the player
+      if (this.health > this.maxHealth / 2) {
         this.x = lerp(this.x, predator.x, 0.025);
         this.y = lerp(this.y, predator.y, 0.025);
       }
+      // if overlap, restore health
       if (d < this.radius + predator.radius) {
         this.health += (this.healthGainPerEat);
         this.health = constrain(this.health, 0, this.maxHealth);
-        // Decrease prey health by the same amount
-        predator.health -= this.healthGainPerEat+0.25;
+        // Decrease player health
+        predator.health -= 0.75;
       }
     }
   }
 
   // display
   //
-  // Draw the predator as an ellipse on the canvas
-  // with a radius the same size as its current health.
+  // Draw the human and its red health bar
   display(inGame) {
     push();
     fill(255);
@@ -163,6 +181,7 @@ class PredatorPro {
     } else {
       image(this.texture_flipped, this.x, this.y, this.radius * 2, this.radius * 2);
     }
+    // health bar
     if (inGame) {
       fill(100);
       rect(this.x - this.radius, this.y - 40, this.radius * 2, 5);
@@ -171,16 +190,15 @@ class PredatorPro {
     }
     pop();
   }
-// reset
-//
-// Set the position to a random location and reset health
-// and radius back to default
-reset(){
-  // Random position
-  this.x = this.campfirePosX;
-  this.y = this.campfirePosY;
+  // reset
+  //
+  // respawn at the camp location
+  reset() {
+    // camp pos
+    this.x = this.campfirePosX;
+    this.y = this.campfirePosY;
 
-  // Default health
-  this.health = this.maxHealth;
-}
+    // Default health
+    this.health = this.maxHealth;
+  }
 }

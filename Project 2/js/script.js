@@ -209,7 +209,7 @@ function setup() {
   append(players, leopard_flipped);
   setupPlayer(); // randomly set textures for players
   // create player1 object
-  player1 = new Predator(100, 100, 3, 30, player1_texture, player1_texture_flipped, 87, 83, 65, 68, 70);
+  player1 = new Predator(100, 100, 2, 30, player1_texture, player1_texture_flipped, 87, 83, 65, 68, 70);
 
   setUpPrey();
   setupHuman();
@@ -286,11 +286,11 @@ function setupHuman() {
   for (let i = 0; i < num_human; i++) {
     let humanX = random(50, width - 50);
     let humanY = random(50, height - 50);
-    // camp position
+    // first human decides the camp position
     campfirePosX = humanX;
     campfirePosY = humanY;
     // human attributes
-    let humanSpeed = 3;
+    let humanSpeed = 3; // faster than player by 1
     let humanRadius = random(25, 30);
     // create human object
     let humanObj = new PredatorPro(humanX, humanY, humanSpeed, humanRadius, human, human_flipped);
@@ -776,7 +776,7 @@ function checkMainMenuButtons() {
       playing = true;
       singlePlayer = false;
       // add the second human
-      player2 = new Predator(width - 100, 100, 3, 30, player2_texture, player2_texture_flipped, UP_ARROW, DOWN_ARROW, LEFT_ARROW, RIGHT_ARROW, 76);
+      player2 = new Predator(width - 100, 100, 2, 30, player2_texture, player2_texture_flipped, UP_ARROW, DOWN_ARROW, LEFT_ARROW, RIGHT_ARROW, 76);
       addHuman();
     }
   }
@@ -871,7 +871,7 @@ function checkGameOverButtons() {
         bestScore = totalScore;
       }
       // reset player
-      player1 = new Predator(100, 100, 3, 30, player1_texture, player1_texture_flipped, 87, 83, 65, 68, 70);
+      player1 = new Predator(100, 100, 2, 30, player1_texture, player1_texture_flipped, 87, 83, 65, 68, 70);
       num_human = 1;
       setUpPrey(); // reset prey
       setupHuman(); // reset human
@@ -900,8 +900,8 @@ function checkGameOverButtons() {
       if (bestScore < totalScore) {
         bestScore = totalScore;
       }
-      player1 = new Predator(100, 100, 3, 30, player1_texture, player1_texture_flipped, 87, 83, 65, 68, 70);
-      player2 = new Predator(width - 100, 100, 3, 30, player2_texture, player2_texture_flipped, UP_ARROW, DOWN_ARROW, LEFT_ARROW, RIGHT_ARROW, 76);
+      player1 = new Predator(100, 100, 2, 30, player1_texture, player1_texture_flipped, 87, 83, 65, 68, 70);
+      player2 = new Predator(width - 100, 100, 2, 30, player2_texture, player2_texture_flipped, UP_ARROW, DOWN_ARROW, LEFT_ARROW, RIGHT_ARROW, 76);
       num_human = 2;
       setUpPrey();
       setupHuman();

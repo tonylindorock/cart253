@@ -103,7 +103,7 @@ class Predator {
     // Update health
     this.health -= this.healthLossPerMove;
     if (this.sprinting) {
-      this.health -= this.healthLossPerMove * 1.5;
+      this.health -= this.healthLossPerMove*1.5;
     }
     this.health = constrain(this.health, 0, this.maxHealth);
 
@@ -162,7 +162,7 @@ class Predator {
     let dx = prey.x - this.x;
     let dy = prey.y - this.y;
     let angle = atan2(dy, dx);
-    // let the prey stay a distance from the player
+    // let the prey keep a distance from the player
     if (d <= 100 && !this.dead) {
       prey.x += prey.speed / 3.5 * Math.cos(angle);
       prey.y += prey.speed / 3.5 * Math.sin(angle);
