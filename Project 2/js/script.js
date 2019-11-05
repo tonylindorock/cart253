@@ -626,6 +626,10 @@ function displayGameOver() {
   }
   fill(255,100);
   ellipse(100,100,120);
+  textAlign(CENTER, CENTER);
+  textSize(16);
+  fill(255);
+  text("YOU ARE HERE",100,175);
   image(player1_texture, 100, 100, player1.radius * 2, player1.radius * 2);
   fill(255);
   textSize(32);
@@ -676,7 +680,12 @@ function checkGameOverButtons() {
   } else {
     fill(255,100);
     ellipse(width-100,100,120);
+    textAlign(CENTER, CENTER);
+    textSize(16);
+    fill(255);
+    text("YOU ARE HERE",width-100,175);
     image(player2_texture, width-100, 100, player1.radius * 2, player1.radius * 2);
+    textSize(32);
     textAlign(RIGHT, CENTER);
     text("play as one", width / 2 - 100, height / 2 + 100);
     fill(SELECTED);
@@ -724,6 +733,10 @@ function showMainMenu() {
 
   fill(255,100);
   ellipse(100,100,120);
+  textAlign(CENTER, CENTER);
+  textSize(16);
+  fill(255);
+  text("YOU ARE HERE",100,175);
   image(player1_texture, 100, 100, player1.radius * 2, player1.radius * 2);
   pop();
 }
@@ -752,8 +765,13 @@ function checkMainMenuButtons() {
   } else {
     fill(255,100);
     ellipse(width-100,100,120);
+    textAlign(CENTER, CENTER);
+    textSize(16);
+    fill(255);
+    text("YOU ARE HERE",width-100,175);
     image(player2_texture, width-100, 100, player1.radius * 2, player1.radius * 2);
     fill(255);
+    textSize(32);
     textAlign(RIGHT, CENTER);
     text("play as one", width / 2 - 100, height / 2 + 120);
     fill(SELECTED);

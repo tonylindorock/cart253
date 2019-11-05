@@ -24,7 +24,7 @@ class Predator {
     // Health properties
     this.maxHealth = this.radius;
     this.health = this.maxHealth; // Must be AFTER defining this.maxHealth
-    this.healthLossPerMove = 0.2;
+    this.healthLossPerMove = 0.15;
     this.originalHealthPerEat = 0.5;
     this.healthGainPerEat = this.originalHealthPerEat;
     this.texture = texture;
@@ -182,7 +182,7 @@ class Predator {
           this.score+=0.5;
           if (this.score % 10 === 0 && this.score >= 10) {
             this.healthLossPerMove -= 0.005;
-            this.healthLossPerMove = constrain(this.healthLossPerMove, 0.1, 0.2)
+            this.healthLossPerMove = constrain(this.healthLossPerMove, 0.1, 0.15)
           }
         }
       }
@@ -207,7 +207,7 @@ class Predator {
         this.score++;
         if (this.score % 10 === 0 && this.score >= 10) {
           this.healthLossPerMove -= 0.015;
-          this.healthLossPerMove = constrain(this.healthLossPerMove, 0.1, 0.2)
+          this.healthLossPerMove = constrain(this.healthLossPerMove, 0.1, 0.15)
         }
       }
     }
