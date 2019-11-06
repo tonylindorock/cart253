@@ -11,7 +11,7 @@
 // Some will live, some will strave, and some will be eaten.
 // So this is the Earth.
 
-// Our players and player textures
+// Our player textures
 let player1;
 let player2;
 let player1_texture;
@@ -31,7 +31,7 @@ const NUM_ANTELOPE = 10;
 const NUM_BISON = 10;
 const NUM_ANIMALS = [NUM_RABBIT, NUM_BOAR, NUM_ZEBRA, NUM_ANTELOPE, NUM_BISON];
 
-let num_human = 1;
+let num_human = 1; // the first human!
 
 // game states
 let playing = false;
@@ -116,7 +116,7 @@ let prey = [];
 let players = [];
 let predatorPro = [];
 
-// all the sounds
+// all the custom-made sounds
 let spring_bg;
 let summer_bg;
 let fall_bg;
