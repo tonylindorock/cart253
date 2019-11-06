@@ -184,6 +184,10 @@ class Predator {
         }
         // Check if the prey died and reset it if so
         if (prey.health <= 0) {
+          // play the sound when the prey is eaten
+          scored_sound.setVolume(0.2);
+          scored_sound.play();
+
           prey.reset();
           this.score += 0.5; // 0.5 point per prey
           // if gets 10 points, player will be stronger
@@ -214,6 +218,10 @@ class Predator {
       human.health -= 0.75; // a fair fight
       // Check if the human died and reset it if so
       if (human.health <= 0) {
+        // play sound when the human is killed
+        scored_sound_1.setVolume(0.3);
+        scored_sound_1.play();
+
         human.reset();
         this.score++; // 1 point per human
         if (this.score % 10 === 0 && this.score >= 10) {

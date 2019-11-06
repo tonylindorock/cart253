@@ -123,6 +123,8 @@ let fall_bg;
 let winter_bg;
 let bg_music = []; // sound array
 let eaten_sound;
+let scored_sound;
+let scored_sound_1;
 let newRecord_sound;
 let noNewRecord_sound;
 
@@ -173,6 +175,8 @@ function preload() {
   winter_bg = loadSound("assets/sounds/Winter.mp3");
   bg_music = [spring_bg, summer_bg, fall_bg, winter_bg]; // bg music in an array
   eaten_sound = loadSound("assets/sounds/Eaten.mp3");
+  scored_sound = loadSound("assets/sounds/Scored.mp3");
+  scored_sound_1 = loadSound("assets/sounds/Man_Killed.mp3");
   newRecord_sound = loadSound("assets/sounds/Lion_Roar.mp3");
   noNewRecord_sound = loadSound("assets/sounds/Wolf_Cry.mp3");
 }
