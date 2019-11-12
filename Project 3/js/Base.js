@@ -1,9 +1,12 @@
 // Base
 //
 // The class which is the base of the player
-// Handles declaration of other Soldier classes
+// Handles creating of other Soldier classes
 
 class Base{
+  // constructor
+  //
+  // takes in player id, map id, and mode id to determine player's base position and keys
   constructor(playerId, mapId, modeId){
     // size
     this.size = 50;
@@ -12,14 +15,14 @@ class Base{
     this.health = this.maxHealth;
     // id
     this.playerId = playerId;
-    // color
+    // color for different ids
     if (this.playerId === 0){
-      this.color = "#599cff";
+      this.color = "#4fc7fb";
     }else if(this.playerId === 1){
-      this.color = "#ff5959";
+      this.color = "#FB524F";
     }
-    // position
-    this.margin = 100;
+    // positions for different maps and ids
+    this.margin = 100; // distance to the edge of the window
     if (this.playerId === 0){
       if(mapId===0){
         this.x = this.margin;
@@ -49,8 +52,13 @@ class Base{
         this.y = height-this.margin;
       }
     }
+    // resource
+    this.resource = 0;
   }
 
+  // display
+  //
+  // display the base and its health on the side of the window
   display(){
     push();
     fill(this.color);
@@ -62,6 +70,7 @@ class Base{
     rect(this.x,this.y,this.size,this.size);
     // base health bar
     noStroke();
+    // map the health into window height
     this.barHeight = map(this.health,0,this.maxHealth,0,height);
     if(this.playerId===0){
       rect(5,height/2,10,this.barHeight);
