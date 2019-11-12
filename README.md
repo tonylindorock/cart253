@@ -17,3 +17,6 @@
 <br>
 <br>
 <a href= "https://tonylindorock.github.io/cart253-2019/Project%202/index.html" <h2>Project 2</h2></a>
+<br>
+<br>
+<a href= "https://tonylindorock.github.io/cart253-2019/Project%203/index.html" <h2>Project 3</h2></a>
