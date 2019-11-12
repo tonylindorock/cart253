@@ -63,16 +63,21 @@ function displayMainMenu(){
 function checkMainMenuButtons(){
   push();
   textAlign(CENTER,CENTER);
+  rectMode(CORNER);
   textSize(32);
-  if (mouseY>height-height/3){
+  if (mouseY>height-75){
     fill(SELECTED);
-    text("P L A Y",width/2,height/2+200);
+    rect(0,height-75,width,75);
+    fill(255);
+    text("P L A Y",width/2,height-35);
     if (mouseIsPressed){
       starting = true;
     }
   }else{
+    fill(50);
+    rect(0,height-75,width,75);
     fill(255);
-    text("P L A Y",width/2,height/2+200);
+    text("P L A Y",width/2,height-35);
   }
   pop();
 }
@@ -112,7 +117,11 @@ function displaySecondMenu(){
     rect(width/2+375,height/2,width/6,height/6);
   }
   if(selectedMap){
-    text("N E X T",width/2,height/2+200);
+    rectMode(CORNER);
+    fill(50);
+    rect(0,height-75,width,75);
+    fill(255);
+    text("N E X T",width/2,height-35);
   }
   pop();
 
@@ -126,7 +135,7 @@ function checkSecondMenuButton(){
   rectMode(CENTER);
   textSize(32);
   if (height/2-height/12<mouseY && mouseY<height/2+height/12){
-    if(mouseX<width/2-375+width/12){
+    if(mouseX<width/2-375+width/12 && mouseX>width/2-375-width/12){
       fill(SELECTED);
       rect(width/2-375,height/2,width/6+10,height/6+10);
       fill(255);
@@ -153,7 +162,7 @@ function checkSecondMenuButton(){
         mapId = 2;
         selectedMap = true;
       }
-    }else if(mouseX>width/2+375-width/12){
+    }else if(mouseX>width/2+375-width/12 && mouseX<width/2+375+width/12){
       fill(SELECTED);
       rect(width/2+375,height/2,width/6+10,height/6+10);
       fill(255);
@@ -168,6 +177,13 @@ function checkSecondMenuButton(){
       mapId = -1;
       selectedMap = false;
     }
+  }
+  if(selectedMap && mouseY>height-75){
+    rectMode(CORNER);
+    fill(SELECTED);
+    rect(0,height-75,width,75);
+    fill(255);
+    text("N E X T",width/2,height-35);
   }
   pop();
 }
