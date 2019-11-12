@@ -9,11 +9,13 @@ Simple Defence is a simple game with simple UI and straightforward rules.
 ******************/
 
 let starting = false;
+let selectedMap = false;
+let mapId = -1;
 let playing = false;
 let gameOver = false;
 let singlePlayer = true;
 
-const SELECTED = "#4ddeff";
+const SELECTED = "#47b3ff";
 
 function preload() {
 
@@ -25,6 +27,7 @@ function setup() {
 
   textFont("Verdana");
   textStyle(BOLD);
+  noStroke();
 }
 
 function draw() {
@@ -33,9 +36,13 @@ function draw() {
     displayMainMenu();
   }else{
     if(!playing){
-      displaySecondMenu()
+      displaySecondMenu();
     }else{
+      if(singlePlayer){
 
+      }else{
+
+      }
     }
   }
 
@@ -74,9 +81,39 @@ function displaySecondMenu(){
   push();
   fill(255);
   textAlign(CENTER,CENTER);
+  imageMode(CENTER);
   rectMode(CENTER);
   textSize(32);
-  text("C H O O S E   Y O U R   M A P",width/2,75);
+  text("C H O O S E   Y O U R   M A P",width/2,height/2-200);
+  rect(width/2-375,height/2,width/6,height/6);
+  rect(width/2-125,height/2,width/6,height/6);
+  rect(width/2+125,height/2,width/6,height/6);
+  rect(width/2+375,height/2,width/6,height/6);
+
+  if (mapId===0){
+    fill(SELECTED);
+    rect(width/2-375,height/2,width/6+10,height/6+10);
+    fill(255);
+    rect(width/2-375,height/2,width/6,height/6);
+  }else if(mapId===1){
+    fill(SELECTED);
+    rect(width/2-125,height/2,width/6+10,height/6+10);
+    fill(255);
+    rect(width/2-125,height/2,width/6,height/6);
+  }else if(mapId===2){
+    fill(SELECTED);
+    rect(width/2+125,height/2,width/6+10,height/6+10);
+    fill(255);
+    rect(width/2+125,height/2,width/6,height/6);
+  }else if(mapId===3){
+    fill(SELECTED);
+    rect(width/2+375,height/2,width/6+10,height/6+10);
+    fill(255);
+    rect(width/2+375,height/2,width/6,height/6);
+  }
+  if(selectedMap){
+    text("N E X T",width/2,height/2+200);
+  }
   pop();
 
   checkSecondMenuButton();
@@ -85,6 +122,52 @@ function displaySecondMenu(){
 function checkSecondMenuButton(){
   push();
   textAlign(CENTER,CENTER);
+  imageMode(CENTER);
+  rectMode(CENTER);
   textSize(32);
+  if (height/2-height/12<mouseY && mouseY<height/2+height/12){
+    if(mouseX<width/2-375+width/12){
+      fill(SELECTED);
+      rect(width/2-375,height/2,width/6+10,height/6+10);
+      fill(255);
+      rect(width/2-375,height/2,width/6,height/6);
+      if(mouseIsPressed){
+        mapId = 0;
+        selectedMap = true;
+      }
+    }else if(mouseX>width/2-125-width/12 && mouseX<width/2-125+width/12){
+      fill(SELECTED);
+      rect(width/2-125,height/2,width/6+10,height/6+10);
+      fill(255);
+      rect(width/2-125,height/2,width/6,height/6);
+      if(mouseIsPressed){
+        mapId = 1;
+        selectedMap = true;
+      }
+    }else if(mouseX>width/2+125-width/12 && mouseX<width/2+125+width/12){
+      fill(SELECTED);
+      rect(width/2+125,height/2,width/6+10,height/6+10);
+      fill(255);
+      rect(width/2+125,height/2,width/6,height/6);
+      if(mouseIsPressed){
+        mapId = 2;
+        selectedMap = true;
+      }
+    }else if(mouseX>width/2+375-width/12){
+      fill(SELECTED);
+      rect(width/2+375,height/2,width/6+10,height/6+10);
+      fill(255);
+      rect(width/2+375,height/2,width/6,height/6);
+      if(mouseIsPressed){
+        mapId = 3;
+        selectedMap = true;
+      }
+    }
+  }else{
+    if(mouseIsPressed){
+      mapId = -1;
+      selectedMap = false;
+    }
+  }
   pop();
 }
