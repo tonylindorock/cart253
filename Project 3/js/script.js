@@ -1,6 +1,6 @@
 /*****************
 - Final Project -
-Simple Defence
+Simple Defence (Prototype)
 
 By Yichen Wang
 
