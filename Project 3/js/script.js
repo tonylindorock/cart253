@@ -6,6 +6,11 @@ By Yichen Wang
 
 
 Simple Defence is a simple game with simple UI and straightforward rules.
+Players can play with the computer or with their friends.
+Players must defend their bases from their competitors and
+must destory their components to win the game.
+Players can send out soldiers using their resources. The more powerful the soldier is,
+the more expensive it will be. Players' resources will gain 1 per second.
 ******************/
 
 let State = "starting";
@@ -237,7 +242,6 @@ function displayModeMenu(){
   text("C H O O S E   A   G A M E   M O D E",width/2,height/2-200);
   rect(width/2-125,height/2,width/6,height/6);
   rect(width/2+125,height/2,width/6,height/6);
-
   if(modeId===0){
     fill(SELECTED);
     rect(width/2-125,height/2,width/6+10,height/6+10);
@@ -316,5 +320,9 @@ function checkModeMenu(){
       playing = true;
     }
   }
+  fill(r,g,b);
+  textSize(32);
+  text("SINGLE",width/2-125,height/2);
+  text("MULTI",width/2+125,height/2);
   pop();
 }

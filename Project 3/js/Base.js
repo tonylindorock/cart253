@@ -14,9 +14,9 @@ class Base{
     this.playerId = playerId;
     // color
     if (this.playerId === 0){
-      this.color = "#a6d4ff";
+      this.color = "#599cff";
     }else if(this.playerId === 1){
-      this.color = "#ffa6a6";
+      this.color = "#ff5959";
     }
     // position
     this.margin = 100;
@@ -53,9 +53,21 @@ class Base{
 
   display(){
     push();
-    rectMode(CENTER);
     fill(this.color);
+    // base
+    rectMode(CENTER);
+    /*
+    stroke(255);
+    strokeWeight(4); */
     rect(this.x,this.y,this.size,this.size);
+    // base health bar
+    noStroke();
+    this.barHeight = map(this.health,0,this.maxHealth,0,height);
+    if(this.playerId===0){
+      rect(5,height/2,10,this.barHeight);
+    }else if (this.playerId===1){
+      rect(width-5,height/2,10,this.barHeight);
+    }
     pop();
   }
 }
