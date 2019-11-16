@@ -1,6 +1,6 @@
 /*****************
 - Final Project -
-Simple Defence (Prototype)
+Simple Defence (Prototype Ex8)
 
 By Yichen Wang
 
