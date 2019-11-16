@@ -3,17 +3,64 @@
 // a generic soldier class
 
 class Soldier{
-  constructor(x,y,playerId){
+  constructor(x,y,playerId,mapId){
     // spawn position
     this.x=x;
     this.y=y;
     // size
-    this.size = 15;
+    this.size = 30;
+    // speed
+    this.speed=1;
+    this.vx=0;
+    this.vy=0;
     // id
     this.playerId=playerId;
+    this.mapId=mapId;
+    // color
+    if(this.playerId==0){
+      this.color="#4fc7fb"; // blue
+    }else if(this.playerId==1){
+      this.color="#FB524F"; // red
+    }
+    // dead or alive
+    this.dead = false;
+    // health
+    this.maxHealth = 25;
+    this.health = this.maxHealth;
+
+    if(this.playerId===0){
+      if (this.mapId===0){
+        this.enemyBaseX = width-100;
+        this.enemyBaseY = height/2;
+      }else if (this.mapId===1){
+        this.enemyBaseX = width-100;
+        this.enemyBaseY = height-100;
+      }else if (this.mapId===2){
+        this.enemyBaseX = width-100;
+        this.enemyBaseY = 100;
+      }else if (this.mapId===3){
+        this.enemyBaseX = width/2;
+        this.enemyBaseY = height-100;
+      }
+    }else if(this.playerId===1){
+      if (this.mapId===0){
+        this.enemyBaseX = 100;
+        this.enemyBaseY = height/2;
+      }else if (this.mapId===1){
+        this.enemyBaseX = 100;
+        this.enemyBaseY = 100;
+      }else if (this.mapId===2){
+        this.enemyBaseX = 100;
+        this.enemyBaseY = height-100;
+      }else if (this.mapId===3){
+        this.enemyBaseX = width/2;
+        this.enemyBaseY = 100;
+      }
+    }
   }
 
-  move(){}
+  // empty functions
+  attackBase(){}
 
   attack(enemy){}
 

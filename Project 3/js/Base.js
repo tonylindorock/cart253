@@ -17,9 +17,9 @@ class Base{
     this.playerId = playerId;
     // color for different ids
     if (this.playerId === 0){
-      this.color = "#4fc7fb";
+      this.color = "#4fc7fb"; // blue
     }else if(this.playerId === 1){
-      this.color = "#FB524F";
+      this.color = "#FB524F"; // red
     }
     // positions for different maps and ids
     this.margin = 100; // distance to the edge of the window
@@ -54,6 +54,11 @@ class Base{
     }
     // resource
     this.resource = 0;
+    // soldier arrays
+    this.squares=[];
+    this.squareElites=[];
+    this.circleShooters=[];
+    this.circleDemos=[];
   }
 
   // display
