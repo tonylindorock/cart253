@@ -3,14 +3,17 @@
 // a generic soldier class
 
 class Soldier{
-  constructor(x,y,playerId,mapId){
+  constructor(x,y,playerId,mapId,uniqueId){
     // spawn position
+    this.baseX = x;
+    this.baseY = y;
+    // position
     this.x=x;
     this.y=y;
     // size
     this.size = 30;
     // speed
-    this.speed=1;
+    this.speed=2;
     this.vx=0;
     this.vy=0;
     // id
@@ -57,6 +60,7 @@ class Soldier{
         this.enemyBaseY = 100;
       }
     }
+    this.uniqueId = uniqueId;
   }
 
   // empty functions

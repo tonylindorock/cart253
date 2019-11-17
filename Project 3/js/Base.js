@@ -61,6 +61,31 @@ class Base{
     this.circleDemos=[];
   }
 
+  hasActiveSoldiers(){
+    let check = false;
+    for(let i=0;i<this.squares.length;i++){
+      if (this.squares[i].dead!=true){
+        check = true;
+      }
+    }
+    for(let i=0;i<this.squareElites.length;i++){
+      if (this.squareElites[i].dead!=true){
+        check = true;
+      }
+    }
+    for(let i=0;i<this.circleShooters.length;i++){
+      if (this.circleShooters[i].dead!=true){
+        check = true;
+      }
+    }
+    for(let i=0;i<this.circleDemos.length;i++){
+      if (this.circleDemos[i].dead!=true){
+        check = true;
+      }
+    }
+    return check;
+  }
+
   // display
   //
   // display the base and its health on the side of the window

@@ -21,6 +21,8 @@ let playing = false; // if playing
 let gameOver = false; // if game is over
 let singlePlayer = true; // if sinlge player
 
+let uniqueIds=[];
+
 // r g b values for background color
 let r;
 let g;
@@ -93,6 +95,23 @@ function draw() {
   }
 }
 
+function getUniqueId(){
+  let id = random(0,100);
+  let sameId = false;
+  for(let i=0;i<uniqueIds.length;i++){
+    if(uniqueIds[i]===id){
+      sameId = true;
+    }
+    if(sameId){
+      id = random(0,100);
+      i=0;
+      sameId=false;
+    }
+  }
+  uniqueIds.push(id);
+  return id;
+}
+
 // setUpBase()
 //
 // create base objects
@@ -120,10 +139,22 @@ function displaySoldiers() {
 
 function moveSoldiers(){
   for (let i = 0; i < baseLeft.squares.length; i++) {
-    baseLeft.squares[i].attackBase();
+    if (!baseRight.hasActiveSoldiers()){
+      baseLeft.squares[i].attackBase();
+    }else{
+      for (let j = 0; j < baseRight.squares.length; j++) {
+        baseLeft.squares[i].attack(baseRight.squares[j]);
+      }
+    }
   }
   for (let i = 0; i < baseRight.squares.length; i++) {
-    baseRight.squares[i].attackBase();
+    if (!baseLeft.hasActiveSoldiers()){
+      baseRight.squares[i].attackBase();
+    }else{
+      for (let j = 0; j < baseLeft.squares.length; j++) {
+        baseRight.squares[i].attack(baseLeft.squares[j]);
+      }
+    }
   }
 }
 
@@ -133,9 +164,10 @@ function moveSoldiers(){
 function keyPressed() {
   if (playing) {
     if (keyCode === 87) {
-      let square = new Square(baseLeft.x, baseLeft.y, 0, mapId);
+      let uniqueId = getUniqueId();
+      let square = new Square(baseLeft.x, baseLeft.y, 0, mapId,uniqueId);
       baseLeft.squares.push(square);
-      console.log(baseLeft.playerId + " spawned a square" +baseLeft.enemyBaseX);
+      console.log(baseLeft.playerId + " spawned a square (id: "+uniqueId+")");
     } else if (keyCode === 65) {
 
     } else if (keyCode === 83) {
@@ -145,9 +177,10 @@ function keyPressed() {
     }
     if (!singlePlayer) {
       if (keyCode === 38) {
-        let square = new Square(baseRight.x, baseRight.y, 1,mapId);
+        let uniqueId = getUniqueId();
+        let square = new Square(baseRight.x, baseRight.y, 1,mapId,uniqueId);
         baseRight.squares.push(square);
-        console.log(baseRight.playerId + " spawned a square");
+        console.log(baseRight.playerId + " spawned a square (id: "+uniqueId+")");
       } else if (keyCode === 37) {
 
       } else if (keyCode === 40) {
