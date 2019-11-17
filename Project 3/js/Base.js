@@ -13,6 +13,9 @@ class Base{
     // health
     this.maxHealth = 200;
     this.health = this.maxHealth;
+    // capacity
+    this.maxCap = 50;
+    this.capacity = 0;
     // id
     this.playerId = playerId;
     // color for different ids
@@ -94,9 +97,8 @@ class Base{
     fill(this.color);
     // base
     rectMode(CENTER);
-    /*
     stroke(255);
-    strokeWeight(4); */
+    strokeWeight(4);
     rect(this.x,this.y,this.size,this.size);
     // base health bar
     noStroke();

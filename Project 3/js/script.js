@@ -137,28 +137,20 @@ function displaySoldiers() {
 
 function moveSoldiers(){
   for (let i = 0; i < baseLeft.squares.length; i++) {
-    if (!baseRight.hasActiveSoldiers()){
-      baseLeft.squares[i].attackBase(baseRight);
-    }else{
       for (let j = 0; j < baseRight.squares.length; j++) {
         baseLeft.squares[i].attack(baseRight.squares[j]);
       }
       if (baseLeft.squares[i].targetId<0){
         baseLeft.squares[i].attackBase(baseRight);
       }
-    }
   }
   for (let i = 0; i < baseRight.squares.length; i++) {
-    if (!baseLeft.hasActiveSoldiers()){
-      baseRight.squares[i].attackBase(baseLeft);
-    }else{
       for (let j = 0; j < baseLeft.squares.length; j++) {
         baseRight.squares[i].attack(baseLeft.squares[j]);
       }
       if (baseRight.squares[i].targetId<0){
         baseRight.squares[i].attackBase(baseLeft);
       }
-    }
   }
 }
 
@@ -167,30 +159,36 @@ function moveSoldiers(){
 // handle the inputs
 function keyPressed() {
   if (playing) {
-    if (keyCode === 87) {
-      let uniqueId = getUniqueId();
-      let square = new Square(baseLeft.x, baseLeft.y, 0, mapId,uniqueId);
-      baseLeft.squares.push(square);
-      console.log(baseLeft.playerId + " spawned a square (id: "+uniqueId+")");
-    } else if (keyCode === 65) {
+    if (baseLeft.capacity<baseLeft.maxCap){
+      if (keyCode === 87) {
+        let uniqueId = getUniqueId();
+        let square = new Square(baseLeft.x, baseLeft.y, 0, mapId,uniqueId);
+        baseLeft.squares.push(square);
+        console.log(baseLeft.playerId + " spawned a square (id: "+uniqueId+")");
+        baseLeft.capacity++;
+      } else if (keyCode === 65) {
 
-    } else if (keyCode === 83) {
+      } else if (keyCode === 83) {
 
-    } else if (keyCode === 68) {
+      } else if (keyCode === 68) {
 
+      }
     }
     if (!singlePlayer) {
-      if (keyCode === 38) {
-        let uniqueId = getUniqueId();
-        let square = new Square(baseRight.x, baseRight.y, 1,mapId,uniqueId);
-        baseRight.squares.push(square);
-        console.log(baseRight.playerId + " spawned a square (id: "+uniqueId+")");
-      } else if (keyCode === 37) {
+      if (baseRight.capacity<baseRight.maxCap){
+        if (keyCode === 38) {
+          let uniqueId = getUniqueId();
+          let square = new Square(baseRight.x, baseRight.y, 1,mapId,uniqueId);
+          baseRight.squares.push(square);
+          console.log(baseRight.playerId + " spawned a square (id: "+uniqueId+")");
+          baseRight.capacity++;
+        } else if (keyCode === 37) {
 
-      } else if (keyCode === 40) {
+        } else if (keyCode === 40) {
 
-      } else if (keyCode === 39) {
+        } else if (keyCode === 39) {
 
+        }
       }
     }
   }
