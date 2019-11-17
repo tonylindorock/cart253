@@ -105,8 +105,14 @@ class Base{
     // map the health into window height
     this.barHeight = map(this.health,0,this.maxHealth,0,height);
     if(this.playerId===0){
+      fill(50);
+      rect(5,height/2,10,height);
+      fill(this.color);
       rect(5,height/2,10,this.barHeight);
     }else if (this.playerId===1){
+      fill(50);
+      rect(width-5,height/2,10,height);
+      fill(this.color);
       rect(width-5,height/2,10,this.barHeight);
     }
     pop();

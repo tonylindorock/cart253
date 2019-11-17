@@ -11,9 +11,11 @@ class Soldier{
     this.x=x;
     this.y=y;
     // size
-    this.size = 30;
+    this.originalSize = 30;
+    this.size = this.originalSize;
     // speed
-    this.speed=2;
+    this.originalSpeed = 2;
+    this.speed=this.originalSpeed;
     this.vx=0;
     this.vy=0;
 

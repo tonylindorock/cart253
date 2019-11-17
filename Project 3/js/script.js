@@ -40,8 +40,16 @@ let baseRight;
 // highlighted color
 const SELECTED = "#47b3ff";
 
-function preload() {
+let MapHorizontal;
+let MapVertical;
+let MapDiagonal1;
+let MapDiagonal2;
 
+function preload() {
+  MapHorizontal = loadImage("assets/images/Horizontal.jpg");
+  MapVertical = loadImage("assets/images/Vertical.jpg");
+  MapDiagonal1 = loadImage("assets/images/Diagonal 1.jpg");
+  MapDiagonal2 = loadImage("assets/images/Diagonal 2.jpg");
 }
 
 // setUp()
@@ -141,7 +149,9 @@ function moveSoldiers(){
         baseLeft.squares[i].attack(baseRight.squares[j]);
       }
       if (baseLeft.squares[i].targetId<0){
-        baseLeft.squares[i].attackBase(baseRight);
+        if(!baseLeft.squares[i].dead){
+          baseLeft.squares[i].attackBase(baseRight);
+        }
       }
   }
   for (let i = 0; i < baseRight.squares.length; i++) {
@@ -149,7 +159,9 @@ function moveSoldiers(){
         baseRight.squares[i].attack(baseLeft.squares[j]);
       }
       if (baseRight.squares[i].targetId<0){
-        baseRight.squares[i].attackBase(baseLeft);
+        if(!baseRight.squares[i].dead){
+          baseRight.squares[i].attackBase(baseLeft);
+        }
       }
   }
 }
@@ -252,34 +264,26 @@ function displayMapMenu() {
   textSize(32);
   text("C H O O S E   Y O U R   M A P", width / 2, height / 2 - 200);
   // 4 maps
-  rect(width / 2 - 375, height / 2, rectUIWidth, rectUIHeight);
-  rect(width / 2 - 125, height / 2, rectUIWidth, rectUIHeight);
-  rect(width / 2 + 125, height / 2, rectUIWidth, rectUIHeight);
-  rect(width / 2 + 375, height / 2, rectUIWidth, rectUIHeight);
+  image(MapHorizontal,width / 2 - 375, height / 2, rectUIWidth, rectUIHeight);
+  image(MapDiagonal1,width / 2 - 125, height / 2, rectUIWidth, rectUIHeight);
+  image(MapDiagonal2,width / 2 + 125, height / 2, rectUIWidth, rectUIHeight);
+  image(MapVertical,width / 2 + 375, height / 2, rectUIWidth, rectUIHeight);
 
   // if a map is selected, highlight that map
+  fill(SELECTED); // outline
   if (mapId === 0) {
-    // outline
-    fill(SELECTED);
     rect(width / 2 - 375, height / 2, rectUIWidth + rectUIStroke, rectUIHeight + rectUIStroke);
     // map
-    fill(255);
-    rect(width / 2 - 375, height / 2, rectUIWidth, rectUIHeight);
+    image(MapHorizontal,width / 2 - 375, height / 2, rectUIWidth, rectUIHeight);
   } else if (mapId === 1) {
-    fill(SELECTED);
     rect(width / 2 - 125, height / 2, rectUIWidth + rectUIStroke, rectUIHeight + rectUIStroke);
-    fill(255);
-    rect(width / 2 - 125, height / 2, rectUIWidth, rectUIHeight);
+    image(MapDiagonal1,width / 2 - 125, height / 2, rectUIWidth, rectUIHeight);
   } else if (mapId === 2) {
-    fill(SELECTED);
     rect(width / 2 + 125, height / 2, rectUIWidth + rectUIStroke, rectUIHeight + rectUIStroke);
-    fill(255);
-    rect(width / 2 + 125, height / 2, rectUIWidth, rectUIHeight);
+    image(MapDiagonal2,width / 2 + 125, height / 2, rectUIWidth, rectUIHeight);
   } else if (mapId === 3) {
-    fill(SELECTED);
     rect(width / 2 + 375, height / 2, rectUIWidth + rectUIStroke, rectUIHeight + rectUIStroke);
-    fill(255);
-    rect(width / 2 + 375, height / 2, rectUIWidth, rectUIHeight);
+    image(MapVertical,width / 2 + 375, height / 2, rectUIWidth, rectUIHeight);
   }
   // if a map is selected, a next button will be displayed
   if (selectedMap) {
@@ -304,16 +308,16 @@ function checkMapMenuButton() {
   rectMode(CENTER);
   // if a map is being hovered, display its name under maps
   textSize(32);
+  fill(SELECTED);
   // map 1
   if (height / 2 - height / 12 < mouseY && mouseY < height / 2 + height / 12 &&
     mouseX > width / 2 - 375 - width / 12 && mouseX < width / 2 + 375 + width / 12) {
     if (mouseX < width / 2 - 375 + width / 12 && mouseX > width / 2 - 375 - width / 12) {
-      fill(SELECTED);
       rect(width / 2 - 375, height / 2, rectUIWidth + rectUIStroke, rectUIHeight + rectUIStroke);
-      fill(255);
-      rect(width / 2 - 375, height / 2, rectUIWidth, rectUIHeight);
+      image(MapHorizontal,width / 2 - 375, height / 2, rectUIWidth, rectUIHeight);
       // map name
       textSize(16);
+      fill(255);
       text("H O R I Z O N T A L", width / 2, height / 2 + 100);
       // if pressed, set mapId and a map is selected
       if (mouseIsPressed) {
@@ -322,11 +326,10 @@ function checkMapMenuButton() {
       }
       // map 2
     } else if (mouseX > width / 2 - 125 - width / 12 && mouseX < width / 2 - 125 + width / 12) {
-      fill(SELECTED);
       rect(width / 2 - 125, height / 2, rectUIWidth + rectUIStroke, rectUIHeight + rectUIStroke);
-      fill(255);
-      rect(width / 2 - 125, height / 2, rectUIWidth, rectUIHeight);
+      image(MapDiagonal1,width / 2 - 125, height / 2, rectUIWidth, rectUIHeight);
       textSize(16);
+      fill(255);
       text("D I A G O N A L   I", width / 2, height / 2 + 100);
       if (mouseIsPressed) {
         mapId = 1;
@@ -334,11 +337,10 @@ function checkMapMenuButton() {
       }
       // map 3
     } else if (mouseX > width / 2 + 125 - width / 12 && mouseX < width / 2 + 125 + width / 12) {
-      fill(SELECTED);
       rect(width / 2 + 125, height / 2, rectUIWidth + rectUIStroke, rectUIHeight + rectUIStroke);
-      fill(255);
-      rect(width / 2 + 125, height / 2, rectUIWidth, rectUIHeight);
+      image(MapDiagonal2,width / 2 + 125, height / 2, rectUIWidth, rectUIHeight);
       textSize(16);
+      fill(255);
       text("D I A G O N A L   I I", width / 2, height / 2 + 100);
       if (mouseIsPressed) {
         mapId = 2;
@@ -346,11 +348,10 @@ function checkMapMenuButton() {
       }
       // map 4s
     } else if (mouseX > width / 2 + 375 - width / 12 && mouseX < width / 2 + 375 + width / 12) {
-      fill(SELECTED);
       rect(width / 2 + 375, height / 2, rectUIWidth + rectUIStroke, rectUIHeight + rectUIStroke);
-      fill(255);
-      rect(width / 2 + 375, height / 2, rectUIWidth, rectUIHeight);
+      image(MapVertical,width / 2 + 375, height / 2, rectUIWidth, rectUIHeight);
       textSize(16);
+      fill(255);
       text("V E R T I C A L", width / 2, height / 2 + 100);
       if (mouseIsPressed) {
         mapId = 3;

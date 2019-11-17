@@ -1,6 +1,8 @@
 // Square
 //
 // An unique class extended from the soldier class
+// Square is a common but reliable soldier type. It harms enemies with melee damage.
+// It must get close to the enemies to harm them.
 
 class Square extends Soldier{
   constructor(x,y,playerId,mapId,uniqueId){
@@ -9,18 +11,23 @@ class Square extends Soldier{
     this.maxHealth = 40;
     this.health = this.maxHealth;
     // speed
+    this.speed+=random(-0.5,0.5);
     this.vx = 0;
     this.vy = 0;
     this.tx = random(0, 100); // To make x and y noise different
     this.ty = random(0, 100); // we use random starting values
+    // damage
+    this.damage+=random(-0.05,0.05);
 
     this.obtainedTarget = false;
-    this.targeted=false;
+    this.targeted=0;
     this.targetId=-1;
 
     this.rotation=0;
     this.originalRotationSpeed =5;
     this.rotationSpeed =this.originalRotationSpeed;
+
+    this.runOnce = true;
   }
 
   attackBase(enemyBase){
@@ -32,6 +39,7 @@ class Square extends Soldier{
       this.x += this.speed * cos(angle);
       this.y += this.speed * sin(angle);
     }else{
+      this.rotationSpeed = 10;
       enemyBase.health -= this.damage;
       enemyBase.health=constrain(enemyBase.health,0,enemyBase.maxHealth);
     }
@@ -50,29 +58,40 @@ class Square extends Soldier{
 
   attack(enemy){
     let d = dist(this.x,this.y,enemy.x,enemy.y);
-    if (this.targetId<0 && !enemy.targeted && this.health>this.maxHealth/2){
+    if (d<200 && this.targetId<0 && enemy.targeted<3){
       this.targetId = enemy.uniqueId;
-      enemy.targeted = true;
+      enemy.targeted++;
+      this.obtainedTarget = true;
+    }else if (this.targetId<0 && enemy.targeted<3 && this.health>this.maxHealth/2){
+      this.targetId = enemy.uniqueId;
+      enemy.targeted++;
       this.obtainedTarget = true;
     }
     let dx = enemy.x-this.x;
     let dy = enemy.y-this.y;
     let angle = atan2(dy, dx);
-
     if(this.targetId === enemy.uniqueId){
       if(d>15){
         this.x += this.speed * cos(angle);
         this.y += this.speed * sin(angle);
       }
       if(d<30){
-        enemy.health -= this.damage;
-        this.rotationSpeed = 10;
+        if(!this.dead){
+          enemy.health -= this.damage;
+          this.rotationSpeed = 10;
+        }
         if (enemy.health<=0){
-          enemy.reset();
+          enemy.dead=true;
           this.targetId = -1;
           this.obtainedTarget=false;
           this.rotationSpeed=this.originalRotationSpeed;
         }
+      }else{
+        this.rotationSpeed=this.originalRotationSpeed;
+      }
+      if (this.dead && this.runOnce){
+        enemy.targeted--;
+        this.runOnce=false;
       }
     }
     // Set velocity via noise()
@@ -115,16 +134,28 @@ class Square extends Soldier{
         this.rotation=this.rotationSpeed;
       }
     }
+    if(this.dead){
+      this.size-=0.5;
+      this.speed=0;
+      if(this.size<=0){
+        this.reset();
+      }
+    }
     pop();
   }
 
   reset(){
     this.x = this.baseX;
     this.y = this.baseY;
+    this.size = this.originalSize;
     this.health=this.maxHealth;
-    this.targeted = false;
+    this.targeted = 0;
+    this.targetId = -1;
+    this.speed=this.originalSpeed;
     this.rotationSpeed=this.originalRotationSpeed;
     this.tx = random(0, 100);
     this.ty = random(0, 100);
+    this.dead=false;
+    this.runOnce=true;
   }
 }
