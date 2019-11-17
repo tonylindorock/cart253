@@ -9,6 +9,8 @@ class Square extends Soldier{
     this.maxHealth = 40;
     this.health = this.maxHealth;
 
+    this.obtainedTarget = false;
+    this.targeted=false;
     this.targetId=-1;
 
     this.rotation=0;
@@ -23,36 +25,41 @@ class Square extends Soldier{
       this.x += this.speed * cos(angle);
       this.y += this.speed * sin(angle);
     }else{
-      enemyBase.health -= damage;
+      enemyBase.health -= this.damage;
+      enemyBase.health=constrain(enemyBase.health,0,enemyBase.maxHealth);
     }
   }
 
   attack(enemy){
-    if (this.targetId<0){
-      this.targetId = enemy.uniqueId;
-    }
     let d = dist(this.x,this.y,enemy.x,enemy.y);
+    if (this.targetId<0 && !enemy.targeted){
+      this.targetId = enemy.uniqueId;
+      enemy.targeted = true;
+      this.obtainedTarget = true;
+    }
     let dx = enemy.x-this.x;
     let dy = enemy.y-this.y;
     let angle = atan2(dy, dx);
+
     if(this.targetId === enemy.uniqueId){
       if(d>30){
         this.x += this.speed * cos(angle);
         this.y += this.speed * sin(angle);
       }else{
-        enemy.health-=0.25;
+        enemy.health -= this.damage;
         if (enemy.health<=0){
           enemy.reset();
           this.targetId = -1;
+          this.obtainedTarget=false;
         }
       }
     }
-
   }
 
   display(){
     push();
     rectMode(CENTER);
+    ellipseMode(CENTER);
     angleMode(DEGREES);
     stroke(255);
     strokeWeight(2);
@@ -72,5 +79,6 @@ class Square extends Soldier{
     this.x = this.baseX;
     this.y = this.baseY;
     this.health=this.maxHealth;
+    this.targeted = false;
   }
 }

@@ -54,8 +54,6 @@ function setup() {
   textFont("Verdana");
   textStyle(BOLD);
   noStroke();
-
-  console.log(width + " " + height);
 }
 
 // randomizeBG()
@@ -140,19 +138,25 @@ function displaySoldiers() {
 function moveSoldiers(){
   for (let i = 0; i < baseLeft.squares.length; i++) {
     if (!baseRight.hasActiveSoldiers()){
-      baseLeft.squares[i].attackBase();
+      baseLeft.squares[i].attackBase(baseRight);
     }else{
       for (let j = 0; j < baseRight.squares.length; j++) {
         baseLeft.squares[i].attack(baseRight.squares[j]);
+      }
+      if (baseLeft.squares[i].targetId<0){
+        baseLeft.squares[i].attackBase(baseRight);
       }
     }
   }
   for (let i = 0; i < baseRight.squares.length; i++) {
     if (!baseLeft.hasActiveSoldiers()){
-      baseRight.squares[i].attackBase();
+      baseRight.squares[i].attackBase(baseLeft);
     }else{
       for (let j = 0; j < baseLeft.squares.length; j++) {
         baseRight.squares[i].attack(baseLeft.squares[j]);
+      }
+      if (baseRight.squares[i].targetId<0){
+        baseRight.squares[i].attackBase(baseLeft);
       }
     }
   }

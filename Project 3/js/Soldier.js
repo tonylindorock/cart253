@@ -16,6 +16,8 @@ class Soldier{
     this.speed=2;
     this.vx=0;
     this.vy=0;
+
+    this.damage = 0.2;
     // id
     this.playerId=playerId;
     this.mapId=mapId;

@@ -11,7 +11,7 @@ class Base{
     // size
     this.size = 50;
     // health
-    this.maxHealth = 100;
+    this.maxHealth = 200;
     this.health = this.maxHealth;
     // id
     this.playerId = playerId;
