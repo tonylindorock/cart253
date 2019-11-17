@@ -76,16 +76,16 @@ class Soldier{
 
   handleWrapping(){
     // Off the left or right
-    if (this.x < 0) {
-      this.x += width;
-    } else if (this.x > width) {
-      this.x -= width;
+    if (this.x < this.size/2) {
+      this.x = this.size/2;
+    } else if (this.x > width-this.size/2) {
+      this.x = width-this.size/2;
     }
     // Off the top or bottom
-    if (this.y < 0) {
-      this.y += height;
-    } else if (this.y > height) {
-      this.y -= height;
+    if (this.y < this.size/2) {
+      this.y = this.size/2;
+    } else if (this.y > height-this.size/2) {
+      this.y = height-this.size/2;
     }
   }
 }

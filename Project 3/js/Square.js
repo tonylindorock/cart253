@@ -14,14 +14,15 @@ class Square extends Soldier{
     this.speed+=random(-0.5,0.5);
     this.vx = 0;
     this.vy = 0;
-    this.tx = random(0, 100); // To make x and y noise different
-    this.ty = random(0, 100); // we use random starting values
+    this.tx = random(0, 1000); // To make x and y noise different
+    this.ty = random(0, 1000); // we use random starting values
     // damage
     this.damage+=random(-0.05,0.05);
 
     this.obtainedTarget = false;
     this.targeted=0;
     this.targetId=-1;
+    this.attacking = false;
 
     this.rotation=0;
     this.originalRotationSpeed =5;
@@ -43,6 +44,7 @@ class Square extends Soldier{
       enemyBase.health -= this.damage;
       enemyBase.health=constrain(enemyBase.health,0,enemyBase.maxHealth);
     }
+    /*
     // Set velocity via noise()
     this.vx = map(noise(this.tx), 0, 1, -0.1, 0.1);
     this.vy = map(noise(this.ty), 0, 1, -0.1, 0.1);
@@ -51,18 +53,14 @@ class Square extends Soldier{
     this.y += this.vy;
     // Update time properties
     this.tx += 0.0001;
-    this.ty += 0.0001;
+    this.ty += 0.0001; */
 
     this.handleWrapping();
   }
 
   attack(enemy){
     let d = dist(this.x,this.y,enemy.x,enemy.y);
-    if (d<200 && this.targetId<0 && enemy.targeted<3){
-      this.targetId = enemy.uniqueId;
-      enemy.targeted++;
-      this.obtainedTarget = true;
-    }else if (this.targetId<0 && enemy.targeted<3 && this.health>this.maxHealth/2){
+    if (d<300 && this.targetId<0 && enemy.targeted<3 && !this.dead){
       this.targetId = enemy.uniqueId;
       enemy.targeted++;
       this.obtainedTarget = true;
@@ -79,6 +77,10 @@ class Square extends Soldier{
         if(!this.dead){
           enemy.health -= this.damage;
           this.rotationSpeed = 10;
+          this.attacking = true;
+          if(!enemy.attacking){
+            enemy.targetId = this.uniqueId;
+          }
         }
         if (enemy.health<=0){
           enemy.dead=true;
@@ -88,15 +90,22 @@ class Square extends Soldier{
         }
       }else{
         this.rotationSpeed=this.originalRotationSpeed;
+        this.attacking = false;
       }
-      if (this.dead && this.runOnce){
-        enemy.targeted--;
+      if (this.dead && this.runOnce && this.targetId === enemy.uniqueId){
+        if(enemy.targeted!=0){
+          enemy.targeted--;
+        }
+        if(enemy.targetId===this.uniqueId){
+          enemy.targetId = -1;
+        }
         this.runOnce=false;
       }
     }
+
     // Set velocity via noise()
-    this.vx = map(noise(this.tx), 0, 1, -0.1, 0.1);
-    this.vy = map(noise(this.ty), 0, 1, -0.1, 0.1);
+    this.vx = map(noise(this.tx), 0, 1, -0.05, 0.05);
+    this.vy = map(noise(this.ty), 0, 1, -0.05, 0.05);
     // Update position
     this.x += this.vx;
     this.y += this.vy;
@@ -151,10 +160,11 @@ class Square extends Soldier{
     this.health=this.maxHealth;
     this.targeted = 0;
     this.targetId = -1;
-    this.speed=this.originalSpeed;
+    this.attacking = false;
+    this.speed=this.originalSpeed+random(-0.5,0.5);
     this.rotationSpeed=this.originalRotationSpeed;
-    this.tx = random(0, 100);
-    this.ty = random(0, 100);
+    this.tx = random(0, 1000);
+    this.ty = random(0, 1000);
     this.dead=false;
     this.runOnce=true;
   }
