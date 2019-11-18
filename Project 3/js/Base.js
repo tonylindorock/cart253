@@ -98,6 +98,8 @@ class Base{
     stroke(255);
     strokeWeight(4);
     rect(this.x,this.y,this.size,this.size);
+    line(this.x,this.y+5,this.x,this.y-5);
+    line(this.x-5,this.y,this.x+5,this.y);
     // base health bar
     noStroke();
     // map the health into window height

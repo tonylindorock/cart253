@@ -13,7 +13,10 @@ class Bullet extends CircleShooter{
     this.size = 10;
 
     this.speed = 5;
-    this.damage = 20 + random(-5, 5);
+    this.damage = 10 + random(-5, 5);
+
+    this.hit=false;
+    this.runOnce = true;
 
     this.playerId = playerId;
     // color
@@ -26,32 +29,37 @@ class Bullet extends CircleShooter{
 
   moveTo(target){
     let d = dist(this.bulletX, this.bulletY, target.x, target.y);
+    let d2 = dist(this.bulletX, this.bulletY, this.startX, this.startY);
     let dx = this.targetX - this.startX;
     let dy = this.targetY - this.startY;
     let angle = atan2(dy, dx);
 
     this.bulletX += this.speed * cos(angle);
     this.bulletY += this.speed * sin(angle);
-
-    if(d<5+target.size/2){
+    if(d2>400){
+      this.hit=true;
+    }
+    if(d<5+target.size/2 && this.runOnce){
       target.health-=this.damage;
-      this.reset();
+      this.hit=true;
+      console.log(this.unqiueId+": bullet hit");
     }
     this.display();
   }
-
 
   display(){
     push();
     ellipseMode(CENTER);
     fill(255);
     ellipse(this.bulletX,this.bulletY,this.size);
+    fill(this.color);
+    ellipse(this.bulletX,this.bulletY,this.size/2);
     pop();
   }
 
   reset() {
     this.bulletX = this.x;
     this.bulletY = this.y;
-    this.bulletFired = false;
+    this.hit = false;
   }
 }

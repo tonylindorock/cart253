@@ -6,8 +6,9 @@ class SquareXL extends Soldier{
     this.health = this.maxHealth;
     this.originalSize = 100;
     this.size = this.originalSize;
+    this.innerSize = this.originalSize;
     // speed
-    this.originalSpeed = 0.5;
+    this.originalSpeed = 0.75;
     this.speed = this.originalSpeed+random(-0.5, 0.5);
     this.vx = 0;
     this.vy = 0;
@@ -17,6 +18,9 @@ class SquareXL extends Soldier{
     this.targeted = 0;
     this.targetId = -1;
 
+    this.rotation = 0;
+    this.originalRotationSpeed = 1;
+    this.rotationSpeed = this.originalRotationSpeed;
     this.animationFinished = false;
   }
 
@@ -32,8 +36,8 @@ class SquareXL extends Soldier{
       if(!this.dead){
         enemyBase.health = enemyBase.health/2;
         enemyBase.health = constrain(enemyBase.health, 0, enemyBase.maxHealth);
+        this.dead = true;
       }
-      this.dead = true;
     }
 
     // Set velocity via noise()
@@ -55,19 +59,40 @@ class SquareXL extends Soldier{
     push();
     rectMode(CENTER);
     ellipseMode(CENTER);
+    angleMode(DEGREES);
+    translate(this.x, this.y);
+    rotate(this.rotation);
     stroke(255);
-    strokeWeight(2);
+    strokeWeight(4);
     fill(this.color);
-    rect(this.x, this.y, this.size, this.size);
-    noStroke();
-    fill(255);
-    rect(this.x, this.y, this.size / 4, this.size / 4);
     if (this.dead) {
-      this.size -= 5;
+      fill(255);
+      rect(0,0, this.innerSize,this.innerSize,8);
+      fill(255, 0);
+      this.size += 3;
+      this.innerSize -= 3;
+      this.innerSize = constrain(this.innerSize, 0, 100);
       this.speed = 0;
-      this.size = constrain(this.size,0,this.originalSize);
-      if (this.size <= 0) {
+      if (this.innerSize <= 0) {
         this.animationFinished = true;
+      }
+    }
+    rect(0,0, this.size, this.size,8);
+    if(!this.dead){
+      line(-10,10,10,-10);
+      line(10,10,-10,-10);
+    }
+    if (this.playerId === 0) {
+      if (this.rotation < 90) {
+        this.rotation += this.rotationSpeed;
+      } else {
+        this.rotation = this.rotationSpeed;
+      }
+    } else {
+      if (this.rotation > -90) {
+        this.rotation -= this.rotationSpeed;
+      } else {
+        this.rotation = this.rotationSpeed;
       }
     }
     pop();
@@ -77,6 +102,8 @@ class SquareXL extends Soldier{
     this.x = this.baseX;
     this.y = this.baseY;
     this.size = this.originalSize;
+    this.rotation = 0;
+    this.rotationSpeed = this.originalRotationSpeed;
     this.speed = this.originalSpeed+random(-0.5, 0.5);
     this.health = this.maxHealth;
     this.tx = random(0, 1000);

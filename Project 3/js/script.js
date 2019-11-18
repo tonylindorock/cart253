@@ -221,7 +221,7 @@ function moveSoldiers(){
   }
   if(baseLeft.squareXL!=null){
     baseLeft.squareXL.attackBase(baseRight);
-    if(baseLeft.animationFinished){
+    if(baseLeft.squareXL.animationFinished){
       baseLeft.squareXL=null;
     }
   }
@@ -284,7 +284,7 @@ function moveSoldiers(){
   }
   if(baseRight.squareXL!=null){
     baseRight.squareXL.attackBase(baseLeft);
-    if(baseRight.animationFinished){
+    if(baseRight.squareXL.animationFinished){
       baseRight.squareXL=null;
     }
   }
@@ -310,9 +310,9 @@ function keyPressed() {
         baseLeft.capacity++;
       } else if (keyCode === 83) {
         let uniqueId = getUniqueId();
-        let squareXL = new SquareXL(baseLeft.x, baseLeft.y, 0, mapId,-10);
+        let squareXL = new SquareXL(baseLeft.x, baseLeft.y, 0, mapId,100);
         baseLeft.squareXL = squareXL;
-        console.log("BLUE player spawned a square XL (id: -10)");
+        console.log("BLUE player spawned a square XL (id: 100)");
       } else if (keyCode === 68) {
         let uniqueId = getUniqueId();
         let circleDemo = new CircleDemo(baseLeft.x, baseLeft.y, 0, mapId,uniqueId);
@@ -337,9 +337,9 @@ function keyPressed() {
           baseRight.capacity++;
         } else if (keyCode === 40) {
           let uniqueId = getUniqueId();
-          let squareXL = new SquareXL(baseRight.x, baseRight.y, 1,mapId,-10);
+          let squareXL = new SquareXL(baseRight.x, baseRight.y, 1,mapId,100);
           baseRight.squareXL = squareXL;
-          console.log("RED player spawned a square XL (id: -10)");
+          console.log("RED player spawned a square XL (id: 100)");
         } else if (keyCode === 39) {
           let uniqueId = getUniqueId();
           let circleDemo = new CircleDemo(baseRight.x, baseRight.y, 1,mapId,uniqueId);

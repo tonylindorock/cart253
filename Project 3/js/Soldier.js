@@ -75,6 +75,9 @@ class Soldier{
   display(){}
 
   handleWrapping(){
+    if(this.health<=0){
+      this.dead=true;
+    }
     // Off the left or right
     if (this.x < this.size/2) {
       this.x = this.size/2;

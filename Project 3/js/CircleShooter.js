@@ -5,7 +5,7 @@ class CircleShooter extends Soldier {
     this.maxHealth = 25;
     this.health = this.maxHealth;
     // speed
-    this.originalSpeed = 1;
+    this.originalSpeed = 2;
     this.speed = this.originalSpeed + random(-0.5, 0.5);
     this.vx = 0;
     this.vy = 0;
@@ -14,14 +14,12 @@ class CircleShooter extends Soldier {
     // damage
     this.damage = 20 + random(-5, 5);
 
-    this.bullets=[-1,-1];
+    this.bullet = null;
 
     this.obtainedTarget = false;
-    this.targeted = 0;
     this.targetId = -1;
     this.attacking = false;
 
-    this.runOnce = true;
     this.bulletFired = false;
   }
 
@@ -33,8 +31,17 @@ class CircleShooter extends Soldier {
     if (d >= 100) {
       this.x += this.speed * cos(angle);
       this.y += this.speed * sin(angle);
-    } else {
-
+    }
+    if (d < 200 && !this.bulletFired && !this.dead) {
+      this.bullet = new Bullet(this.x, this.y, enemyBase.x, enemyBase.y, this.playerId, this.uniqueId);
+      this.bulletFired = true;
+    }
+    if (this.bulletFired && !this.dead) {
+      this.bullet.moveTo(enemyBase);
+      if (this.bullet.hit) {
+        this.bulletFired = false;
+        this.bullet = null;
+      }
     }
     /*
     // Set velocity via noise()
@@ -51,11 +58,9 @@ class CircleShooter extends Soldier {
   }
 
   attack(enemy) {
-    let bullet;
     let d = dist(this.x, this.y, enemy.x, enemy.y);
-    if (d < 300 && this.targetId < 0 && (enemy.targeted < 3||enemy.uniqueId===-10) && !this.dead && !enemy.dead) {
+    if (d < 300 && this.targetId < 0 && !this.dead && !enemy.dead) {
       this.targetId = enemy.uniqueId;
-      enemy.targeted++;
       this.obtainedTarget = true;
     }
     let dx = enemy.x - this.x;
@@ -67,8 +72,16 @@ class CircleShooter extends Soldier {
         this.x += this.speed * cos(angle);
         this.y += this.speed * sin(angle);
       }
-      if(d < 200){
-
+      if (d < 200 && !this.bulletFired && !this.dead) {
+        this.bullet = new Bullet(this.x, this.y, enemy.x, enemy.y, this.playerId, this.uniqueId);
+        this.bulletFired = true;
+      }
+      if (this.bulletFired && !this.dead) {
+        this.bullet.moveTo(enemy);
+        if (this.bullet.hit) {
+          this.bulletFired = false;
+          this.bullet = null;
+        }
       }
     }
 
@@ -83,9 +96,9 @@ class CircleShooter extends Soldier {
     this.ty += 0.0001;
 
     this.handleWrapping();
-}
+  }
 
-  display(){
+  display() {
     push();
     rectMode(CENTER);
     ellipseMode(CENTER);
@@ -112,13 +125,13 @@ class CircleShooter extends Soldier {
     this.y = this.baseY;
     this.size = this.originalSize;
     this.health = this.maxHealth;
-    this.targeted = 0;
     this.targetId = -1;
     this.attacking = false;
     this.speed = this.originalSpeed + random(-0.5, 0.5);
     this.tx = random(0, 1000);
     this.ty = random(0, 1000);
     this.dead = false;
-    this.runOnce = true;
+    this.bullet = null;
+    this.bulletFired = false;
   }
 }
