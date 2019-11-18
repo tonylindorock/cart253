@@ -60,7 +60,7 @@ class Square extends Soldier {
 
   attack(enemy) {
     let d = dist(this.x, this.y, enemy.x, enemy.y);
-    if (d < 300 && this.targetId < 0 && enemy.targeted < 3 && !this.dead && !enemy.dead) {
+    if (d < 300 && this.targetId < 0 && (enemy.targeted < 3||enemy.uniqueId===-10) && !this.dead && !enemy.dead) {
       this.targetId = enemy.uniqueId;
       enemy.targeted++;
       this.obtainedTarget = true;
@@ -82,20 +82,18 @@ class Square extends Soldier {
             enemy.targetId = this.uniqueId;
           }
         }
-        if (enemy.health <= 0) {
-          enemy.dead = true;
-          this.targetId = -1;
-          this.obtainedTarget = false;
-          this.rotationSpeed = this.originalRotationSpeed;
-        }
       } else {
         this.rotationSpeed = this.originalRotationSpeed;
         this.attacking = false;
       }
-      if (this.dead && this.runOnce && this.targetId === enemy.uniqueId) {
-        if (enemy.targeted != 0) {
+      if (enemy.health <= 0) {
+        enemy.dead = true;
+        this.targetId = -1;
+        this.obtainedTarget = false;
+        this.rotationSpeed = this.originalRotationSpeed;
+      }
+      if (this.dead && this.runOnce && !enemy.dead && this.obtainedTarget) {
           enemy.targeted--;
-        }
         if (enemy.targetId === this.uniqueId) {
           enemy.targetId = -1;
         }
@@ -160,6 +158,7 @@ class Square extends Soldier {
     this.health = this.maxHealth;
     this.targeted = 0;
     this.targetId = -1;
+    this.obtainedTarget = false;
     this.attacking = false;
     this.speed = this.originalSpeed + random(-0.5, 0.5);
     this.rotationSpeed = this.originalRotationSpeed;

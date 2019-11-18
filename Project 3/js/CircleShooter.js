@@ -53,7 +53,7 @@ class CircleShooter extends Soldier {
   attack(enemy) {
     let bullet;
     let d = dist(this.x, this.y, enemy.x, enemy.y);
-    if (d < 300 && this.targetId < 0 && enemy.targeted < 2 && !this.dead) {
+    if (d < 300 && this.targetId < 0 && (enemy.targeted < 3||enemy.uniqueId===-10) && !this.dead && !enemy.dead) {
       this.targetId = enemy.uniqueId;
       enemy.targeted++;
       this.obtainedTarget = true;
@@ -66,12 +66,9 @@ class CircleShooter extends Soldier {
       if (d > 150) {
         this.x += this.speed * cos(angle);
         this.y += this.speed * sin(angle);
-      }else{
-        this.x -= this.speed * cos(angle);
-        this.y -= this.speed * sin(angle);
       }
       if(d < 200){
-      
+
       }
     }
 

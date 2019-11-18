@@ -1,3 +1,9 @@
+// CircleDemo
+//
+// An unique class extended from the soldier class
+// Circle demo is a powerful class. It can destroy most of the classes.
+// However, it will die when it comes in contact with any enemy.
+
 class CircleDemo extends Soldier {
   constructor(x, y, playerId, mapId, uniqueId) {
     super(x, y, playerId, mapId, uniqueId);
@@ -52,7 +58,7 @@ class CircleDemo extends Soldier {
 
   attack(enemy) {
     let d = dist(this.x, this.y, enemy.x, enemy.y);
-    if (d < 300 && this.targetId < 0 && enemy.targeted < 2 && !this.dead && !enemy.dead) {
+    if (d < 300 && this.targetId < 0 && (enemy.targeted <= 1||enemy.uniqueId===-10) && !this.dead && !enemy.dead) {
       this.targetId = enemy.uniqueId;
       enemy.targeted++;
       this.obtainedTarget = true;
@@ -76,10 +82,8 @@ class CircleDemo extends Soldier {
           this.obtainedTarget = false;
         }
       }
-      if (this.dead && this.runOnce && this.targetId === enemy.uniqueId) {
-        if (enemy.targeted != 0) {
+      if (this.dead && this.runOnce && !enemy.dead && this.obtainedTarget) {
           enemy.targeted--;
-        }
         if (enemy.targetId === this.uniqueId) {
           enemy.targetId = -1;
         }
@@ -116,7 +120,7 @@ class CircleDemo extends Soldier {
       this.innerSize -= 1;
       this.innerSize = constrain(this.innerSize, 0, 30);
       this.speed = 0;
-      if (this.size >= 100) {
+      if (this.innerSize <= 0) {
         this.reset();
       }
     }
@@ -132,6 +136,7 @@ class CircleDemo extends Soldier {
     this.health = this.maxHealth;
     this.targeted = 0;
     this.targetId = -1;
+    this.obtainedTarget = false;
     this.attacking = false;
     this.speed = this.originalSpeed + random(-0.5, 0.5);
     this.tx = random(0, 1000);

@@ -59,7 +59,7 @@ class Base{
     this.resource = 0;
     // soldier arrays
     this.squares=[];
-    this.squareElites=[];
+    this.squareXL = null;
     this.circleShooters=[];
     this.circleDemos=[];
   }
@@ -71,10 +71,8 @@ class Base{
         check = true;
       }
     }
-    for(let i=0;i<this.squareElites.length;i++){
-      if (this.squareElites[i].dead!=true){
-        check = true;
-      }
+    if (this.squareXL.dead!=true){
+      check = true;
     }
     for(let i=0;i<this.circleShooters.length;i++){
       if (this.circleShooters[i].dead!=true){

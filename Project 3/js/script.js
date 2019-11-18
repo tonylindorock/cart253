@@ -135,6 +135,12 @@ function displayBase() {
 }
 
 function displaySoldiers() {
+  if(baseRight.squareXL!=null){
+    baseRight.squareXL.display();
+  }
+  if(baseLeft.squareXL!=null){
+    baseLeft.squareXL.display();
+  }
   for (let i = 0; i < baseLeft.squares.length; i++) {
     baseLeft.squares[i].display();
   }
@@ -166,7 +172,10 @@ function moveSoldiers(){
       for (let j = 0; j < baseRight.circleDemos.length; j++) {
         baseLeft.squares[i].attack(baseRight.circleDemos[j]);
       }
-      if (baseLeft.squares[i].targetId<0){
+      if(baseRight.squareXL!=null){
+        baseLeft.squares[i].attack(baseRight.squareXL);
+      }
+      if (baseLeft.squares[i].targetId===-1){
         if(!baseLeft.squares[i].dead){
           baseLeft.squares[i].attackBase(baseRight);
         }
@@ -182,7 +191,10 @@ function moveSoldiers(){
     for (let j = 0; j < baseRight.circleDemos.length; j++) {
       baseLeft.circleShooters[i].attack(baseRight.circleDemos[j]);
     }
-    if (baseLeft.circleShooters[i].targetId<0){
+    if(baseRight.squareXL!=null){
+      baseLeft.circleShooters[i].attack(baseRight.squareXL);
+    }
+    if (baseLeft.circleShooters[i].targetId===-1){
       if(!baseLeft.circleShooters[i].dead){
         baseLeft.circleShooters[i].attackBase(baseRight);
       }
@@ -198,10 +210,19 @@ function moveSoldiers(){
     for (let j = 0; j < baseRight.circleDemos.length; j++) {
       baseLeft.circleDemos[i].attack(baseRight.circleDemos[j]);
     }
-    if (baseLeft.circleDemos[i].targetId<0){
+    if(baseRight.squareXL!=null){
+      baseLeft.circleDemos[i].attack(baseRight.squareXL);
+    }
+    if (baseLeft.circleDemos[i].targetId===-1){
       if(!baseLeft.circleDemos[i].dead){
         baseLeft.circleDemos[i].attackBase(baseRight);
       }
+    }
+  }
+  if(baseLeft.squareXL!=null){
+    baseLeft.squareXL.attackBase(baseRight);
+    if(baseLeft.animationFinished){
+      baseLeft.squareXL=null;
     }
   }
   for (let i = 0; i < baseRight.squares.length; i++) {
@@ -214,7 +235,10 @@ function moveSoldiers(){
       for (let j = 0; j < baseLeft.circleDemos.length; j++) {
         baseRight.squares[i].attack(baseLeft.circleDemos[j]);
       }
-      if (baseRight.squares[i].targetId<0){
+      if(baseLeft.squareXL!=null){
+        baseRight.squares[i].attack(baseLeft.squareXL);
+      }
+      if (baseRight.squares[i].targetId===-1){
         if(!baseRight.squares[i].dead){
           baseRight.squares[i].attackBase(baseLeft);
         }
@@ -230,7 +254,10 @@ function moveSoldiers(){
     for (let j = 0; j < baseLeft.circleDemos.length; j++) {
       baseRight.circleShooters[i].attack(baseLeft.circleDemos[j]);
     }
-    if (baseRight.circleShooters[i].targetId<0){
+    if(baseLeft.squareXL!=null){
+      baseRight.circleShooters[i].attack(baseLeft.squareXL);
+    }
+    if (baseRight.circleShooters[i].targetId===-1){
       if(!baseRight.circleShooters[i].dead){
         baseRight.circleShooters[i].attackBase(baseLeft);
       }
@@ -246,10 +273,19 @@ function moveSoldiers(){
     for (let j = 0; j < baseLeft.circleDemos.length; j++) {
       baseRight.circleDemos[i].attack(baseLeft.circleDemos[j]);
     }
-    if (baseRight.circleDemos[i].targetId<0){
+    if(baseLeft.squareXL!=null){
+      baseRight.circleDemos[i].attack(baseLeft.squareXL);
+    }
+    if (baseRight.circleDemos[i].targetId===-1){
       if(!baseRight.circleDemos[i].dead){
         baseRight.circleDemos[i].attackBase(baseLeft);
       }
+    }
+  }
+  if(baseRight.squareXL!=null){
+    baseRight.squareXL.attackBase(baseLeft);
+    if(baseRight.animationFinished){
+      baseRight.squareXL=null;
     }
   }
 }
@@ -264,21 +300,24 @@ function keyPressed() {
         let uniqueId = getUniqueId();
         let square = new Square(baseLeft.x, baseLeft.y, 0, mapId,uniqueId);
         baseLeft.squares.push(square);
-        console.log(baseLeft.playerId + " spawned a square (id: "+uniqueId+")");
+        console.log("BLUE player spawned a square (id: "+uniqueId+")");
         baseLeft.capacity++;
       } else if (keyCode === 65) {
         let uniqueId = getUniqueId();
         let circleShooter = new CircleShooter(baseLeft.x, baseLeft.y, 0, mapId,uniqueId);
         baseLeft.circleShooters.push(circleShooter);
-        console.log(baseLeft.playerId + " spawned a circle shooter (id: "+uniqueId+")");
+        console.log("BLUE player spawned a circle shooter (id: "+uniqueId+")");
         baseLeft.capacity++;
       } else if (keyCode === 83) {
-
+        let uniqueId = getUniqueId();
+        let squareXL = new SquareXL(baseLeft.x, baseLeft.y, 0, mapId,-10);
+        baseLeft.squareXL = squareXL;
+        console.log("BLUE player spawned a square XL (id: -10)");
       } else if (keyCode === 68) {
         let uniqueId = getUniqueId();
         let circleDemo = new CircleDemo(baseLeft.x, baseLeft.y, 0, mapId,uniqueId);
         baseLeft.circleDemos.push(circleDemo);
-        console.log(baseLeft.playerId + " spawned a circle demo (id: "+uniqueId+")");
+        console.log("BLUE player spawned a circle demo (id: "+uniqueId+")");
         baseLeft.capacity++;
       }
     }
@@ -288,21 +327,24 @@ function keyPressed() {
           let uniqueId = getUniqueId();
           let square = new Square(baseRight.x, baseRight.y, 1,mapId,uniqueId);
           baseRight.squares.push(square);
-          console.log(baseRight.playerId + " spawned a square (id: "+uniqueId+")");
+          console.log("RED player spawned a square (id: "+uniqueId+")");
           baseRight.capacity++;
         } else if (keyCode === 37) {
           let uniqueId = getUniqueId();
           let circleShooter = new CircleShooter(baseRight.x, baseRight.y, 1,mapId,uniqueId);
           baseRight.circleShooters.push(circleShooter);
-          console.log(baseRight.playerId + " spawned a circle shooter (id: "+uniqueId+")");
+          console.log("RED player spawned a circle shooter (id: "+uniqueId+")");
           baseRight.capacity++;
         } else if (keyCode === 40) {
-
+          let uniqueId = getUniqueId();
+          let squareXL = new SquareXL(baseRight.x, baseRight.y, 1,mapId,-10);
+          baseRight.squareXL = squareXL;
+          console.log("RED player spawned a square XL (id: -10)");
         } else if (keyCode === 39) {
           let uniqueId = getUniqueId();
           let circleDemo = new CircleDemo(baseRight.x, baseRight.y, 1,mapId,uniqueId);
           baseRight.circleDemos.push(circleDemo);
-          console.log(baseRight.playerId + " spawned a circle demo (id: "+uniqueId+")");
+          console.log("RED player spawned a circle demo (id: "+uniqueId+")");
           baseRight.capacity++;
         }
       }
