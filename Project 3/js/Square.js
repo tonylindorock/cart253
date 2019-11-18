@@ -60,7 +60,7 @@ class Square extends Soldier {
 
   attack(enemy) {
     let d = dist(this.x, this.y, enemy.x, enemy.y);
-    if (d < 300 && this.targetId < 0 && enemy.targeted < 3 && !this.dead) {
+    if (d < 300 && this.targetId < 0 && enemy.targeted < 3 && !this.dead && !enemy.dead) {
       this.targetId = enemy.uniqueId;
       enemy.targeted++;
       this.obtainedTarget = true;

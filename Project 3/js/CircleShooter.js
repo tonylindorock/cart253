@@ -14,6 +14,8 @@ class CircleShooter extends Soldier {
     // damage
     this.damage = 20 + random(-5, 5);
 
+    this.bullets=[-1,-1];
+
     this.obtainedTarget = false;
     this.targeted = 0;
     this.targetId = -1;
@@ -49,8 +51,9 @@ class CircleShooter extends Soldier {
   }
 
   attack(enemy) {
+    let bullet;
     let d = dist(this.x, this.y, enemy.x, enemy.y);
-    if (d < 300 && this.targetId < 0 && enemy.targeted < 3 && !this.dead) {
+    if (d < 300 && this.targetId < 0 && enemy.targeted < 2 && !this.dead) {
       this.targetId = enemy.uniqueId;
       enemy.targeted++;
       this.obtainedTarget = true;
@@ -58,15 +61,20 @@ class CircleShooter extends Soldier {
     let dx = enemy.x - this.x;
     let dy = enemy.y - this.y;
     let angle = atan2(dy, dx);
+
     if (this.targetId === enemy.uniqueId) {
       if (d > 150) {
         this.x += this.speed * cos(angle);
         this.y += this.speed * sin(angle);
+      }else{
+        this.x -= this.speed * cos(angle);
+        this.y -= this.speed * sin(angle);
       }
-      if(d < 200 && !this.bulletFired){
-        
+      if(d < 200){
+      
       }
     }
+
     // Set velocity via noise()
     this.vx = map(noise(this.tx), 0, 1, -0.05, 0.05);
     this.vy = map(noise(this.ty), 0, 1, -0.05, 0.05);

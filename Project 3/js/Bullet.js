@@ -1,12 +1,20 @@
-class Bullet{
-  constructor(x, y,targetX,targetY,playerId){
-    this.x = x;
-    this.y = y;
-    this.size = 10;
+class Bullet extends CircleShooter{
+  constructor(x, y,targetX,targetY,playerId,uniqueId){
+    super(x,y,playerId,-1,uniqueId);
+    this.bulletX = x;
+    this.bulletY = y;
+
+    this.startX=this.bulletX;
+    this.startY=this.bulletY;
+
     this.targetX = targetX;
     this.targetY = targetY;
+
+    this.size = 10;
+
     this.speed = 5;
     this.damage = 20 + random(-5, 5);
+
     this.playerId = playerId;
     // color
     if(this.playerId==0){
@@ -14,46 +22,36 @@ class Bullet{
     }else if(this.playerId==1){
       this.color="#FB524F"; // red
     }
-
-    this.hit = false;
   }
 
   moveTo(target){
-    let d = dist(this.x,this.y,this.targetX,this.targetX);
-    let dx = this.targetX-this.x;
-    let dy = this.targetY-this.y;
+    let d = dist(this.bulletX, this.bulletY, target.x, target.y);
+    let dx = this.targetX - this.startX;
+    let dy = this.targetY - this.startY;
     let angle = atan2(dy, dx);
-    this.x += this.speed * cos(angle);
-    this.y += this.speed * sin(angle);
 
-    if(d<5+target.size){
-      console.log("It's a hit");
-      this.hit = true;
-      target.health=-this.damage;
-      target.health = constrain(target.health,0,target.maxHealth);
+    this.bulletX += this.speed * cos(angle);
+    this.bulletY += this.speed * sin(angle);
+
+    if(d<5+target.size/2){
+      target.health-=this.damage;
+      this.reset();
     }
+    this.display();
   }
 
-  handleWrapping(){
-    // Off the left or right
-    if (this.x < this.size/2) {
-
-    } else if (this.x > width-this.size/2) {
-
-    }
-    // Off the top or bottom
-    if (this.y < this.size/2) {
-
-    } else if (this.y > height-this.size/2) {
-
-    }
-  }
 
   display(){
     push();
     ellipseMode(CENTER);
-    fill(this.color);
-    ellipse(this.x,this.y,this.size);
+    fill(255);
+    ellipse(this.bulletX,this.bulletY,this.size);
     pop();
+  }
+
+  reset() {
+    this.bulletX = this.x;
+    this.bulletY = this.y;
+    this.bulletFired = false;
   }
 }
