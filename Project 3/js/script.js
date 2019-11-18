@@ -147,6 +147,12 @@ function displaySoldiers() {
   for (let i = 0; i < baseLeft.circleShooters.length; i++) {
     baseLeft.circleShooters[i].display();
   }
+  for (let i = 0; i < baseLeft.circleDemos.length; i++) {
+    baseLeft.circleDemos[i].display();
+  }
+  for (let i = 0; i < baseRight.circleDemos.length; i++) {
+    baseRight.circleDemos[i].display();
+  }
 }
 
 function moveSoldiers(){
@@ -156,6 +162,9 @@ function moveSoldiers(){
       }
       for (let j = 0; j < baseRight.circleShooters.length; j++) {
         baseLeft.squares[i].attack(baseRight.circleShooters[j]);
+      }
+      for (let j = 0; j < baseRight.circleDemos.length; j++) {
+        baseLeft.squares[i].attack(baseRight.circleDemos[j]);
       }
       if (baseLeft.squares[i].targetId<0){
         if(!baseLeft.squares[i].dead){
@@ -168,11 +177,30 @@ function moveSoldiers(){
       baseLeft.circleShooters[i].attack(baseRight.squares[j]);
     }
     for (let j = 0; j < baseRight.circleShooters.length; j++) {
-      baseLeft.circleShooters[i].attack(baseRight.squares[j]);
+      baseLeft.circleShooters[i].attack(baseRight.circleShooters[j]);
+    }
+    for (let j = 0; j < baseRight.circleDemos.length; j++) {
+      baseLeft.circleShooters[i].attack(baseRight.circleDemos[j]);
     }
     if (baseLeft.circleShooters[i].targetId<0){
       if(!baseLeft.circleShooters[i].dead){
         baseLeft.circleShooters[i].attackBase(baseRight);
+      }
+    }
+  }
+  for (let i = 0; i < baseLeft.circleDemos.length; i++) {
+    for (let j = 0; j < baseRight.squares.length; j++) {
+      baseLeft.circleDemos[i].attack(baseRight.squares[j]);
+    }
+    for (let j = 0; j < baseRight.circleShooters.length; j++) {
+      baseLeft.circleDemos[i].attack(baseRight.circleShooters[j]);
+    }
+    for (let j = 0; j < baseRight.circleDemos.length; j++) {
+      baseLeft.circleDemos[i].attack(baseRight.circleDemos[j]);
+    }
+    if (baseLeft.circleDemos[i].targetId<0){
+      if(!baseLeft.circleDemos[i].dead){
+        baseLeft.circleDemos[i].attackBase(baseRight);
       }
     }
   }
@@ -182,6 +210,9 @@ function moveSoldiers(){
       }
       for (let j = 0; j < baseLeft.circleShooters.length; j++) {
         baseRight.squares[i].attack(baseLeft.circleShooters[j]);
+      }
+      for (let j = 0; j < baseLeft.circleDemos.length; j++) {
+        baseRight.squares[i].attack(baseLeft.circleDemos[j]);
       }
       if (baseRight.squares[i].targetId<0){
         if(!baseRight.squares[i].dead){
@@ -194,11 +225,30 @@ function moveSoldiers(){
       baseRight.circleShooters[i].attack(baseLeft.squares[j]);
     }
     for (let j = 0; j < baseLeft.circleShooters.length; j++) {
-      baseRight.circleShooters[i].attack(baseLeft.squares[j]);
+      baseRight.circleShooters[i].attack(baseLeft.circleShooters[j]);
+    }
+    for (let j = 0; j < baseLeft.circleDemos.length; j++) {
+      baseRight.circleShooters[i].attack(baseLeft.circleDemos[j]);
     }
     if (baseRight.circleShooters[i].targetId<0){
       if(!baseRight.circleShooters[i].dead){
         baseRight.circleShooters[i].attackBase(baseLeft);
+      }
+    }
+  }
+  for (let i = 0; i < baseRight.circleDemos.length; i++) {
+    for (let j = 0; j < baseLeft.squares.length; j++) {
+      baseRight.circleDemos[i].attack(baseLeft.squares[j]);
+    }
+    for (let j = 0; j < baseLeft.circleShooters.length; j++) {
+      baseRight.circleDemos[i].attack(baseLeft.circleShooters[j]);
+    }
+    for (let j = 0; j < baseLeft.circleDemos.length; j++) {
+      baseRight.circleDemos[i].attack(baseLeft.circleDemos[j]);
+    }
+    if (baseRight.circleDemos[i].targetId<0){
+      if(!baseRight.circleDemos[i].dead){
+        baseRight.circleDemos[i].attackBase(baseLeft);
       }
     }
   }
@@ -219,13 +269,17 @@ function keyPressed() {
       } else if (keyCode === 65) {
         let uniqueId = getUniqueId();
         let circleShooter = new CircleShooter(baseLeft.x, baseLeft.y, 0, mapId,uniqueId);
-        baseLeft.squares.push(circleShooter);
-        console.log(baseLeft.playerId + " spawned a square (id: "+uniqueId+")");
+        baseLeft.circleShooters.push(circleShooter);
+        console.log(baseLeft.playerId + " spawned a circle shooter (id: "+uniqueId+")");
         baseLeft.capacity++;
       } else if (keyCode === 83) {
 
       } else if (keyCode === 68) {
-
+        let uniqueId = getUniqueId();
+        let circleDemo = new CircleDemo(baseLeft.x, baseLeft.y, 0, mapId,uniqueId);
+        baseLeft.circleDemos.push(circleDemo);
+        console.log(baseLeft.playerId + " spawned a circle demo (id: "+uniqueId+")");
+        baseLeft.capacity++;
       }
     }
     if (!singlePlayer) {
@@ -234,18 +288,22 @@ function keyPressed() {
           let uniqueId = getUniqueId();
           let square = new Square(baseRight.x, baseRight.y, 1,mapId,uniqueId);
           baseRight.squares.push(square);
-          console.log(baseRight.playerId + " spawned a circle shooter (id: "+uniqueId+")");
+          console.log(baseRight.playerId + " spawned a square (id: "+uniqueId+")");
           baseRight.capacity++;
         } else if (keyCode === 37) {
           let uniqueId = getUniqueId();
           let circleShooter = new CircleShooter(baseRight.x, baseRight.y, 1,mapId,uniqueId);
-          baseRight.squares.push(circleShooter);
+          baseRight.circleShooters.push(circleShooter);
           console.log(baseRight.playerId + " spawned a circle shooter (id: "+uniqueId+")");
           baseRight.capacity++;
         } else if (keyCode === 40) {
 
         } else if (keyCode === 39) {
-
+          let uniqueId = getUniqueId();
+          let circleDemo = new CircleDemo(baseRight.x, baseRight.y, 1,mapId,uniqueId);
+          baseRight.circleDemos.push(circleDemo);
+          console.log(baseRight.playerId + " spawned a circle demo (id: "+uniqueId+")");
+          baseRight.capacity++;
         }
       }
     }

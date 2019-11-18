@@ -13,10 +13,6 @@ class CircleShooter extends Soldier {
     this.ty = random(0, 1000); // we use random starting values
     // damage
     this.damage = 20 + random(-5, 5);
-    // magazine
-    this.maxMag =4;
-    this.mag=this.maxMag;
-    this.bullets=[];
 
     this.obtainedTarget = false;
     this.targeted = 0;
@@ -24,8 +20,8 @@ class CircleShooter extends Soldier {
     this.attacking = false;
 
     this.runOnce = true;
+    this.bulletFired = false;
   }
-
 
   attackBase(enemyBase) {
     let d = dist(this.x, this.y, this.enemyBaseX, this.enemyBaseY);
@@ -66,6 +62,9 @@ class CircleShooter extends Soldier {
       if (d > 150) {
         this.x += this.speed * cos(angle);
         this.y += this.speed * sin(angle);
+      }
+      if(d < 200 && !this.bulletFired){
+        
       }
     }
     // Set velocity via noise()
