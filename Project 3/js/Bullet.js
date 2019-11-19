@@ -1,7 +1,7 @@
 // Bullet
 //
 // A child class of CircleShooter class.
-//
+// Used to be fired at the enemy unit and hurt them
 
 class Bullet extends CircleShooter{
   constructor(x, y,targetX,targetY,playerId,uniqueId){
@@ -15,12 +15,17 @@ class Bullet extends CircleShooter{
     this.targetX = targetX;
     this.targetY = targetY;
 
+    this.angle = 0;
+
     this.size = 10;
+    this.innerSize = this.size;
 
     this.speed = 5;
-    this.damage = 1.5;
+    this.damage = 5;
+    this.dead = false;
 
     this.hit=false;
+    this.displayBullet = true;
     this.runOnce = true;
 
     this.playerId = playerId;
@@ -38,6 +43,7 @@ class Bullet extends CircleShooter{
     let dx = this.targetX - this.startX;
     let dy = this.targetY - this.startY;
     let angle = atan2(dy, dx);
+    this.angle = angle;
 
     this.bulletX += this.speed * cos(angle);
     this.bulletY += this.speed * sin(angle);
@@ -47,20 +53,39 @@ class Bullet extends CircleShooter{
     if(d<target.size/2 && this.runOnce){
       target.health-=this.damage;
       target.health=constrain(target.health,0,target.maxHealth);
+      // this.displayBullet = false;
+      this.runOnce = false;
       this.hit=true;
-      console.log(this.unqiueId+": bullet hit");
     }
     this.display();
   }
 
   display(){
-    push();
-    ellipseMode(CENTER);
-    stroke(255);
-    strokeWeight(2);
-    fill(this.color);
-    ellipse(this.bulletX,this.bulletY,this.size);
-    pop();
+    if(this.displayBullet){
+      push();
+      ellipseMode(CENTER);
+      rectMode(CENTER)
+      angleMode(DEGREES);
+      noStroke();
+      fill(255);
+      // translate(this.bulletX,this.bulletY);
+      // rotate(this.angle);
+      // rect(0,0,this.size+10,this.size,16);
+      if(this.hit){
+        this.speed = 0;
+        this.size += 1;
+        this.innerSize -= 1;
+        if (this.size >= 20){
+          this.dead = true;
+        }
+        ellipse(this.bulletX,this.bulletY,this.innerSize);
+        stroke(255);
+        strokeWeight(2);
+        fill(255,0);
+      }
+      ellipse(this.bulletX,this.bulletY,this.size);
+      pop();
+    }
   }
 
   reset() {

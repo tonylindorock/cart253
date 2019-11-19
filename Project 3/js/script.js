@@ -21,7 +21,7 @@ let playing = false; // if playing
 let gameOver = false; // if game is over
 let singlePlayer = true; // if sinlge player
 
-let uniqueIds=[];
+let uniqueIds = [];
 
 // r g b values for background color
 let r;
@@ -39,6 +39,8 @@ let baseRight;
 
 // highlighted color
 const SELECTED = "#47b3ff";
+const BLUE = "#4fc7fb";
+const RED = "#FB524F";
 
 let MapHorizontal;
 let MapVertical;
@@ -101,20 +103,8 @@ function draw() {
   }
 }
 
-function getUniqueId(){
-  let id = random(0,100);
-  let sameId = false;
-  for(let i=0;i<uniqueIds.length;i++){
-    if(uniqueIds[i]===id){
-      sameId = true;
-    }
-    if(sameId){
-      id = random(0,100);
-      i=0;
-      sameId=false;
-    }
-  }
-  uniqueIds.push(id);
+function getUniqueId() {
+  let id = random(0, 100);
   return id;
 }
 
@@ -135,10 +125,10 @@ function displayBase() {
 }
 
 function displaySoldiers() {
-  if(baseRight.squareXL!=null){
+  if (baseRight.squareXL != null) {
     baseRight.squareXL.display();
   }
-  if(baseLeft.squareXL!=null){
+  if (baseLeft.squareXL != null) {
     baseLeft.squareXL.display();
   }
   for (let i = 0; i < baseLeft.squares.length; i++) {
@@ -161,25 +151,25 @@ function displaySoldiers() {
   }
 }
 
-function moveSoldiers(){
+function moveSoldiers() {
   for (let i = 0; i < baseLeft.squares.length; i++) {
-      for (let j = 0; j < baseRight.squares.length; j++) {
-        baseLeft.squares[i].attack(baseRight.squares[j]);
+    for (let j = 0; j < baseRight.squares.length; j++) {
+      baseLeft.squares[i].attack(baseRight.squares[j]);
+    }
+    for (let j = 0; j < baseRight.circleShooters.length; j++) {
+      baseLeft.squares[i].attack(baseRight.circleShooters[j]);
+    }
+    for (let j = 0; j < baseRight.circleDemos.length; j++) {
+      baseLeft.squares[i].attack(baseRight.circleDemos[j]);
+    }
+    if (baseRight.squareXL != null) {
+      baseLeft.squares[i].attack(baseRight.squareXL);
+    }
+    if (baseLeft.squares[i].targetId === -1) {
+      if (!baseLeft.squares[i].dead) {
+        baseLeft.squares[i].attackBase(baseRight);
       }
-      for (let j = 0; j < baseRight.circleShooters.length; j++) {
-        baseLeft.squares[i].attack(baseRight.circleShooters[j]);
-      }
-      for (let j = 0; j < baseRight.circleDemos.length; j++) {
-        baseLeft.squares[i].attack(baseRight.circleDemos[j]);
-      }
-      if(baseRight.squareXL!=null){
-        baseLeft.squares[i].attack(baseRight.squareXL);
-      }
-      if (baseLeft.squares[i].targetId===-1){
-        if(!baseLeft.squares[i].dead){
-          baseLeft.squares[i].attackBase(baseRight);
-        }
-      }
+    }
   }
   for (let i = 0; i < baseLeft.circleShooters.length; i++) {
     for (let j = 0; j < baseRight.squares.length; j++) {
@@ -191,11 +181,11 @@ function moveSoldiers(){
     for (let j = 0; j < baseRight.circleDemos.length; j++) {
       baseLeft.circleShooters[i].attack(baseRight.circleDemos[j]);
     }
-    if(baseRight.squareXL!=null){
+    if (baseRight.squareXL != null) {
       baseLeft.circleShooters[i].attack(baseRight.squareXL);
     }
-    if (baseLeft.circleShooters[i].targetId===-1){
-      if(!baseLeft.circleShooters[i].dead){
+    if (baseLeft.circleShooters[i].targetId === -1) {
+      if (!baseLeft.circleShooters[i].dead) {
         baseLeft.circleShooters[i].attackBase(baseRight);
       }
     }
@@ -210,39 +200,39 @@ function moveSoldiers(){
     for (let j = 0; j < baseRight.circleDemos.length; j++) {
       baseLeft.circleDemos[i].attack(baseRight.circleDemos[j]);
     }
-    if(baseRight.squareXL!=null){
+    if (baseRight.squareXL != null) {
       baseLeft.circleDemos[i].attack(baseRight.squareXL);
     }
-    if (baseLeft.circleDemos[i].targetId===-1){
-      if(!baseLeft.circleDemos[i].dead){
+    if (baseLeft.circleDemos[i].targetId === -1) {
+      if (!baseLeft.circleDemos[i].dead) {
         baseLeft.circleDemos[i].attackBase(baseRight);
       }
     }
   }
-  if(baseLeft.squareXL!=null){
+  if (baseLeft.squareXL != null) {
     baseLeft.squareXL.attackBase(baseRight);
-    if(baseLeft.squareXL.animationFinished){
-      baseLeft.squareXL=null;
+    if (baseLeft.squareXL.animationFinished) {
+      baseLeft.squareXL = null;
     }
   }
   for (let i = 0; i < baseRight.squares.length; i++) {
-      for (let j = 0; j < baseLeft.squares.length; j++) {
-        baseRight.squares[i].attack(baseLeft.squares[j]);
+    for (let j = 0; j < baseLeft.squares.length; j++) {
+      baseRight.squares[i].attack(baseLeft.squares[j]);
+    }
+    for (let j = 0; j < baseLeft.circleShooters.length; j++) {
+      baseRight.squares[i].attack(baseLeft.circleShooters[j]);
+    }
+    for (let j = 0; j < baseLeft.circleDemos.length; j++) {
+      baseRight.squares[i].attack(baseLeft.circleDemos[j]);
+    }
+    if (baseLeft.squareXL != null) {
+      baseRight.squares[i].attack(baseLeft.squareXL);
+    }
+    if (baseRight.squares[i].targetId === -1) {
+      if (!baseRight.squares[i].dead) {
+        baseRight.squares[i].attackBase(baseLeft);
       }
-      for (let j = 0; j < baseLeft.circleShooters.length; j++) {
-        baseRight.squares[i].attack(baseLeft.circleShooters[j]);
-      }
-      for (let j = 0; j < baseLeft.circleDemos.length; j++) {
-        baseRight.squares[i].attack(baseLeft.circleDemos[j]);
-      }
-      if(baseLeft.squareXL!=null){
-        baseRight.squares[i].attack(baseLeft.squareXL);
-      }
-      if (baseRight.squares[i].targetId===-1){
-        if(!baseRight.squares[i].dead){
-          baseRight.squares[i].attackBase(baseLeft);
-        }
-      }
+    }
   }
   for (let i = 0; i < baseRight.circleShooters.length; i++) {
     for (let j = 0; j < baseLeft.squares.length; j++) {
@@ -254,11 +244,11 @@ function moveSoldiers(){
     for (let j = 0; j < baseLeft.circleDemos.length; j++) {
       baseRight.circleShooters[i].attack(baseLeft.circleDemos[j]);
     }
-    if(baseLeft.squareXL!=null){
+    if (baseLeft.squareXL != null) {
       baseRight.circleShooters[i].attack(baseLeft.squareXL);
     }
-    if (baseRight.circleShooters[i].targetId===-1){
-      if(!baseRight.circleShooters[i].dead){
+    if (baseRight.circleShooters[i].targetId === -1) {
+      if (!baseRight.circleShooters[i].dead) {
         baseRight.circleShooters[i].attackBase(baseLeft);
       }
     }
@@ -273,19 +263,19 @@ function moveSoldiers(){
     for (let j = 0; j < baseLeft.circleDemos.length; j++) {
       baseRight.circleDemos[i].attack(baseLeft.circleDemos[j]);
     }
-    if(baseLeft.squareXL!=null){
+    if (baseLeft.squareXL != null) {
       baseRight.circleDemos[i].attack(baseLeft.squareXL);
     }
-    if (baseRight.circleDemos[i].targetId===-1){
-      if(!baseRight.circleDemos[i].dead){
+    if (baseRight.circleDemos[i].targetId === -1) {
+      if (!baseRight.circleDemos[i].dead) {
         baseRight.circleDemos[i].attackBase(baseLeft);
       }
     }
   }
-  if(baseRight.squareXL!=null){
+  if (baseRight.squareXL != null) {
     baseRight.squareXL.attackBase(baseLeft);
-    if(baseRight.squareXL.animationFinished){
-      baseRight.squareXL=null;
+    if (baseRight.squareXL.animationFinished) {
+      baseRight.squareXL = null;
     }
   }
 }
@@ -295,58 +285,117 @@ function moveSoldiers(){
 // handle the inputs
 function keyPressed() {
   if (playing) {
-    if (baseLeft.capacity<baseLeft.maxCap){
-      if (keyCode === 87) {
+    if (keyCode === 83) {
+      if (baseLeft.resource >= 32) {
+        baseLeft.DownkeyColor = BLUE;
         let uniqueId = getUniqueId();
-        let square = new Square(baseLeft.x, baseLeft.y, 0, mapId,uniqueId);
-        baseLeft.squares.push(square);
-        console.log("BLUE player spawned a square (id: "+uniqueId+")");
-        baseLeft.capacity++;
-      } else if (keyCode === 65) {
-        let uniqueId = getUniqueId();
-        let circleShooter = new CircleShooter(baseLeft.x, baseLeft.y, 0, mapId,uniqueId);
-        baseLeft.circleShooters.push(circleShooter);
-        console.log("BLUE player spawned a circle shooter (id: "+uniqueId+")");
-        baseLeft.capacity++;
-      } else if (keyCode === 83) {
-        let uniqueId = getUniqueId();
-        let squareXL = new SquareXL(baseLeft.x, baseLeft.y, 0, mapId,100);
+        let squareXL = new SquareXL(baseLeft.x, baseLeft.y, 0, mapId, 100);
         baseLeft.squareXL = squareXL;
         console.log("BLUE player spawned a square XL (id: 100)");
+        baseLeft.resource -= squareXL.cost;
+      }
+    }
+    if (baseLeft.capacity < baseLeft.maxCap) {
+      if (keyCode === 87) {
+        if (baseLeft.resource >= 4) {
+          baseLeft.UpkeyColor = BLUE;
+          let uniqueId = getUniqueId();
+          let square = new Square(baseLeft.x, baseLeft.y, 0, mapId, uniqueId);
+          baseLeft.squares.push(square);
+          console.log("BLUE player spawned a square (id: " + uniqueId + ")");
+          baseLeft.capacity++;
+          baseLeft.resource -= square.cost;
+        }
+      } else if (keyCode === 65) {
+        if (baseLeft.resource >= 8) {
+          baseLeft.LeftkeyColor = BLUE;
+          let uniqueId = getUniqueId();
+          let circleShooter = new CircleShooter(baseLeft.x, baseLeft.y, 0, mapId, uniqueId);
+          baseLeft.circleShooters.push(circleShooter);
+          console.log("BLUE player spawned a circle shooter (id: " + uniqueId + ")");
+          baseLeft.capacity++;
+          baseLeft.resource -= circleShooter.cost;
+        }
       } else if (keyCode === 68) {
-        let uniqueId = getUniqueId();
-        let circleDemo = new CircleDemo(baseLeft.x, baseLeft.y, 0, mapId,uniqueId);
-        baseLeft.circleDemos.push(circleDemo);
-        console.log("BLUE player spawned a circle demo (id: "+uniqueId+")");
-        baseLeft.capacity++;
+        if (baseLeft.resource >= 16) {
+          baseLeft.RightkeyColor = BLUE;
+          let uniqueId = getUniqueId();
+          let circleDemo = new CircleDemo(baseLeft.x, baseLeft.y, 0, mapId, uniqueId);
+          baseLeft.circleDemos.push(circleDemo);
+          console.log("BLUE player spawned a circle demo (id: " + uniqueId + ")");
+          baseLeft.capacity++;
+          baseLeft.resource -= circleDemo.cost;
+        }
       }
     }
     if (!singlePlayer) {
-      if (baseRight.capacity<baseRight.maxCap){
-        if (keyCode === 38) {
+      if (keyCode === 40) {
+        if (baseRight.resource >= 32) {
+          baseRight.DownkeyColor = RED;
           let uniqueId = getUniqueId();
-          let square = new Square(baseRight.x, baseRight.y, 1,mapId,uniqueId);
-          baseRight.squares.push(square);
-          console.log("RED player spawned a square (id: "+uniqueId+")");
-          baseRight.capacity++;
-        } else if (keyCode === 37) {
-          let uniqueId = getUniqueId();
-          let circleShooter = new CircleShooter(baseRight.x, baseRight.y, 1,mapId,uniqueId);
-          baseRight.circleShooters.push(circleShooter);
-          console.log("RED player spawned a circle shooter (id: "+uniqueId+")");
-          baseRight.capacity++;
-        } else if (keyCode === 40) {
-          let uniqueId = getUniqueId();
-          let squareXL = new SquareXL(baseRight.x, baseRight.y, 1,mapId,100);
+          let squareXL = new SquareXL(baseRight.x, baseRight.y, 1, mapId, 100);
           baseRight.squareXL = squareXL;
           console.log("RED player spawned a square XL (id: 100)");
-        } else if (keyCode === 39) {
-          let uniqueId = getUniqueId();
-          let circleDemo = new CircleDemo(baseRight.x, baseRight.y, 1,mapId,uniqueId);
-          baseRight.circleDemos.push(circleDemo);
-          console.log("RED player spawned a circle demo (id: "+uniqueId+")");
-          baseRight.capacity++;
+          baseRight.resource -= squareXL.cost;
         }
+      }
+      if (baseRight.capacity < baseRight.maxCap) {
+        if (keyCode === 38) {
+          if (baseRight.resource >= 4) {
+            baseRight.UpkeyColor = RED;
+            let uniqueId = getUniqueId();
+            let square = new Square(baseRight.x, baseRight.y, 1, mapId, uniqueId);
+            baseRight.squares.push(square);
+            console.log("RED player spawned a square (id: " + uniqueId + ")");
+            baseRight.capacity++;
+            baseRight.resource -= square.cost;
+          }
+        } else if (keyCode === 37) {
+          if (baseRight.resource >= 8) {
+            baseRight.LeftkeyColor = RED;
+            let uniqueId = getUniqueId();
+            let circleShooter = new CircleShooter(baseRight.x, baseRight.y, 1, mapId, uniqueId);
+            baseRight.circleShooters.push(circleShooter);
+            console.log("RED player spawned a circle shooter (id: " + uniqueId + ")");
+            baseRight.capacity++;
+            baseRight.resource -= circleShooter.cost;
+          }
+        } else if (keyCode === 39) {
+          if (baseRight.resource >= 16) {
+            baseRight.RightkeyColor = RED;
+            let uniqueId = getUniqueId();
+            let circleDemo = new CircleDemo(baseRight.x, baseRight.y, 1, mapId, uniqueId);
+            baseRight.circleDemos.push(circleDemo);
+            console.log("RED player spawned a circle demo (id: " + uniqueId + ")");
+            baseRight.capacity++;
+            baseRight.resource -= circleDemo.cost;
+          }
+        }
+      }
+    }
+  }
+}
+
+function keyReleased() {
+  if (playing) {
+    if (keyCode === 87) {
+      baseLeft.UpkeyColor = color(255, 0);
+    } else if (keyCode === 65) {
+      baseLeft.LeftkeyColor = color(255, 0);
+    } else if (keyCode === 83) {
+      baseLeft.DownkeyColor = color(255, 0);
+    } else if (keyCode === 68) {
+      baseLeft.RightkeyColor = color(255, 0);
+    }
+    if (!singlePlayer) {
+      if (keyCode === 38) {
+        baseRight.UpkeyColor = color(255, 0);
+      } else if (keyCode === 37) {
+        baseRight.LeftkeyColor = color(255, 0);
+      } else if (keyCode === 40) {
+        baseRight.DownkeyColor = color(255, 0);
+      } else if (keyCode === 39) {
+        baseRight.RightkeyColor = color(255, 0);
       }
     }
   }
@@ -410,26 +459,26 @@ function displayMapMenu() {
   textSize(32);
   text("C H O O S E   Y O U R   M A P", width / 2, height / 2 - 200);
   // 4 maps
-  image(MapHorizontal,width / 2 - 375, height / 2, rectUIWidth, rectUIHeight);
-  image(MapDiagonal1,width / 2 - 125, height / 2, rectUIWidth, rectUIHeight);
-  image(MapDiagonal2,width / 2 + 125, height / 2, rectUIWidth, rectUIHeight);
-  image(MapVertical,width / 2 + 375, height / 2, rectUIWidth, rectUIHeight);
+  image(MapHorizontal, width / 2 - 375, height / 2, rectUIWidth, rectUIHeight);
+  image(MapDiagonal1, width / 2 - 125, height / 2, rectUIWidth, rectUIHeight);
+  image(MapDiagonal2, width / 2 + 125, height / 2, rectUIWidth, rectUIHeight);
+  image(MapVertical, width / 2 + 375, height / 2, rectUIWidth, rectUIHeight);
 
   // if a map is selected, highlight that map
   fill(SELECTED); // outline
   if (mapId === 0) {
     rect(width / 2 - 375, height / 2, rectUIWidth + rectUIStroke, rectUIHeight + rectUIStroke);
     // map
-    image(MapHorizontal,width / 2 - 375, height / 2, rectUIWidth, rectUIHeight);
+    image(MapHorizontal, width / 2 - 375, height / 2, rectUIWidth, rectUIHeight);
   } else if (mapId === 1) {
     rect(width / 2 - 125, height / 2, rectUIWidth + rectUIStroke, rectUIHeight + rectUIStroke);
-    image(MapDiagonal1,width / 2 - 125, height / 2, rectUIWidth, rectUIHeight);
+    image(MapDiagonal1, width / 2 - 125, height / 2, rectUIWidth, rectUIHeight);
   } else if (mapId === 2) {
     rect(width / 2 + 125, height / 2, rectUIWidth + rectUIStroke, rectUIHeight + rectUIStroke);
-    image(MapDiagonal2,width / 2 + 125, height / 2, rectUIWidth, rectUIHeight);
+    image(MapDiagonal2, width / 2 + 125, height / 2, rectUIWidth, rectUIHeight);
   } else if (mapId === 3) {
     rect(width / 2 + 375, height / 2, rectUIWidth + rectUIStroke, rectUIHeight + rectUIStroke);
-    image(MapVertical,width / 2 + 375, height / 2, rectUIWidth, rectUIHeight);
+    image(MapVertical, width / 2 + 375, height / 2, rectUIWidth, rectUIHeight);
   }
   // if a map is selected, a next button will be displayed
   if (selectedMap) {
@@ -460,7 +509,7 @@ function checkMapMenuButton() {
     mouseX > width / 2 - 375 - width / 12 && mouseX < width / 2 + 375 + width / 12) {
     if (mouseX < width / 2 - 375 + width / 12 && mouseX > width / 2 - 375 - width / 12) {
       rect(width / 2 - 375, height / 2, rectUIWidth + rectUIStroke, rectUIHeight + rectUIStroke);
-      image(MapHorizontal,width / 2 - 375, height / 2, rectUIWidth, rectUIHeight);
+      image(MapHorizontal, width / 2 - 375, height / 2, rectUIWidth, rectUIHeight);
       // map name
       textSize(16);
       fill(255);
@@ -473,7 +522,7 @@ function checkMapMenuButton() {
       // map 2
     } else if (mouseX > width / 2 - 125 - width / 12 && mouseX < width / 2 - 125 + width / 12) {
       rect(width / 2 - 125, height / 2, rectUIWidth + rectUIStroke, rectUIHeight + rectUIStroke);
-      image(MapDiagonal1,width / 2 - 125, height / 2, rectUIWidth, rectUIHeight);
+      image(MapDiagonal1, width / 2 - 125, height / 2, rectUIWidth, rectUIHeight);
       textSize(16);
       fill(255);
       text("D I A G O N A L   I", width / 2, height / 2 + 100);
@@ -484,7 +533,7 @@ function checkMapMenuButton() {
       // map 3
     } else if (mouseX > width / 2 + 125 - width / 12 && mouseX < width / 2 + 125 + width / 12) {
       rect(width / 2 + 125, height / 2, rectUIWidth + rectUIStroke, rectUIHeight + rectUIStroke);
-      image(MapDiagonal2,width / 2 + 125, height / 2, rectUIWidth, rectUIHeight);
+      image(MapDiagonal2, width / 2 + 125, height / 2, rectUIWidth, rectUIHeight);
       textSize(16);
       fill(255);
       text("D I A G O N A L   I I", width / 2, height / 2 + 100);
@@ -495,7 +544,7 @@ function checkMapMenuButton() {
       // map 4s
     } else if (mouseX > width / 2 + 375 - width / 12 && mouseX < width / 2 + 375 + width / 12) {
       rect(width / 2 + 375, height / 2, rectUIWidth + rectUIStroke, rectUIHeight + rectUIStroke);
-      image(MapVertical,width / 2 + 375, height / 2, rectUIWidth, rectUIHeight);
+      image(MapVertical, width / 2 + 375, height / 2, rectUIWidth, rectUIHeight);
       textSize(16);
       fill(255);
       text("V E R T I C A L", width / 2, height / 2 + 100);

@@ -18,12 +18,17 @@ class Base{
     this.capacity = 0;
     // id
     this.playerId = playerId;
+    this.modeId = modeId;
     // color for different ids
     if (this.playerId === 0){
       this.color = "#4fc7fb"; // blue
     }else if(this.playerId === 1){
       this.color = "#FB524F"; // red
     }
+    this.UpkeyColor = color(255,0);
+    this.LeftkeyColor = color(255,0);
+    this.DownkeyColor = color(255,0);
+    this.RightkeyColor = color(255,0);
     // positions for different maps and ids
     this.margin = 100; // distance to the edge of the window
     if (this.playerId === 0){
@@ -56,7 +61,8 @@ class Base{
       }
     }
     // resource
-    this.resource = 0;
+    this.resource = 1000;
+
     // soldier arrays
     this.squares=[];
     this.squareXL = null;
@@ -87,14 +93,24 @@ class Base{
     return check;
   }
 
+  gainResources(){
+    let currentSec = frameCount;
+    if (currentSec%60===0 && currentSec!=0){
+      this.resource+=1;
+    }
+  }
+
   // display
   //
   // display the base and its health on the side of the window
   display(){
+    this.gainResources();
+
     push();
     fill(this.color);
     // base
     rectMode(CENTER);
+    ellipseMode(CENTER);
     stroke(255);
     strokeWeight(4);
     rect(this.x,this.y,this.size,this.size);
@@ -104,16 +120,90 @@ class Base{
     noStroke();
     // map the health into window height
     this.barHeight = map(this.health,0,this.maxHealth,0,height);
+    strokeWeight(2);
     if(this.playerId===0){
       fill(50);
       rect(5,height/2,10,height);
       fill(this.color);
       rect(5,height/2,10,this.barHeight);
+
+      textAlign(LEFT,CENTER);
+      textSize(32);
+      fill(255,150);
+      text(this.resource,this.x+35,this.y+50);
+      // key squares
+      stroke(255);
+      fill(this.UpkeyColor);
+      rect(this.x,this.y-50,30,30,4);
+      fill(this.LeftkeyColor);
+      rect(this.x-50,this.y,30,30,4);
+      fill(this.DownkeyColor);
+      rect(this.x,this.y+50,30,30,4);
+      fill(this.RightkeyColor);
+      rect(this.x+50,this.y,30,30,4);
+      // keys
+      noStroke();
+      textAlign(CENTER,CENTER);
+      textSize(16);
+      // up key
+      fill(255);
+      text("W",this.x,this.y-50);
+      fill(255,150);
+      text(this.squares.length,this.x,this.y-75);
+      // left key
+      fill(255);
+      text("A",this.x-50,this.y);
+      fill(255,150);
+      text(this.circleShooters.length,this.x-50,this.y-25);
+      // down key
+      fill(255);
+      text("S",this.x,this.y+50);
+      // right key
+      text("D",this.x+50,this.y);
+      fill(255,150);
+      text(this.circleDemos.length,this.x+50,this.y-25);
     }else if (this.playerId===1){
       fill(50);
       rect(width-5,height/2,10,height);
       fill(this.color);
       rect(width-5,height/2,10,this.barHeight);
+      if (this.modeId===1){
+        textAlign(RIGHT,CENTER);
+        textSize(32);
+        fill(255,150);
+        text(this.resource,this.x-35,this.y+50);
+        // key squares
+        stroke(255);
+        fill(this.UpkeyColor);
+        rect(this.x,this.y-50,30,30,4);
+        fill(this.LeftkeyColor);
+        rect(this.x-50,this.y,30,30,4);
+        fill(this.DownkeyColor);
+        rect(this.x,this.y+50,30,30,4);
+        fill(this.RightkeyColor);
+        rect(this.x+50,this.y,30,30,4);
+        // keys
+        noStroke();
+        textAlign(CENTER,CENTER);
+        textSize(16);
+        // up key
+        fill(255);
+        text("↑",this.x,this.y-50);
+        fill(255,150);
+        text(this.squares.length,this.x,this.y-75);
+        // left key
+        fill(255);
+        text("←",this.x-50,this.y);
+        fill(255,150);
+        text(this.circleShooters.length,this.x-50,this.y-25);
+        // down key
+        fill(255);
+        text("↓",this.x,this.y+50);
+        // right key
+        text("→",this.x+50,this.y);
+        fill(255,150);
+        text(this.circleDemos.length,this.x+50,this.y-25);
+      }
     }
     pop();
   }

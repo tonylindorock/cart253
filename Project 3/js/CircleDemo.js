@@ -11,6 +11,8 @@ class CircleDemo extends Soldier {
     // health
     this.maxHealth = 30;
     this.health = this.maxHealth;
+    // cost
+    this.cost = 16;
     // speed
     this.originalSpeed = 2;
     this.speed = this.originalSpeed + random(-0.5, 0.5);

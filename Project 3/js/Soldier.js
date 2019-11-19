@@ -34,6 +34,8 @@ class Soldier{
     // health
     this.maxHealth = 25;
     this.health = this.maxHealth;
+    // cost
+    this.cost = 4;
 
     if(this.playerId===0){
       if (this.mapId===0){

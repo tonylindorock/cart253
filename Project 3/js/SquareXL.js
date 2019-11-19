@@ -7,6 +7,8 @@ class SquareXL extends Soldier{
     this.originalSize = 100;
     this.size = this.originalSize;
     this.innerSize = this.originalSize;
+    // cost
+    this.cost = 32;
     // speed
     this.originalSpeed = 0.75;
     this.speed = this.originalSpeed+random(-0.5, 0.5);

@@ -4,6 +4,8 @@ class CircleShooter extends Soldier {
     // health
     this.maxHealth = 20;
     this.health = this.maxHealth;
+    // cost
+    this.cost = 8;
     // speed
     this.originalSpeed = 1;
     this.speed = this.originalSpeed + random(-0.5, 0.5);
@@ -36,7 +38,7 @@ class CircleShooter extends Soldier {
     }
     if (this.bulletFired && !this.dead) {
       this.bullet.moveTo(enemyBase);
-      if (this.bullet.hit) {
+      if (this.bullet.dead) {
         this.bulletFired = false;
         this.bullet = null;
       }
@@ -85,7 +87,7 @@ class CircleShooter extends Soldier {
           enemy.targetId = this.uniqueId;
         }
         this.bullet.moveTo(enemy);
-        if (this.bullet.hit) {
+        if (this.bullet.dead) {
           this.bulletFired = false;
           this.bullet = null;
         }
