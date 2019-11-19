@@ -2,17 +2,15 @@ class CircleShooter extends Soldier {
   constructor(x, y, playerId, mapId, uniqueId) {
     super(x, y, playerId, mapId, uniqueId);
     // health
-    this.maxHealth = 25;
+    this.maxHealth = 20;
     this.health = this.maxHealth;
     // speed
-    this.originalSpeed = 2;
+    this.originalSpeed = 1;
     this.speed = this.originalSpeed + random(-0.5, 0.5);
     this.vx = 0;
     this.vy = 0;
     this.tx = random(0, 1000); // To make x and y noise different
     this.ty = random(0, 1000); // we use random starting values
-    // damage
-    this.damage = 20 + random(-5, 5);
 
     this.bullet = null;
 
@@ -58,6 +56,7 @@ class CircleShooter extends Soldier {
   }
 
   attack(enemy) {
+    let sec = second();
     let d = dist(this.x, this.y, enemy.x, enemy.y);
     if (d < 300 && this.targetId < 0 && !this.dead && !enemy.dead) {
       this.targetId = enemy.uniqueId;
@@ -68,20 +67,33 @@ class CircleShooter extends Soldier {
     let angle = atan2(dy, dx);
 
     if (this.targetId === enemy.uniqueId) {
-      if (d > 150) {
+      if (d >= 150) {
         this.x += this.speed * cos(angle);
         this.y += this.speed * sin(angle);
+      } else {
+        this.x -= this.speed * cos(angle);
+        this.y -= this.speed * sin(angle);
       }
       if (d < 200 && !this.bulletFired && !this.dead) {
         this.bullet = new Bullet(this.x, this.y, enemy.x, enemy.y, this.playerId, this.uniqueId);
         this.bulletFired = true;
+        this.attacking = true;
       }
       if (this.bulletFired && !this.dead) {
+        this.attacking = true;
+        if (!enemy.attacking) {
+          enemy.targetId = this.uniqueId;
+        }
         this.bullet.moveTo(enemy);
         if (this.bullet.hit) {
           this.bulletFired = false;
           this.bullet = null;
         }
+      }
+      if (enemy.dead) {
+        this.targetId = -1;
+        this.obtainedTarget = false;
+        this.attacking = false;
       }
     }
 

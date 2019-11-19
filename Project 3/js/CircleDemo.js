@@ -61,6 +61,7 @@ class CircleDemo extends Soldier {
     if (d < 300 && this.targetId < 0 && !this.dead && !enemy.dead) {
       this.targetId = enemy.uniqueId;
       this.obtainedTarget = true;
+      this.attacking = true;
     }
     let dx = enemy.x - this.x;
     let dy = enemy.y - this.y;
@@ -84,6 +85,7 @@ class CircleDemo extends Soldier {
       if (enemy.dead) {
         this.targetId = -1;
         this.obtainedTarget = false;
+        this.attacking = false;
       }
     }
 

@@ -1,3 +1,8 @@
+// Bullet
+//
+// A child class of CircleShooter class.
+//
+
 class Bullet extends CircleShooter{
   constructor(x, y,targetX,targetY,playerId,uniqueId){
     super(x,y,playerId,-1,uniqueId);
@@ -13,7 +18,7 @@ class Bullet extends CircleShooter{
     this.size = 10;
 
     this.speed = 5;
-    this.damage = 10 + random(-5, 5);
+    this.damage = 1.5;
 
     this.hit=false;
     this.runOnce = true;
@@ -36,11 +41,12 @@ class Bullet extends CircleShooter{
 
     this.bulletX += this.speed * cos(angle);
     this.bulletY += this.speed * sin(angle);
-    if(d2>400){
+    if(d2>=250){
       this.hit=true;
     }
-    if(d<5+target.size/2 && this.runOnce){
+    if(d<target.size/2 && this.runOnce){
       target.health-=this.damage;
+      target.health=constrain(target.health,0,target.maxHealth);
       this.hit=true;
       console.log(this.unqiueId+": bullet hit");
     }
@@ -50,10 +56,10 @@ class Bullet extends CircleShooter{
   display(){
     push();
     ellipseMode(CENTER);
-    fill(255);
-    ellipse(this.bulletX,this.bulletY,this.size);
+    stroke(255);
+    strokeWeight(2);
     fill(this.color);
-    ellipse(this.bulletX,this.bulletY,this.size/2);
+    ellipse(this.bulletX,this.bulletY,this.size);
     pop();
   }
 
