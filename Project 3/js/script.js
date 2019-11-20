@@ -422,7 +422,7 @@ function displayMainMenu() {
   rectMode(CENTER);
   // title
   textSize(64);
-  text("S I M P L E   D E F E N C E", width / 2, 100);
+  text("S I M P L E   D E F E N C E", width / 2, height / 2);
   pop();
   // check the play button
   checkMainMenuButton();

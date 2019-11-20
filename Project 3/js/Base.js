@@ -61,7 +61,7 @@ class Base {
       }
     }
     // resource
-    this.resource = 1000;
+    this.resource = 0;
 
     // soldier arrays
     this.squares = [];
