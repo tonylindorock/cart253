@@ -3,6 +3,7 @@
 // An unique class extended from the soldier class
 // Square is a common but reliable soldier type. It harms enemies with melee damage.
 // It must get close to the enemies to harm them.
+// It can do standard damage and has a great health.
 
 class Square extends Soldier {
   constructor(x, y, playerId, mapId, uniqueId) {

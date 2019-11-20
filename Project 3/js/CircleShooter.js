@@ -1,3 +1,9 @@
+// CircleShooter
+//
+// An unique class extended from the soldier class.
+// CircleShooter shoots Bullet to harm enemy units
+// It can do decent damage but has a lower health
+
 class CircleShooter extends Soldier {
   constructor(x, y, playerId, mapId, uniqueId) {
     super(x, y, playerId, mapId, uniqueId);
@@ -80,6 +86,8 @@ class CircleShooter extends Soldier {
         this.bullet = new Bullet(this.x, this.y, enemy.x, enemy.y, this.playerId, this.uniqueId);
         this.bulletFired = true;
         this.attacking = true;
+      }else{
+        this.attacking = false;
       }
       if (this.bulletFired && !this.dead) {
         this.attacking = true;

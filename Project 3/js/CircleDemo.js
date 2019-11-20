@@ -3,6 +3,8 @@
 // An unique class extended from the soldier class
 // Circle demo is a powerful class. It can destroy most of the classes.
 // However, it will die when it comes in contact with any enemy.
+// It can kill any sqaure, circleShooter, circleDemo units instantly.
+// It has a decent health.
 
 class CircleDemo extends Soldier {
   constructor(x, y, playerId, mapId, uniqueId) {

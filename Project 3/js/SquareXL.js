@@ -1,3 +1,10 @@
+// SquareXL
+//
+// An special class extended from the soldier class
+// This unit will not harm any moving units
+// It only will head to the enemy base and once it reaches, the health of enemy base cuts half.
+// It does a lot damage to the enemy base and has the highest health.
+
 class SquareXL extends Soldier{
   constructor(x,y,playerId,mapId,uniqueId){
     super(x,y,playerId,mapId,uniqueId);

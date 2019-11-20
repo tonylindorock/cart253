@@ -21,6 +21,10 @@ let playing = false; // if playing
 let gameOver = false; // if game is over
 let singlePlayer = true; // if sinlge player
 
+const RULE0 = "You must defend your base against your component.";
+const RULE1 = "To do so, you can buy 4 tatical units using your resource.";
+const RULE2 = "Use these units to protect your base and destory the enemy base!";
+
 let uniqueIds = [];
 
 // r g b values for background color
@@ -411,7 +415,7 @@ function displayMainMenu() {
   rectMode(CENTER);
   // title
   textSize(64);
-  text("S I M P L E   D E F E N C E", width / 2, height / 2);
+  text("S I M P L E   D E F E N C E", width / 2, 100);
   pop();
   // check the play button
   checkMainMenuButton();

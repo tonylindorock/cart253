@@ -2,6 +2,7 @@
 //
 // A child class of CircleShooter class.
 // Used to be fired at the enemy unit and hurt them
+// Each bullet will respawn to be shot again after it reaches over 250 distance units
 
 class Bullet extends CircleShooter{
   constructor(x, y,targetX,targetY,playerId,uniqueId){
@@ -15,8 +16,6 @@ class Bullet extends CircleShooter{
     this.targetX = targetX;
     this.targetY = targetY;
 
-    this.angle = 0;
-
     this.size = 10;
     this.innerSize = this.size;
 
@@ -25,6 +24,7 @@ class Bullet extends CircleShooter{
     this.dead = false;
 
     this.hit=false;
+    this.maxRange = false;
     this.displayBullet = true;
     this.runOnce = true;
 
@@ -43,17 +43,15 @@ class Bullet extends CircleShooter{
     let dx = this.targetX - this.startX;
     let dy = this.targetY - this.startY;
     let angle = atan2(dy, dx);
-    this.angle = angle;
 
     this.bulletX += this.speed * cos(angle);
     this.bulletY += this.speed * sin(angle);
     if(d2>=250){
-      this.hit=true;
+      this.dead=true;
     }
     if(d<target.size/2 && this.runOnce){
       target.health-=this.damage;
       target.health=constrain(target.health,0,target.maxHealth);
-      // this.displayBullet = false;
       this.runOnce = false;
       this.hit=true;
     }
@@ -68,7 +66,7 @@ class Bullet extends CircleShooter{
       angleMode(DEGREES);
       noStroke();
       fill(255);
-      // translate(this.bulletX,this.bulletY);
+      // translate(this.bulletX,this.bulleßtY);
       // rotate(this.angle);
       // rect(0,0,this.size+10,this.size,16);
       if(this.hit){
@@ -76,7 +74,8 @@ class Bullet extends CircleShooter{
         this.size += 1;
         this.innerSize -= 1;
         if (this.size >= 20){
-          this.dead = true;
+          this.displayBullet = false;
+          this.speed = 5;
         }
         ellipse(this.bulletX,this.bulletY,this.innerSize);
         stroke(255);
