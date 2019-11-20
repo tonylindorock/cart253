@@ -21,10 +21,11 @@ class Square extends Soldier {
     this.damage += random(-0.05, 0.05);
 
     this.obtainedTarget = false;
-    this.targeted = 0;
-    this.targetId = -1;
-    this.attacking = false;
+    this.targeted = 0; // how many enemies are after it
+    this.targetId = -1; // targeted enemy id
+    this.attacking = false; // if attacking
 
+    // rotations for animation
     this.rotation = 0;
     this.originalRotationSpeed = 5;
     this.rotationSpeed = this.originalRotationSpeed;
@@ -32,6 +33,9 @@ class Square extends Soldier {
     this.runOnce = true;
   }
 
+  // attackBase(enemyBase)
+  //
+  // approach and attack the enemy base
   attackBase(enemyBase) {
     let d = dist(this.x, this.y, this.enemyBaseX, this.enemyBaseY);
     let dx = this.enemyBaseX - this.x;
@@ -59,6 +63,9 @@ class Square extends Soldier {
     this.handleWrapping();
   }
 
+  // attack(enemy)
+  //
+  // select an enemy and keep attacking it until it dies
   attack(enemy) {
     let d = dist(this.x, this.y, enemy.x, enemy.y);
     if (d < 300 && this.targetId < 0 && !this.dead && !enemy.dead) {
@@ -111,6 +118,10 @@ class Square extends Soldier {
     this.handleWrapping();
   }
 
+  // display()
+  //
+  // display the rotating square
+  // play an animation when dies
   display() {
     push();
     rectMode(CENTER);
@@ -148,6 +159,9 @@ class Square extends Soldier {
     pop();
   }
 
+  // reset()
+  //
+  // might be useful
   reset() {
     this.x = this.baseX;
     this.y = this.baseY;

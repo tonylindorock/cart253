@@ -20,15 +20,18 @@ class CircleShooter extends Soldier {
     this.tx = random(0, 1000); // To make x and y noise different
     this.ty = random(0, 1000); // we use random starting values
 
-    this.bullet = null;
+    this.bullet = null; // attribute to store a Bullet object
 
     this.obtainedTarget = false;
-    this.targetId = -1;
-    this.attacking = false;
+    this.targetId = -1; // targeted enemy id
+    this.attacking = false; // if attacking
 
-    this.bulletFired = false;
+    this.bulletFired = false; // if a bullet is fired
   }
 
+  // attackBase(enemyBase)
+  //
+  // approach and attack the enemy base
   attackBase(enemyBase) {
     let d = dist(this.x, this.y, this.enemyBaseX, this.enemyBaseY);
     let dx = this.enemyBaseX - this.x;
@@ -63,6 +66,9 @@ class CircleShooter extends Soldier {
     this.handleWrapping();
   }
 
+  // attack(enemy)
+  //
+  // select an enemy and keep attacking it until it dies
   attack(enemy) {
     let sec = second();
     let d = dist(this.x, this.y, enemy.x, enemy.y);
@@ -86,7 +92,7 @@ class CircleShooter extends Soldier {
         this.bullet = new Bullet(this.x, this.y, enemy.x, enemy.y, this.playerId, this.uniqueId);
         this.bulletFired = true;
         this.attacking = true;
-      }else{
+      } else {
         this.attacking = false;
       }
       if (this.bulletFired && !this.dead) {
@@ -120,6 +126,10 @@ class CircleShooter extends Soldier {
     this.handleWrapping();
   }
 
+  // display()
+  //
+  // display the circleShooter
+  // play an animation when dies
   display() {
     push();
     rectMode(CENTER);
@@ -142,6 +152,9 @@ class CircleShooter extends Soldier {
     pop();
   }
 
+  // reset()
+  //
+  // might be useful
   reset() {
     this.x = this.baseX;
     this.y = this.baseY;

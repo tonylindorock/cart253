@@ -23,16 +23,19 @@ class CircleDemo extends Soldier {
     this.tx = random(0, 1000); // To make x and y noise different
     this.ty = random(0, 1000); // we use random starting values
     // damage
-    this.damage = 45 + random(-5, 5);
+    this.damage = 45;
 
     this.obtainedTarget = false;
-    this.targeted = 0;
-    this.targetId = -1;
-    this.attacking = false;
+    this.targeted = 0; // how many enemies are after it
+    this.targetId = -1; // targeted enemy id
+    this.attacking = false; // if attacking
 
     this.runOnce = true;
   }
 
+  // attackBase(enemyBase)
+//
+// approach and attack the enemy base
   attackBase(enemyBase) {
     let d = dist(this.x, this.y, this.enemyBaseX, this.enemyBaseY);
     let dx = this.enemyBaseX - this.x;
@@ -60,6 +63,9 @@ class CircleDemo extends Soldier {
     this.handleWrapping();
   }
 
+  // attack(enemy)
+  //
+  // select an enemy and keep attacking it until it dies
   attack(enemy) {
     let d = dist(this.x, this.y, enemy.x, enemy.y);
     if (d < 300 && this.targetId < 0 && !this.dead && !enemy.dead) {
@@ -106,6 +112,10 @@ class CircleDemo extends Soldier {
     this.handleWrapping();
   }
 
+  // display()
+  //
+  // display the circleDemo
+  // play an animation when explodes
   display() {
     push();
     rectMode(CENTER);
@@ -130,6 +140,9 @@ class CircleDemo extends Soldier {
     pop();
   }
 
+  // reset()
+  //
+  // might be useful
   reset() {
     this.x = this.baseX;
     this.y = this.baseY;

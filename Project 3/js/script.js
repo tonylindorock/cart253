@@ -128,6 +128,9 @@ function displayBase() {
   baseRight.display();
 }
 
+// displaySoldiers()
+//
+// display all soldier units
 function displaySoldiers() {
   if (baseRight.squareXL != null) {
     baseRight.squareXL.display();
@@ -155,6 +158,7 @@ function displaySoldiers() {
   }
 }
 
+// let all soldier units attack their enemies and enemy base
 function moveSoldiers() {
   for (let i = 0; i < baseLeft.squares.length; i++) {
     for (let j = 0; j < baseRight.squares.length; j++) {
@@ -286,7 +290,7 @@ function moveSoldiers() {
 
 // keyPressed()
 //
-// handle the inputs
+// read the inputs to spawn the specified unit
 function keyPressed() {
   if (playing) {
     if (keyCode === 83) {
@@ -380,6 +384,9 @@ function keyPressed() {
   }
 }
 
+// keyReleased()
+//
+// if released, let the button go back to normal
 function keyReleased() {
   if (playing) {
     if (keyCode === 87) {
