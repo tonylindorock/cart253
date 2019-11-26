@@ -22,7 +22,7 @@ let gameOver = false; // if game is over
 let singlePlayer = true; // if sinlge player
 
 const RULE0 = "You must defend your base against your component.";
-const RULE1 = "To do so, you can buy 4 tatical units using your resource.";
+const RULE1 = "To do so, you can buy 4 tatical units using your resources.";
 const RULE2 = "Use these units to protect your base and destory the enemy base!";
 
 let uniqueIds = [];
@@ -46,6 +46,7 @@ const SELECTED = "#47b3ff";
 const BLUE = "#4fc7fb";
 const RED = "#FB524F";
 
+// images
 let MapHorizontal;
 let MapVertical;
 let MapDiagonal1;
@@ -88,6 +89,9 @@ function draw() {
   // different states displaying different menus
   if (State === "starting") {
     displayMainMenu();
+  }
+  if (State === "help") {
+    displayHelp();
   }
   if (State === "selectingMaps") {
     displayMapMenu();
@@ -294,7 +298,7 @@ function moveSoldiers() {
 function keyPressed() {
   if (playing) {
     if (keyCode === 83) {
-      if (baseLeft.resource >= 32) {
+      if (baseLeft.resource >= 42) {
         baseLeft.DownkeyColor = BLUE;
         let uniqueId = getUniqueId();
         let squareXL = new SquareXL(baseLeft.x, baseLeft.y, 0, mapId, 100);
@@ -305,7 +309,7 @@ function keyPressed() {
     }
     if (baseLeft.capacity < baseLeft.maxCap) {
       if (keyCode === 87) {
-        if (baseLeft.resource >= 4) {
+        if (baseLeft.resource >= 8) {
           baseLeft.UpkeyColor = BLUE;
           let uniqueId = getUniqueId();
           let square = new Square(baseLeft.x, baseLeft.y, 0, mapId, uniqueId);
@@ -315,7 +319,7 @@ function keyPressed() {
           baseLeft.resource -= square.cost;
         }
       } else if (keyCode === 65) {
-        if (baseLeft.resource >= 8) {
+        if (baseLeft.resource >= 16) {
           baseLeft.LeftkeyColor = BLUE;
           let uniqueId = getUniqueId();
           let circleShooter = new CircleShooter(baseLeft.x, baseLeft.y, 0, mapId, uniqueId);
@@ -338,7 +342,7 @@ function keyPressed() {
     }
     if (!singlePlayer) {
       if (keyCode === 40) {
-        if (baseRight.resource >= 32) {
+        if (baseRight.resource >= 42) {
           baseRight.DownkeyColor = RED;
           let uniqueId = getUniqueId();
           let squareXL = new SquareXL(baseRight.x, baseRight.y, 1, mapId, 100);
@@ -349,7 +353,7 @@ function keyPressed() {
       }
       if (baseRight.capacity < baseRight.maxCap) {
         if (keyCode === 38) {
-          if (baseRight.resource >= 4) {
+          if (baseRight.resource >= 8) {
             baseRight.UpkeyColor = RED;
             let uniqueId = getUniqueId();
             let square = new Square(baseRight.x, baseRight.y, 1, mapId, uniqueId);
@@ -359,7 +363,7 @@ function keyPressed() {
             baseRight.resource -= square.cost;
           }
         } else if (keyCode === 37) {
-          if (baseRight.resource >= 8) {
+          if (baseRight.resource >= 16) {
             baseRight.LeftkeyColor = RED;
             let uniqueId = getUniqueId();
             let circleShooter = new CircleShooter(baseRight.x, baseRight.y, 1, mapId, uniqueId);
@@ -432,6 +436,64 @@ function displayMainMenu() {
 //
 // check the main menu button
 function checkMainMenuButton() {
+  push();
+  textAlign(CENTER, CENTER);
+  // play button
+  rectMode(CORNER);
+  textSize(32);
+  // if hovering PLAY
+  if (mouseY > height - 75) {
+    fill(SELECTED);
+    rect(0, height - 75, width, 75);
+    fill(255);
+    text("P L A Y", width / 2, height - 35);
+    // if pressed, go to next state - choosing map
+    if (mouseIsPressed) {
+      State = "selectingMaps";
+    }
+    // if not hovering
+  } else {
+    fill(50, 150);
+    rect(0, height - 75, width, 75);
+    fill(255);
+    text("P L A Y", width / 2, height - 35);
+  }
+  // if hovering HELP
+  if (mouseY < height - 80 && mouseY > height - 155) {
+    fill(SELECTED);
+    rect(0, height - 155, width, 75);
+    fill(255);
+    text("H E L P", width / 2, height - 120);
+    // if pressed, go to next state - choosing map
+    if (mouseIsPressed) {
+      State = "help";
+    }
+    // if not hovering
+  } else {
+    fill(50, 150);
+    rect(0, height - 155, width, 75);
+    fill(255);
+    text("H E L P", width / 2, height - 120);
+  }
+  pop();
+}
+
+// displayHelp()
+//
+//
+function displayHelp(){
+  push();
+  fill(255);
+  textAlign(LEFT, CENTER);
+  imageMode(CENTER);
+  rectMode(CENTER);
+  textSize(18);
+  pop();
+
+  checkHelpButton();
+}
+
+function checkHelpButton(){
   push();
   textAlign(CENTER, CENTER);
   // play button

@@ -61,7 +61,7 @@ class Base {
       }
     }
     // resource
-    this.resource = 0;
+    this.resource = 32;
 
     // soldier arrays
     this.squares = [];
@@ -117,9 +117,9 @@ class Base {
     // base
     rectMode(CENTER);
     ellipseMode(CENTER);
+    rect(this.x, this.y, this.size, this.size);
     stroke(255);
     strokeWeight(4);
-    rect(this.x, this.y, this.size, this.size);
     line(this.x, this.y + 5, this.x, this.y - 5);
     line(this.x - 5, this.y, this.x + 5, this.y);
     // base health bar
@@ -154,20 +154,34 @@ class Base {
       // up key
       fill(255);
       text("W", this.x, this.y - 50);
-      fill(255, 150);
-      text(this.squares.length, this.x, this.y - 75);
       // left key
-      fill(255);
       text("A", this.x - 50, this.y);
-      fill(255, 150);
-      text(this.circleShooters.length, this.x - 50, this.y - 25);
       // down key
-      fill(255);
       text("S", this.x, this.y + 50);
       // right key
       text("D", this.x + 50, this.y);
-      fill(255, 150);
-      text(this.circleDemos.length, this.x + 50, this.y - 25);
+      // costs
+      fill(255, 206, 43);
+      textSize(12);
+      text("$8", this.x, this.y - 80);
+      text("$16", this.x - 50, this.y - 30);
+      text("$16", this.x + 50, this.y - 30);
+      text("$42", this.x, this.y + 80);
+      // number of units
+      textAlign(CENTER, CENTER);
+      rectMode(CENTER);
+      textSize(16);
+      fill(255);
+      rect(this.x+20,this.y-65, 30, 20, 32);
+      rect(this.x-30,this.y-15, 30, 20, 32);
+      rect(this.x+65,this.y-15, 30, 20, 32);
+      rect(this.x+20,this.y+35, 30, 20, 32);
+      fill(this.color);
+      text(this.squares.length,this.x+20,this.y-65);
+      text(this.circleShooters.length,this.x-30,this.y-15);
+      text(this.circleDemos.length,this.x+65,this.y-15);
+      text(int(this.squareXL!=null),this.x+20,this.y+35);
+
     } else if (this.playerId === 1) {
       fill(50);
       rect(width - 5, height / 2, 10, height);
@@ -195,20 +209,35 @@ class Base {
         // up key
         fill(255);
         text("↑", this.x, this.y - 50);
-        fill(255, 150);
-        text(this.squares.length, this.x, this.y - 75);
         // left key
         fill(255);
         text("←", this.x - 50, this.y);
-        fill(255, 150);
-        text(this.circleShooters.length, this.x - 50, this.y - 25);
         // down key
         fill(255);
         text("↓", this.x, this.y + 50);
         // right key
         text("→", this.x + 50, this.y);
-        fill(255, 150);
-        text(this.circleDemos.length, this.x + 50, this.y - 25);
+        // costs
+        fill(255, 206, 43);
+        textSize(12);
+        text("$8", this.x, this.y - 80);
+        text("$16", this.x - 50, this.y - 30);
+        text("$16", this.x + 50, this.y - 30);
+        text("$42", this.x, this.y + 80);
+        // number of units
+        textAlign(CENTER, CENTER);
+        rectMode(CENTER);
+        fill(255);
+        textSize(16);
+        rect(this.x+20,this.y-65, 30, 20, 32);
+        rect(this.x-30,this.y-15, 30, 20, 32);
+        rect(this.x+65,this.y-15, 30, 20, 32);
+        rect(this.x+20,this.y+35, 30, 20, 32);
+        fill(this.color);
+        text(this.squares.length,this.x+20,this.y-65);
+        text(this.circleShooters.length,this.x-30,this.y-15);
+        text(this.circleDemos.length,this.x+65,this.y-15);
+        text(int(this.squareXL!=null),this.x+20,this.y+35);
       }
     }
     pop();

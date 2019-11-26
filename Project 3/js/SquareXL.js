@@ -9,14 +9,14 @@ class SquareXL extends Soldier {
   constructor(x, y, playerId, mapId, uniqueId) {
     super(x, y, playerId, mapId, uniqueId);
     // health
-    this.maxHealth = 400;
+    this.maxHealth = 600;
     this.health = this.maxHealth;
     // sizes
     this.originalSize = 100;
     this.size = this.originalSize;
     this.innerSize = this.originalSize;
     // cost
-    this.cost = 32;
+    this.cost = 42;
     // speed
     this.originalSpeed = 0.75;
     this.speed = this.originalSpeed + random(-0.5, 0.5);

@@ -11,7 +11,7 @@ class CircleShooter extends Soldier {
     this.maxHealth = 20;
     this.health = this.maxHealth;
     // cost
-    this.cost = 8;
+    this.cost = 16;
     // speed
     this.originalSpeed = 1;
     this.speed = this.originalSpeed + random(-0.5, 0.5);

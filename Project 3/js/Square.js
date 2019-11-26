@@ -18,7 +18,7 @@ class Square extends Soldier {
     this.tx = random(0, 1000); // To make x and y noise different
     this.ty = random(0, 1000); // we use random starting values
     // damage
-    this.damage += random(-0.05, 0.05);
+    this.damage = 0.2;
 
     this.obtainedTarget = false;
     this.targeted = 0; // how many enemies are after it

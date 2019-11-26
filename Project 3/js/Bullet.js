@@ -21,7 +21,7 @@ class Bullet extends CircleShooter {
     this.innerSize = this.size;
 
     this.speed = 5;
-    this.damage = 5;
+    this.damage = 10;
     this.hit = false; // whether it's hit or miss
 
     this.dead = false; // if the bullet fly out of range, it dies

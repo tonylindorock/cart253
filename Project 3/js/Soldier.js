@@ -35,7 +35,7 @@ class Soldier {
     this.maxHealth = 25;
     this.health = this.maxHealth;
     // cost
-    this.cost = 4;
+    this.cost = 8;
     // knowing the location of enemy base
     if (this.playerId === 0) {
       if (this.mapId === 0) {
