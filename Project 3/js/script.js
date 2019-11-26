@@ -51,12 +51,14 @@ let MapHorizontal;
 let MapVertical;
 let MapDiagonal1;
 let MapDiagonal2;
+let PicHelp;
 
 function preload() {
   MapHorizontal = loadImage("assets/images/Horizontal.jpg");
   MapVertical = loadImage("assets/images/Vertical.jpg");
   MapDiagonal1 = loadImage("assets/images/Diagonal 1.jpg");
   MapDiagonal2 = loadImage("assets/images/Diagonal 2.jpg");
+  HelpPic = loadImage("assets/images/SD Help.png");
 }
 
 // setUp()
@@ -130,6 +132,12 @@ function setUpBase() {
 function displayBase() {
   baseLeft.display();
   baseRight.display();
+  if (keyIsDown(70)){
+    baseLeft.displayUnitsMenu();
+  }
+  if (keyIsDown(76)){
+    baseRight.displayUnitsMenu();
+  }
 }
 
 // displaySoldiers()
@@ -426,7 +434,7 @@ function displayMainMenu() {
   rectMode(CENTER);
   // title
   textSize(64);
-  text("S I M P L E   D E F E N C E", width / 2, height / 2);
+  text("S I M P L E   D E F E N C E", width / 2, height / 2 - 75);
   pop();
   // check the play button
   checkMainMenuButton();
@@ -485,9 +493,10 @@ function displayHelp(){
   push();
   fill(255);
   textAlign(LEFT, CENTER);
-  imageMode(CENTER);
+  imageMode(CORNER);
   rectMode(CENTER);
   textSize(18);
+  image(HelpPic,0,0,width,height);
   pop();
 
   checkHelpButton();

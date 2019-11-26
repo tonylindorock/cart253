@@ -101,9 +101,52 @@ class Base {
   // each second the base will gain 1 resource
   gainResources() {
     let currentSec = frameCount;
-    if (currentSec % 60 === 0 && currentSec != 0) {
+    if (currentSec % 120 === 0 && currentSec != 0) {
       this.resource += 1;
     }
+  }
+
+  displayUnitsMenu(){
+    push();
+    rectMode(CENTER);
+    ellipseMode(CENTER);
+    textAlign(CENTER,CENTER);
+    fill(255,150);
+    textSize(12);
+    text("square", this.x, this.y - 95);
+    text("shooter", this.x - 50, this.y - 45);
+    text("demo", this.x + 50, this.y - 45);
+    text("square XL", this.x+50, this.y + 80);
+    // square
+    stroke(255);
+    strokeWeight(2);
+    fill(this.color);
+    rect(this.x, this.y - 50, 30, 30);
+    noStroke();
+    fill(255);
+    rect(this.x, this.y - 50, 30/4,30/4);
+
+    //circleShooter
+    stroke(255);
+    strokeWeight(2);
+    fill(this.color);
+    ellipse(this.x-50, this.y, 30);
+    noStroke();
+    fill(255);
+    ellipse(this.x-50, this.y, 30 / 4);
+
+    // circleDemo
+    stroke(255);
+    strokeWeight(2);
+    fill(this.color);
+    ellipse(this.x+50, this.y, 30);
+
+    // squareXL
+    stroke(255);
+    rect(this.x, this.y+50, 30, 30, 4);
+    line(this.x-5, this.y+55, this.x+5, this.y+45);
+    line(this.x+5, this.y+55, this.x-5, this.y+45);
+    pop();
   }
 
   // display
@@ -138,13 +181,32 @@ class Base {
       fill(255, 150);
       text(this.resource, this.x + 35, this.y + 50);
       // key squares
-      stroke(255);
+      if(this.resource >= 8 && this.squares.length+this.circleShooters.length+this.circleDemos.length < 50){
+        stroke(255);
+      }else{
+        stroke(255,100);
+      }
       fill(this.UpkeyColor);
       rect(this.x, this.y - 50, 30, 30, 4);
+      if(this.resource >= 16  && this.squares.length+this.circleShooters.length+this.circleDemos.length < 50){
+        stroke(255);
+      }else{
+        stroke(255,100);
+      }
       fill(this.LeftkeyColor);
       rect(this.x - 50, this.y, 30, 30, 4);
+      if(this.resource >= 42  && this.squareXL===null){
+        stroke(255);
+      }else{
+        stroke(255,100);
+      }
       fill(this.DownkeyColor);
       rect(this.x, this.y + 50, 30, 30, 4);
+      if(this.resource >= 16  && this.squares.length+this.circleShooters.length+this.circleDemos.length < 50){
+        stroke(255);
+      }else{
+        stroke(255,100);
+      }
       fill(this.RightkeyColor);
       rect(this.x + 50, this.y, 30, 30, 4);
       // keys
@@ -152,36 +214,33 @@ class Base {
       textAlign(CENTER, CENTER);
       textSize(16);
       // up key
-      fill(255);
+      if(this.resource >= 8 && this.squares.length+this.circleShooters.length+this.circleDemos.length < 50){
+        fill(255);
+      }else{
+        fill(255,100);
+      }
       text("W", this.x, this.y - 50);
       // left key
+      if(this.resource >= 16 && this.squares.length+this.circleShooters.length+this.circleDemos.length < 50){
+        fill(255);
+      }else{
+        fill(255,100);
+      }
       text("A", this.x - 50, this.y);
       // down key
+      if(this.resource >= 42 && this.squareXL===null){
+        fill(255);
+      }else{
+        fill(255,100);
+      }
       text("S", this.x, this.y + 50);
       // right key
+      if(this.resource >= 16 && this.squares.length+this.circleShooters.length+this.circleDemos.length < 50){
+        fill(255);
+      }else{
+        fill(255,100);
+      }
       text("D", this.x + 50, this.y);
-      // costs
-      fill(255, 206, 43);
-      textSize(12);
-      text("$8", this.x, this.y - 80);
-      text("$16", this.x - 50, this.y - 30);
-      text("$16", this.x + 50, this.y - 30);
-      text("$42", this.x, this.y + 80);
-      // number of units
-      textAlign(CENTER, CENTER);
-      rectMode(CENTER);
-      textSize(16);
-      fill(255);
-      rect(this.x+20,this.y-65, 30, 20, 32);
-      rect(this.x-30,this.y-15, 30, 20, 32);
-      rect(this.x+65,this.y-15, 30, 20, 32);
-      rect(this.x+20,this.y+35, 30, 20, 32);
-      fill(this.color);
-      text(this.squares.length,this.x+20,this.y-65);
-      text(this.circleShooters.length,this.x-30,this.y-15);
-      text(this.circleDemos.length,this.x+65,this.y-15);
-      text(int(this.squareXL!=null),this.x+20,this.y+35);
-
     } else if (this.playerId === 1) {
       fill(50);
       rect(width - 5, height / 2, 10, height);
@@ -193,53 +252,89 @@ class Base {
         fill(255, 150);
         text(this.resource, this.x - 35, this.y + 50);
         // key squares
-        stroke(255);
+        if(this.resource >= 8  && this.squares.length+this.circleShooters.length+this.circleDemos.length < 50){
+          stroke(255);
+        }else{
+          stroke(255,100);
+        }
         fill(this.UpkeyColor);
         rect(this.x, this.y - 50, 30, 30, 4);
+        if(this.resource >= 16  && this.squares.length+this.circleShooters.length+this.circleDemos.length < 50){
+          stroke(255);
+        }else{
+          stroke(255,100);
+        }
         fill(this.LeftkeyColor);
         rect(this.x - 50, this.y, 30, 30, 4);
+        if(this.resource >= 42  && this.squareXL===null){
+          stroke(255);
+        }else{
+          stroke(255,100);
+        }
         fill(this.DownkeyColor);
         rect(this.x, this.y + 50, 30, 30, 4);
+        if(this.resource >= 16 && this.squares.length+this.circleShooters.length+this.circleDemos.length < 50){
+          stroke(255);
+        }else{
+          stroke(255,100);
+        }
         fill(this.RightkeyColor);
         rect(this.x + 50, this.y, 30, 30, 4);
         // keys
-        noStroke();
         textAlign(CENTER, CENTER);
         textSize(16);
+        noStroke();
         // up key
-        fill(255);
+        if(this.resource >= 8 && this.squares.length+this.circleShooters.length+this.circleDemos.length < 50){
+          fill(255);
+        }else{
+          fill(255,100);
+        }
         text("↑", this.x, this.y - 50);
         // left key
-        fill(255);
+        if(this.resource >= 16 && this.squares.length+this.circleShooters.length+this.circleDemos.length < 50){
+          fill(255);
+        }else{
+          fill(255,100);
+        }
         text("←", this.x - 50, this.y);
         // down key
-        fill(255);
+        if(this.resource >= 42 && this.squareXL===null){
+          fill(255);
+        }else{
+          fill(255,100);
+        }
         text("↓", this.x, this.y + 50);
         // right key
+        if(this.resource >= 16 && this.squares.length+this.circleShooters.length+this.circleDemos.length < 50){
+          fill(255);
+        }else{
+          fill(255,100);
+        }
         text("→", this.x + 50, this.y);
-        // costs
-        fill(255, 206, 43);
-        textSize(12);
-        text("$8", this.x, this.y - 80);
-        text("$16", this.x - 50, this.y - 30);
-        text("$16", this.x + 50, this.y - 30);
-        text("$42", this.x, this.y + 80);
-        // number of units
-        textAlign(CENTER, CENTER);
-        rectMode(CENTER);
-        fill(255);
-        textSize(16);
-        rect(this.x+20,this.y-65, 30, 20, 32);
-        rect(this.x-30,this.y-15, 30, 20, 32);
-        rect(this.x+65,this.y-15, 30, 20, 32);
-        rect(this.x+20,this.y+35, 30, 20, 32);
-        fill(this.color);
-        text(this.squares.length,this.x+20,this.y-65);
-        text(this.circleShooters.length,this.x-30,this.y-15);
-        text(this.circleDemos.length,this.x+65,this.y-15);
-        text(int(this.squareXL!=null),this.x+20,this.y+35);
       }
     }
+    // costs
+    fill(255, 206, 43);
+    textSize(12);
+    text("$8", this.x, this.y - 80);
+    text("$16", this.x - 50, this.y - 30);
+    text("$16", this.x + 50, this.y - 30);
+    text("$42", this.x, this.y + 80);
+    // number of units
+    textAlign(CENTER, CENTER);
+    rectMode(CENTER);
+    fill(255);
+    textSize(16);
+    rect(this.x+20,this.y-65, 30, 20, 32);
+    rect(this.x-30,this.y-15, 30, 20, 32);
+    rect(this.x+65,this.y-15, 30, 20, 32);
+    rect(this.x+20,this.y+35, 30, 20, 32);
+    fill(this.color);
+    text(this.squares.length,this.x+20,this.y-65);
+    text(this.circleShooters.length,this.x-30,this.y-15);
+    text(this.circleDemos.length,this.x+65,this.y-15);
+    text(int(this.squareXL!=null),this.x+20,this.y+35);
     pop();
   }
 }
