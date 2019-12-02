@@ -27,6 +27,7 @@ class CircleShooter extends Soldier {
     this.attacking = false; // if attacking
 
     this.bulletFired = false; // if a bullet is fired
+    this.animationFinished = false;
   }
 
   // attackBase(enemyBase)
@@ -146,7 +147,7 @@ class CircleShooter extends Soldier {
       this.size -= 0.5;
       this.speed = 0;
       if (this.size <= 0) {
-        this.reset();
+        this.animationFinished = true;
       }
     }
     pop();
@@ -158,6 +159,10 @@ class CircleShooter extends Soldier {
   reset() {
     this.x = this.baseX;
     this.y = this.baseY;
+    this.size = 0;
+  }
+
+  respawn(){
     this.size = this.originalSize;
     this.health = this.maxHealth;
     this.targetId = -1;
@@ -165,8 +170,8 @@ class CircleShooter extends Soldier {
     this.speed = this.originalSpeed + random(-0.5, 0.5);
     this.tx = random(0, 1000);
     this.ty = random(0, 1000);
-    this.dead = false;
     this.bullet = null;
     this.bulletFired = false;
+    this.dead = false;
   }
 }

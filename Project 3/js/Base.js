@@ -63,6 +63,10 @@ class Base {
     // resource
     this.resource = 32;
 
+    this.squaresNum = 0;
+    this.circleShootersNum = 0;
+    this.circleDemosNum = 0;
+
     // soldier arrays
     this.squares = [];
     this.squareXL = null;
@@ -78,19 +82,43 @@ class Base {
     for (let i = 0; i < this.squares.length; i++) {
       if (this.squares[i].dead != true) {
         check = true;
+      }else{
+        if (this.squares[i].animationFinished){
+          let temp = this.squares[0];
+          this.squares[0] = this.squares[i];
+          this.squares[i] = temp;
+          this.squares.shift();
+          this.capacity--;
+        }
       }
     }
-    if (this.squareXL.dead != true) {
+    if (this.squareXL != null) {
       check = true;
     }
     for (let i = 0; i < this.circleShooters.length; i++) {
       if (this.circleShooters[i].dead != true) {
         check = true;
+      }else{
+        if (this.circleShooters[i].animationFinished){
+          let temp = this.circleShooters[0];
+          this.circleShooters[0] = this.circleShooters[i];
+          this.circleShooters[i] = temp;
+          this.circleShooters.shift();
+          this.capacity--;
+        }
       }
     }
     for (let i = 0; i < this.circleDemos.length; i++) {
       if (this.circleDemos[i].dead != true) {
         check = true;
+      }else{
+        if (this.circleDemos[i].animationFinished){
+          let temp = this.circleDemos[0];
+          this.circleDemos[0] = this.circleDemos[i];
+          this.circleDemos[i] = temp;
+          this.circleDemos.shift();
+          this.capacity--;
+        }
       }
     }
     return check;
@@ -101,7 +129,7 @@ class Base {
   // each second the base will gain 1 resource
   gainResources() {
     let currentSec = frameCount;
-    if (currentSec % 120 === 0 && currentSec != 0) {
+    if (currentSec % 60 === 0 && currentSec != 0) {
       this.resource += 1;
     }
   }
@@ -154,6 +182,7 @@ class Base {
   // display the base and its health on the side of the window
   display() {
     this.gainResources();
+    this.hasActiveSoldiers();
 
     push();
     fill(this.color);
@@ -181,7 +210,7 @@ class Base {
       fill(255, 150);
       text(this.resource, this.x + 35, this.y + 50);
       // key squares
-      if(this.resource >= 8 && this.squares.length+this.circleShooters.length+this.circleDemos.length < 50){
+      if(this.resource >= 16 && this.squares.length+this.circleShooters.length+this.circleDemos.length < 50){
         stroke(255);
       }else{
         stroke(255,100);
@@ -214,7 +243,7 @@ class Base {
       textAlign(CENTER, CENTER);
       textSize(16);
       // up key
-      if(this.resource >= 8 && this.squares.length+this.circleShooters.length+this.circleDemos.length < 50){
+      if(this.resource >= 16 && this.squares.length+this.circleShooters.length+this.circleDemos.length < 50){
         fill(255);
       }else{
         fill(255,100);
@@ -252,7 +281,7 @@ class Base {
         fill(255, 150);
         text(this.resource, this.x - 35, this.y + 50);
         // key squares
-        if(this.resource >= 8  && this.squares.length+this.circleShooters.length+this.circleDemos.length < 50){
+        if(this.resource >= 16  && this.squares.length+this.circleShooters.length+this.circleDemos.length < 50){
           stroke(255);
         }else{
           stroke(255,100);
@@ -285,7 +314,7 @@ class Base {
         textSize(16);
         noStroke();
         // up key
-        if(this.resource >= 8 && this.squares.length+this.circleShooters.length+this.circleDemos.length < 50){
+        if(this.resource >= 16 && this.squares.length+this.circleShooters.length+this.circleDemos.length < 50){
           fill(255);
         }else{
           fill(255,100);
@@ -315,26 +344,28 @@ class Base {
       }
     }
     // costs
-    fill(255, 206, 43);
-    textSize(12);
-    text("$8", this.x, this.y - 80);
-    text("$16", this.x - 50, this.y - 30);
-    text("$16", this.x + 50, this.y - 30);
-    text("$42", this.x, this.y + 80);
-    // number of units
-    textAlign(CENTER, CENTER);
-    rectMode(CENTER);
-    fill(255);
-    textSize(16);
-    rect(this.x+20,this.y-65, 30, 20, 32);
-    rect(this.x-30,this.y-15, 30, 20, 32);
-    rect(this.x+65,this.y-15, 30, 20, 32);
-    rect(this.x+20,this.y+35, 30, 20, 32);
-    fill(this.color);
-    text(this.squares.length,this.x+20,this.y-65);
-    text(this.circleShooters.length,this.x-30,this.y-15);
-    text(this.circleDemos.length,this.x+65,this.y-15);
-    text(int(this.squareXL!=null),this.x+20,this.y+35);
+    if (this.modeId === 1 || (this.modeId === 0 && this.playerId === 0)){
+      fill(255, 206, 43);
+      textSize(12);
+      text("$16", this.x, this.y - 80);
+      text("$16", this.x - 50, this.y - 30);
+      text("$16", this.x + 50, this.y - 30);
+      text("$42", this.x, this.y + 80);
+      // number of units
+      textAlign(CENTER, CENTER);
+      rectMode(CENTER);
+      fill(255);
+      textSize(16);
+      rect(this.x+20,this.y-65, 30, 20, 32);
+      rect(this.x-30,this.y-15, 30, 20, 32);
+      rect(this.x+65,this.y-15, 30, 20, 32);
+      rect(this.x+20,this.y+35, 30, 20, 32);
+      fill(this.color);
+      text(this.squaresNum,this.x+20,this.y-65);
+      text(this.circleShootersNum,this.x-30,this.y-15);
+      text(this.circleDemosNum,this.x+65,this.y-15);
+      text(int(this.squareXL!=null),this.x+20,this.y+35);
+    }
     pop();
   }
 }

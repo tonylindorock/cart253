@@ -31,6 +31,7 @@ class CircleDemo extends Soldier {
     this.attacking = false; // if attacking
 
     this.runOnce = true;
+    this.animationFinished = false;
   }
 
   // attackBase(enemyBase)
@@ -133,7 +134,7 @@ class CircleDemo extends Soldier {
       this.innerSize = constrain(this.innerSize, 0, 30);
       this.speed = 0;
       if (this.innerSize <= 0) {
-        this.reset();
+        this.animationFinished = true;
       }
     }
     ellipse(this.x, this.y, this.size);
@@ -146,6 +147,10 @@ class CircleDemo extends Soldier {
   reset() {
     this.x = this.baseX;
     this.y = this.baseY;
+    this.size = 0;
+  }
+
+  respawn(){
     this.size = this.originalSize;
     this.innerSize = this.size;
     this.health = this.maxHealth;

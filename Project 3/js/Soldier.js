@@ -35,7 +35,7 @@ class Soldier {
     this.maxHealth = 25;
     this.health = this.maxHealth;
     // cost
-    this.cost = 8;
+    this.cost = 16;
     // knowing the location of enemy base
     if (this.playerId === 0) {
       if (this.mapId === 0) {
@@ -75,6 +75,10 @@ class Soldier {
   attack(enemy) {}
 
   display() {}
+
+  reset(){}
+
+  respawn(){}
 
   // handleWrapping()
   //

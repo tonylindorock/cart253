@@ -21,6 +21,11 @@ let playing = false; // if playing
 let gameOver = false; // if game is over
 let singlePlayer = true; // if sinlge player
 
+let time = 0;
+let timeBarLength = 0;
+let playTime = 0; // current frame count
+const RESPAWN_TIME = 5; // 5s for each respawn
+
 const RULE0 = "You must defend your base against your component.";
 const RULE1 = "To do so, you can buy 4 tatical units using your resources.";
 const RULE2 = "Use these units to protect your base and destory the enemy base!";
@@ -43,6 +48,7 @@ let baseRight;
 
 // highlighted color
 const SELECTED = "#47b3ff";
+const GOLD = "#ffce2b";
 const BLUE = "#4fc7fb";
 const RED = "#FB524F";
 
@@ -102,6 +108,9 @@ function draw() {
     displayModeMenu();
   }
   // if playing
+  if (playing){
+    displayTime();
+  }
   if (singlePlayer && playing) {
     displayBase();
     displaySoldiers();
@@ -135,7 +144,7 @@ function displayBase() {
   if (keyIsDown(70)){
     baseLeft.displayUnitsMenu();
   }
-  if (keyIsDown(76)){
+  if (keyIsDown(76) && modeId === 1){
     baseRight.displayUnitsMenu();
   }
 }
@@ -317,13 +326,14 @@ function keyPressed() {
     }
     if (baseLeft.capacity < baseLeft.maxCap) {
       if (keyCode === 87) {
-        if (baseLeft.resource >= 8) {
+        if (baseLeft.resource >= 16) {
           baseLeft.UpkeyColor = BLUE;
           let uniqueId = getUniqueId();
           let square = new Square(baseLeft.x, baseLeft.y, 0, mapId, uniqueId);
           baseLeft.squares.push(square);
           console.log("BLUE player spawned a square (id: " + uniqueId + ")");
           baseLeft.capacity++;
+          baseLeft.squaresNum++;
           baseLeft.resource -= square.cost;
         }
       } else if (keyCode === 65) {
@@ -334,6 +344,7 @@ function keyPressed() {
           baseLeft.circleShooters.push(circleShooter);
           console.log("BLUE player spawned a circle shooter (id: " + uniqueId + ")");
           baseLeft.capacity++;
+          baseLeft.circleShootersNum++;
           baseLeft.resource -= circleShooter.cost;
         }
       } else if (keyCode === 68) {
@@ -344,6 +355,7 @@ function keyPressed() {
           baseLeft.circleDemos.push(circleDemo);
           console.log("BLUE player spawned a circle demo (id: " + uniqueId + ")");
           baseLeft.capacity++;
+          baseLeft.circleDemosNum++;
           baseLeft.resource -= circleDemo.cost;
         }
       }
@@ -361,13 +373,14 @@ function keyPressed() {
       }
       if (baseRight.capacity < baseRight.maxCap) {
         if (keyCode === 38) {
-          if (baseRight.resource >= 8) {
+          if (baseRight.resource >= 16) {
             baseRight.UpkeyColor = RED;
             let uniqueId = getUniqueId();
             let square = new Square(baseRight.x, baseRight.y, 1, mapId, uniqueId);
             baseRight.squares.push(square);
             console.log("RED player spawned a square (id: " + uniqueId + ")");
             baseRight.capacity++;
+            baseRight.squaresNum++;
             baseRight.resource -= square.cost;
           }
         } else if (keyCode === 37) {
@@ -378,6 +391,7 @@ function keyPressed() {
             baseRight.circleShooters.push(circleShooter);
             console.log("RED player spawned a circle shooter (id: " + uniqueId + ")");
             baseRight.capacity++;
+            baseRight.circleShootersNum++;
             baseRight.resource -= circleShooter.cost;
           }
         } else if (keyCode === 39) {
@@ -388,6 +402,7 @@ function keyPressed() {
             baseRight.circleDemos.push(circleDemo);
             console.log("RED player spawned a circle demo (id: " + uniqueId + ")");
             baseRight.capacity++;
+            baseRight.circleDemosNum++;
             baseRight.resource -= circleDemo.cost;
           }
         }
@@ -421,6 +436,82 @@ function keyReleased() {
         baseRight.RightkeyColor = color(255, 0);
       }
     }
+  }
+}
+
+function displayTime(){
+  playTime = frameCount;
+  if (playTime % 1 === 0 && playTime!=0){
+    time += 0.0167;
+    if (time >= 10){
+      time = 0;
+      respawnUnits();
+    }
+  }
+  timeBarLength = map(time,0,10,25,250);
+  push();
+  fill(255);
+  textAlign(CENTER,CENTER);
+  rectMode(LEFT);
+  textSize(16);
+  if (mapId!=3){
+    text("T",width/2-125, 25);
+    fill(GOLD);
+    rect(width/2-125,50,timeBarLength,25,32);
+    text("RESPAWN",width/2+125, 25);
+    stroke(255);
+    strokeWeight(4);
+    fill(255,0);
+    rect(width/2-125, 50, 250, 25,32);
+  }else{
+    text("T",width-375, 25);
+    fill(GOLD);
+    rect(width-375, 50, timeBarLength, 25,32);
+    text("RESPAWN",width-125, 25);
+    stroke(255);
+    strokeWeight(4);
+    fill(255,0);
+    rect(width-375, 50, 250, 25,32);
+  }
+  pop();
+}
+
+function respawnUnits(){
+  for (let i = 0; i < baseLeft.squaresNum; i++) {
+    let uniqueId = getUniqueId();
+    let square = new Square(baseLeft.x, baseLeft.y, 0, mapId, uniqueId);
+    baseLeft.squares.push(square);
+    baseLeft.capacity++;
+  }
+  for (let i = 0; i < baseLeft.circleShootersNum; i++) {
+    let uniqueId = getUniqueId();
+    let circleShooter = new CircleShooter(baseLeft.x, baseLeft.y, 0, mapId, uniqueId);
+    baseLeft.circleShooters.push(circleShooter);
+    baseLeft.capacity++;
+  }
+  for (let i = 0; i < baseLeft.circleDemosNum; i++) {
+    let uniqueId = getUniqueId();
+    let circleDemo = new CircleDemo(baseLeft.x, baseLeft.y, 0, mapId, uniqueId);
+    baseLeft.circleDemos.push(circleDemo);
+    baseLeft.capacity++;
+  }
+  for (let i = 0; i < baseRight.squaresNum; i++) {
+    let uniqueId = getUniqueId();
+    let square = new Square(baseRight.x, baseRight.y, 1, mapId, uniqueId);
+    baseRight.squares.push(square);
+    baseRight.capacity++;
+  }
+  for (let i = 0; i < baseRight.circleShootersNum; i++) {
+    let uniqueId = getUniqueId();
+    let circleShooter = new CircleShooter(baseRight.x, baseRight.y, 1, mapId, uniqueId);
+    baseRight.circleShooters.push(circleShooter);
+    baseRight.capacity++;
+  }
+  for (let i = 0; i < baseRight.circleDemosNum; i++) {
+    let uniqueId = getUniqueId();
+    let circleDemo = new CircleDemo(baseRight.x, baseRight.y, 1, mapId, uniqueId);
+    baseRight.circleDemos.push(circleDemo);
+    baseRight.capacity++;
   }
 }
 

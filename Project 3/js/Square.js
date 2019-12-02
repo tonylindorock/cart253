@@ -31,6 +31,7 @@ class Square extends Soldier {
     this.rotationSpeed = this.originalRotationSpeed;
 
     this.runOnce = true;
+    this.animationFinished = false;
   }
 
   // attackBase(enemyBase)
@@ -153,7 +154,7 @@ class Square extends Soldier {
       this.size -= 0.5;
       this.speed = 0;
       if (this.size <= 0) {
-        this.reset();
+        this.animationFinished = true;
       }
     }
     pop();
@@ -165,6 +166,10 @@ class Square extends Soldier {
   reset() {
     this.x = this.baseX;
     this.y = this.baseY;
+    this.size = 0;
+  }
+
+  respawn(){
     this.size = this.originalSize;
     this.health = this.maxHealth;
     this.targeted = 0;
