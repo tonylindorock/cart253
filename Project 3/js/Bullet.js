@@ -21,7 +21,7 @@ class Bullet extends CircleShooter {
     this.innerSize = this.size;
 
     this.speed = 5;
-    this.damage = 5;
+    this.damage = 7;
     this.hit = false; // whether it's hit or miss
 
     this.dead = false; // if the bullet fly out of range, it dies
@@ -84,9 +84,12 @@ class Bullet extends CircleShooter {
         this.speed = 0;
         this.size += 1;
         this.innerSize -= 1;
-        if (this.size >= 20) {
+        if (this.size >= 20 && this.uniqueId != -1) {
           this.displayBullet = false;
           this.speed = 5;
+        }else if (this.size >= 30){
+          this.displayBullet = false;
+          this.speed = 10;
         }
         ellipse(this.bulletX, this.bulletY, this.innerSize);
         stroke(255);

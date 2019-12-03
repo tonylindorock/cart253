@@ -43,24 +43,13 @@ class Square extends Soldier {
     let dy = this.enemyBaseY - this.y;
     let angle = atan2(dy, dx);
     if (d >= 35) {
-      this.x += this.speed * cos(angle);
-      this.y += this.speed * sin(angle);
+        this.x += this.speed * cos(angle);
+        this.y += this.speed * sin(angle);
     } else {
-      this.rotationSpeed = 10;
-      enemyBase.health -= this.damage;
-      enemyBase.health = constrain(enemyBase.health, 0, enemyBase.maxHealth);
+        this.rotationSpeed = 10;
+        enemyBase.health -= this.damage;
+        enemyBase.health = constrain(enemyBase.health, 0, enemyBase.maxHealth);
     }
-    /*
-    // Set velocity via noise()
-    this.vx = map(noise(this.tx), 0, 1, -0.1, 0.1);
-    this.vy = map(noise(this.ty), 0, 1, -0.1, 0.1);
-    // Update position
-    this.x += this.vx;
-    this.y += this.vy;
-    // Update time properties
-    this.tx += 0.0001;
-    this.ty += 0.0001; */
-
     this.handleWrapping();
   }
 
@@ -124,40 +113,44 @@ class Square extends Soldier {
   // display the rotating square
   // play an animation when dies
   display() {
-    push();
-    rectMode(CENTER);
-    ellipseMode(CENTER);
-    angleMode(DEGREES);
-    translate(this.x, this.y);
-    rotate(this.rotation);
-    stroke(255);
-    strokeWeight(2);
-    fill(this.color);
-    rect(0, 0, this.size, this.size);
-    noStroke();
-    fill(255);
-    rect(0, 0, this.size / 4, this.size / 4);
-    if (this.playerId === 0) {
-      if (this.rotation < 90) {
-        this.rotation += this.rotationSpeed;
+    if (this.show){
+      push();
+      rectMode(CENTER);
+      ellipseMode(CENTER);
+      angleMode(DEGREES);
+      translate(this.x, this.y);
+      rotate(this.rotation);
+      stroke(255);
+      strokeWeight(2);
+      fill(this.color);
+      rect(0, 0, this.size, this.size);
+      noStroke();
+      fill(255);
+      rect(0, 0, this.size / 4, this.size / 4);
+      if (this.playerId === 0) {
+        if (this.rotation < 90) {
+          this.rotation += this.rotationSpeed;
+        } else {
+          this.rotation = this.rotationSpeed;
+        }
       } else {
-        this.rotation = this.rotationSpeed;
+        if (this.rotation > -90) {
+          this.rotation -= this.rotationSpeed;
+        } else {
+          this.rotation = this.rotationSpeed;
+        }
       }
-    } else {
-      if (this.rotation > -90) {
-        this.rotation -= this.rotationSpeed;
-      } else {
-        this.rotation = this.rotationSpeed;
+      if (this.dead) {
+        this.size -= 0.5;
+        this.speed = 0;
+        this.size = constrain(this.size,0,this.originalSize);
+        if (this.size <= 0) {
+          this.animationFinished = true;
+          this.show = false;
+        }
       }
+      pop();
     }
-    if (this.dead) {
-      this.size -= 0.5;
-      this.speed = 0;
-      if (this.size <= 0) {
-        this.animationFinished = true;
-      }
-    }
-    pop();
   }
 
   // reset()

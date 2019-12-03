@@ -11,7 +11,7 @@ class CircleShooter extends Soldier {
     this.maxHealth = 20;
     this.health = this.maxHealth;
     // cost
-    this.cost = 16;
+    this.cost = 20;
     // speed
     this.originalSpeed = 1;
     this.speed = this.originalSpeed + random(-0.5, 0.5);
@@ -38,32 +38,21 @@ class CircleShooter extends Soldier {
     let dx = this.enemyBaseX - this.x;
     let dy = this.enemyBaseY - this.y;
     let angle = atan2(dy, dx);
-    if (d >= 100) {
-      this.x += this.speed * cos(angle);
-      this.y += this.speed * sin(angle);
-    }
-    if (d < 200 && !this.bulletFired && !this.dead) {
-      this.bullet = new Bullet(this.x, this.y, enemyBase.x, enemyBase.y, this.playerId, this.uniqueId);
-      this.bulletFired = true;
-    }
-    if (this.bulletFired && !this.dead) {
-      this.bullet.moveTo(enemyBase);
-      if (this.bullet.dead) {
-        this.bulletFired = false;
-        this.bullet = null;
+      if (d >= 100) {
+        this.x += this.speed * cos(angle);
+        this.y += this.speed * sin(angle);
       }
-    }
-    /*
-    // Set velocity via noise()
-    this.vx = map(noise(this.tx), 0, 1, -0.1, 0.1);
-    this.vy = map(noise(this.ty), 0, 1, -0.1, 0.1);
-    // Update position
-    this.x += this.vx;
-    this.y += this.vy;
-    // Update time properties
-    this.tx += 0.0001;
-    this.ty += 0.0001; */
-
+      if (d < 200 && !this.bulletFired && !this.dead) {
+        this.bullet = new Bullet(this.x, this.y, enemyBase.x, enemyBase.y, this.playerId, this.uniqueId);
+        this.bulletFired = true;
+      }
+      if (this.bulletFired && !this.dead) {
+        this.bullet.moveTo(enemyBase);
+        if (this.bullet.dead) {
+          this.bulletFired = false;
+          this.bullet = null;
+        }
+      }
     this.handleWrapping();
   }
 
@@ -71,7 +60,6 @@ class CircleShooter extends Soldier {
   //
   // select an enemy and keep attacking it until it dies
   attack(enemy) {
-    let sec = second();
     let d = dist(this.x, this.y, enemy.x, enemy.y);
     if (d < 300 && this.targetId < 0 && !this.dead && !enemy.dead) {
       this.targetId = enemy.uniqueId;
@@ -132,25 +120,28 @@ class CircleShooter extends Soldier {
   // display the circleShooter
   // play an animation when dies
   display() {
-    push();
-    rectMode(CENTER);
-    ellipseMode(CENTER);
-    angleMode(DEGREES);
-    stroke(255);
-    strokeWeight(2);
-    fill(this.color);
-    ellipse(this.x, this.y, this.size);
-    noStroke();
-    fill(255);
-    ellipse(this.x, this.y, this.size / 4);
-    if (this.dead) {
-      this.size -= 0.5;
-      this.speed = 0;
-      if (this.size <= 0) {
-        this.animationFinished = true;
+    if (this.show){
+      push();
+      rectMode(CENTER);
+      ellipseMode(CENTER);
+      angleMode(DEGREES);
+      stroke(255);
+      strokeWeight(2);
+      fill(this.color);
+      ellipse(this.x, this.y, this.size);
+      noStroke();
+      fill(255);
+      ellipse(this.x, this.y, this.size / 4);
+      if (this.dead) {
+        this.size -= 0.5;
+        this.speed = 0;
+        if (this.size <= 0) {
+          this.animationFinished = true;
+          this.show = false;
+        }
       }
+      pop();
     }
-    pop();
   }
 
   // reset()

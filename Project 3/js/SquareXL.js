@@ -41,16 +41,16 @@ class SquareXL extends Soldier {
     let dx = this.enemyBaseX - this.x;
     let dy = this.enemyBaseY - this.y;
     let angle = atan2(dy, dx);
-    if (d >= 35) {
-      this.x += this.speed * cos(angle);
-      this.y += this.speed * sin(angle);
-    } else {
-      if (!this.dead) {
-        enemyBase.health = enemyBase.health / 2;
-        enemyBase.health = constrain(enemyBase.health, 0, enemyBase.maxHealth);
-        this.dead = true;
+      if (d >= 35) {
+        this.x += this.speed * cos(angle);
+        this.y += this.speed * sin(angle);
+      } else {
+        if (!this.dead) {
+          enemyBase.health = enemyBase.health / 2;
+          enemyBase.health = constrain(enemyBase.health, 0, enemyBase.maxHealth);
+          this.dead = true;
+        }
       }
-    }
 
     // Set velocity via noise()
     this.vx = map(noise(this.tx), 0, 1, -0.1, 0.1);

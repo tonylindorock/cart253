@@ -26,6 +26,10 @@ let timeBarLength = 0;
 let playTime = 0; // current frame count
 const RESPAWN_TIME = 5; // 5s for each respawn
 
+let runOnce = true;
+let p = 0;
+let nextUnit = -1;
+
 const RULE0 = "You must defend your base against your component.";
 const RULE1 = "To do so, you can buy 4 tatical units using your resources.";
 const RULE2 = "Use these units to protect your base and destory the enemy base!";
@@ -110,15 +114,19 @@ function draw() {
   // if playing
   if (playing){
     displayTime();
+    if (singlePlayer) {
+      computerPlays();
+      displayBase();
+      displaySoldiers();
+      moveSoldiers();
+    } else if (!singlePlayer) {
+      displayBase();
+      displaySoldiers();
+      moveSoldiers();
+    }
   }
-  if (singlePlayer && playing) {
-    displayBase();
-    displaySoldiers();
-    moveSoldiers();
-  } else if (!singlePlayer && playing) {
-    displayBase();
-    displaySoldiers();
-    moveSoldiers();
+  if (gameOver){
+
   }
 }
 
@@ -139,13 +147,29 @@ function setUpBase() {
 //
 // display the two bases
 function displayBase() {
-  baseLeft.display();
-  baseRight.display();
+  if (baseLeft.health > 0){
+    baseLeft.display();
+  }else{
+    baseLeft.displayAnimation();
+  }
+  if (baseRight.health > 0){
+    baseRight.display();
+  }else{
+    baseRight.displayAnimation();
+  }
   if (keyIsDown(70)){
     baseLeft.displayUnitsMenu();
   }
   if (keyIsDown(76) && modeId === 1){
     baseRight.displayUnitsMenu();
+  }
+  if (baseLeft.animationFinished){
+    playing = false;
+    gameOver = true;
+  }
+  if (baseRight.animationFinished){
+    playing = false;
+    gameOver = true;
   }
 }
 
@@ -315,7 +339,7 @@ function moveSoldiers() {
 function keyPressed() {
   if (playing) {
     if (keyCode === 83) {
-      if (baseLeft.resource >= 42) {
+      if (baseLeft.resource >= 42 && baseLeft.squareXL===null) {
         baseLeft.DownkeyColor = BLUE;
         let uniqueId = getUniqueId();
         let squareXL = new SquareXL(baseLeft.x, baseLeft.y, 0, mapId, 100);
@@ -337,7 +361,7 @@ function keyPressed() {
           baseLeft.resource -= square.cost;
         }
       } else if (keyCode === 65) {
-        if (baseLeft.resource >= 16) {
+        if (baseLeft.resource >= 20) {
           baseLeft.LeftkeyColor = BLUE;
           let uniqueId = getUniqueId();
           let circleShooter = new CircleShooter(baseLeft.x, baseLeft.y, 0, mapId, uniqueId);
@@ -362,7 +386,7 @@ function keyPressed() {
     }
     if (!singlePlayer) {
       if (keyCode === 40) {
-        if (baseRight.resource >= 42) {
+        if (baseRight.resource >= 42  && baseRight.squareXL===null) {
           baseRight.DownkeyColor = RED;
           let uniqueId = getUniqueId();
           let squareXL = new SquareXL(baseRight.x, baseRight.y, 1, mapId, 100);
@@ -384,7 +408,7 @@ function keyPressed() {
             baseRight.resource -= square.cost;
           }
         } else if (keyCode === 37) {
-          if (baseRight.resource >= 16) {
+          if (baseRight.resource >= 20) {
             baseRight.LeftkeyColor = RED;
             let uniqueId = getUniqueId();
             let circleShooter = new CircleShooter(baseRight.x, baseRight.y, 1, mapId, uniqueId);
@@ -445,10 +469,12 @@ function displayTime(){
     time += 0.0167;
     if (time >= 10){
       time = 0;
-      respawnUnits();
+      if (baseLeft.health > 0 || baseRight.health > 0){
+        respawnUnits();
+      }
     }
   }
-  timeBarLength = map(time,0,10,25,250);
+  timeBarLength = map(time,0,10,0,250);
   push();
   fill(255);
   textAlign(CENTER,CENTER);
@@ -457,21 +483,21 @@ function displayTime(){
   if (mapId!=3){
     text("T",width/2-125, 25);
     fill(GOLD);
-    rect(width/2-125,50,timeBarLength,25,32);
+    rect(width/2-125,50,timeBarLength,25);
     text("RESPAWN",width/2+125, 25);
     stroke(255);
     strokeWeight(4);
     fill(255,0);
-    rect(width/2-125, 50, 250, 25,32);
+    rect(width/2-125, 50, 250, 25);
   }else{
     text("T",width-375, 25);
     fill(GOLD);
-    rect(width-375, 50, timeBarLength, 25,32);
+    rect(width-375, 50, timeBarLength, 25);
     text("RESPAWN",width-125, 25);
     stroke(255);
     strokeWeight(4);
     fill(255,0);
-    rect(width-375, 50, 250, 25,32);
+    rect(width-375, 50, 250, 25);
   }
   pop();
 }
@@ -512,6 +538,125 @@ function respawnUnits(){
     let circleDemo = new CircleDemo(baseRight.x, baseRight.y, 1, mapId, uniqueId);
     baseRight.circleDemos.push(circleDemo);
     baseRight.capacity++;
+  }
+}
+
+// computerPlays()
+//
+// This is the way how computer plays the game
+// The behaviour is completely random
+// Sometimes it can be hard to beat, sometimes it can be very dumb
+function computerPlays(){
+  if (runOnce){
+    p = int(random(0,5));
+    runOnce = false;
+  }
+  if (p === 4){
+    if (baseRight.squaresNum < 2 || baseRight.circleDemosNum < 2){
+      while(p===4){
+        p = int(random(0,4));
+      }
+    }
+    nextUnit = p;
+  }
+  if (p === 3 && nextUnit < 0){
+    if (baseRight.resource > 32){
+      nextUnit = p;
+    }else{
+      while(p===3){
+        p = int(random(0,4));
+      }
+      nextUnit = p;
+    }
+  }
+  if (p===2  && nextUnit < 0){
+    if (baseRight.circleDemosNum <= baseLeft.circleDemosNum){
+      nextUnit = p;
+    }else{
+      nextUnit = 0;
+    }
+  }
+  if (p===1  && nextUnit < 0){
+    if (baseRight.resource >= 15 && baseRight.circleShootersNum <= baseLeft.circleShootersNum){
+      nextUnit = p;
+    }else{
+      p = int(random(0,4));
+      if (p===3 && baseRight.resource < 32){
+        while(p===3){
+          p = int(random(0,4));
+        }
+      }
+        nextUnit = p;
+      }
+    }
+  if (p===0  && nextUnit < 0){
+    if (baseRight.squaresNum <= baseLeft.circleDemosNum){
+      nextUnit = p;
+    }else{
+      p = int(random(0,4));
+      if (p===3 && baseRight.resource < 32){
+        while(p===3){
+          p = int(random(0,4));
+        }
+      }
+      nextUnit = p;
+    }
+  }
+  if (nextUnit === 0){
+    if (baseRight.resource >= 16) {
+      baseRight.UpkeyColor = RED;
+      let uniqueId = getUniqueId();
+      let square = new Square(baseRight.x, baseRight.y, 1, mapId, uniqueId);
+      baseRight.squares.push(square);
+      console.log("RED player spawned a square (id: " + uniqueId + ")");
+      baseRight.capacity++;
+      baseRight.squaresNum++;
+      baseRight.resource -= square.cost;
+      nextUnit = -1;
+      runOnce = true;
+    }
+  }else if(nextUnit === 1){
+    if (baseRight.resource >= 20) {
+      baseRight.LeftkeyColor = RED;
+      let uniqueId = getUniqueId();
+      let circleShooter = new CircleShooter(baseRight.x, baseRight.y, 1, mapId, uniqueId);
+      baseRight.circleShooters.push(circleShooter);
+      console.log("RED player spawned a circle shooter (id: " + uniqueId + ")");
+      baseRight.capacity++;
+      baseRight.circleShootersNum++;
+      baseRight.resource -= circleShooter.cost;
+      nextUnit = -1;
+      runOnce = true;
+    }
+  }else if(nextUnit === 2){
+    if (baseRight.resource >= 16) {
+      baseRight.RightkeyColor = RED;
+      let uniqueId = getUniqueId();
+      let circleDemo = new CircleDemo(baseRight.x, baseRight.y, 1, mapId, uniqueId);
+      baseRight.circleDemos.push(circleDemo);
+      console.log("RED player spawned a circle demo (id: " + uniqueId + ")");
+      baseRight.capacity++;
+      baseRight.circleDemosNum++;
+      baseRight.resource -= circleDemo.cost;
+      nextUnit = -1;
+      runOnce = true;
+    }
+  }else if(nextUnit === 3){
+    if (baseRight.resource >= 42  && baseRight.squareXL===null) {
+      baseRight.DownkeyColor = RED;
+      let uniqueId = getUniqueId();
+      let squareXL = new SquareXL(baseRight.x, baseRight.y, 1, mapId, 100);
+      baseRight.squareXL = squareXL;
+      console.log("RED player spawned a square XL (id: 100)");
+      baseRight.resource -= squareXL.cost;
+      nextUnit = -1;
+      runOnce = true;
+    }
+  }else if(nextUnit === 4){
+    if (baseRight.resource >= 30){
+      nextUnit = -1;
+      runOnce = true;
+    }
   }
 }
 

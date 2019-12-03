@@ -42,25 +42,14 @@ class CircleDemo extends Soldier {
     let dx = this.enemyBaseX - this.x;
     let dy = this.enemyBaseY - this.y;
     let angle = atan2(dy, dx);
-    if (d >= 35) {
-      this.x += this.speed * cos(angle);
-      this.y += this.speed * sin(angle);
-    } else {
-      enemyBase.health -= this.damage;
-      enemyBase.health = constrain(enemyBase.health, 0, enemyBase.maxHealth);
-      this.dead = true;
-    }
-    /*
-    // Set velocity via noise()
-    this.vx = map(noise(this.tx), 0, 1, -0.1, 0.1);
-    this.vy = map(noise(this.ty), 0, 1, -0.1, 0.1);
-    // Update position
-    this.x += this.vx;
-    this.y += this.vy;
-    // Update time properties
-    this.tx += 0.0001;
-    this.ty += 0.0001; */
-
+      if (d >= 35) {
+        this.x += this.speed * cos(angle);
+        this.y += this.speed * sin(angle);
+      } else {
+        enemyBase.health -= this.damage;
+        enemyBase.health = constrain(enemyBase.health, 0, enemyBase.maxHealth);
+        this.dead = true;
+      }
     this.handleWrapping();
   }
 
@@ -118,27 +107,30 @@ class CircleDemo extends Soldier {
   // display the circleDemo
   // play an animation when explodes
   display() {
-    push();
-    rectMode(CENTER);
-    ellipseMode(CENTER);
-    angleMode(DEGREES);
-    stroke(255);
-    strokeWeight(2);
-    fill(this.color);
-    if (this.dead) {
-      fill(255);
-      ellipse(this.x, this.y, this.innerSize);
-      fill(255, 0);
-      this.size += 3;
-      this.innerSize -= 1;
-      this.innerSize = constrain(this.innerSize, 0, 30);
-      this.speed = 0;
-      if (this.innerSize <= 0) {
-        this.animationFinished = true;
+    if (this.show){
+      push();
+      rectMode(CENTER);
+      ellipseMode(CENTER);
+      angleMode(DEGREES);
+      stroke(255);
+      strokeWeight(2);
+      fill(this.color);
+      if (this.dead) {
+        fill(255);
+        ellipse(this.x, this.y, this.innerSize);
+        fill(255, 0);
+        this.size += 3;
+        this.innerSize -= 1;
+        this.innerSize = constrain(this.innerSize, 0, 30);
+        this.speed = 0;
+        if (this.innerSize <= 0) {
+          this.animationFinished = true;
+          this.show = false;
+        }
       }
+      ellipse(this.x, this.y, this.size);
+      pop();
     }
-    ellipse(this.x, this.y, this.size);
-    pop();
   }
 
   // reset()
