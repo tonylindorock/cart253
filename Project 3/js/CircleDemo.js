@@ -11,10 +11,10 @@ class CircleDemo extends Soldier {
     super(x, y, playerId, mapId, uniqueId);
     this.innerSize = this.size;
     // health
-    this.maxHealth = 30;
+    this.maxHealth = 40;
     this.health = this.maxHealth;
     // cost
-    this.cost = 16;
+    this.cost = 20;
     // speed
     this.originalSpeed = 2;
     this.speed = this.originalSpeed + random(-0.5, 0.5);
@@ -23,7 +23,7 @@ class CircleDemo extends Soldier {
     this.tx = random(0, 1000); // To make x and y noise different
     this.ty = random(0, 1000); // we use random starting values
     // damage
-    this.damage = 45;
+    this.damage = 50;
 
     this.obtainedTarget = false;
     this.targeted = 0; // how many enemies are after it
@@ -42,6 +42,7 @@ class CircleDemo extends Soldier {
     let dx = this.enemyBaseX - this.x;
     let dy = this.enemyBaseY - this.y;
     let angle = atan2(dy, dx);
+    if (enemyBase.health>0){
       if (d >= 35) {
         this.x += this.speed * cos(angle);
         this.y += this.speed * sin(angle);
@@ -50,6 +51,7 @@ class CircleDemo extends Soldier {
         enemyBase.health = constrain(enemyBase.health, 0, enemyBase.maxHealth);
         this.dead = true;
       }
+    }
     this.handleWrapping();
   }
 

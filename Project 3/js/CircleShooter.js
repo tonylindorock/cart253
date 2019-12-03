@@ -8,10 +8,10 @@ class CircleShooter extends Soldier {
   constructor(x, y, playerId, mapId, uniqueId) {
     super(x, y, playerId, mapId, uniqueId);
     // health
-    this.maxHealth = 20;
+    this.maxHealth = 30;
     this.health = this.maxHealth;
     // cost
-    this.cost = 20;
+    this.cost = 28;
     // speed
     this.originalSpeed = 1;
     this.speed = this.originalSpeed + random(-0.5, 0.5);
@@ -38,6 +38,7 @@ class CircleShooter extends Soldier {
     let dx = this.enemyBaseX - this.x;
     let dy = this.enemyBaseY - this.y;
     let angle = atan2(dy, dx);
+    if (enemyBase.health>0){
       if (d >= 100) {
         this.x += this.speed * cos(angle);
         this.y += this.speed * sin(angle);
@@ -53,6 +54,7 @@ class CircleShooter extends Soldier {
           this.bullet = null;
         }
       }
+    }
     this.handleWrapping();
   }
 

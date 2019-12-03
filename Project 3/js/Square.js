@@ -9,7 +9,7 @@ class Square extends Soldier {
   constructor(x, y, playerId, mapId, uniqueId) {
     super(x, y, playerId, mapId, uniqueId);
     // health
-    this.maxHealth = 40;
+    this.maxHealth = 50;
     this.health = this.maxHealth;
     // speed
     this.speed += random(-0.5, 0.5);
@@ -18,7 +18,7 @@ class Square extends Soldier {
     this.tx = random(0, 1000); // To make x and y noise different
     this.ty = random(0, 1000); // we use random starting values
     // damage
-    this.damage = 0.2;
+    this.damage = 0.3;
 
     this.obtainedTarget = false;
     this.targeted = 0; // how many enemies are after it
@@ -42,13 +42,15 @@ class Square extends Soldier {
     let dx = this.enemyBaseX - this.x;
     let dy = this.enemyBaseY - this.y;
     let angle = atan2(dy, dx);
-    if (d >= 35) {
-        this.x += this.speed * cos(angle);
-        this.y += this.speed * sin(angle);
-    } else {
-        this.rotationSpeed = 10;
-        enemyBase.health -= this.damage;
-        enemyBase.health = constrain(enemyBase.health, 0, enemyBase.maxHealth);
+    if (enemyBase.health>0){
+      if (d >= 35) {
+          this.x += this.speed * cos(angle);
+          this.y += this.speed * sin(angle);
+      } else {
+          this.rotationSpeed = 10;
+          enemyBase.health -= this.damage;
+          enemyBase.health = constrain(enemyBase.health, 0, enemyBase.maxHealth);
+      }
     }
     this.handleWrapping();
   }

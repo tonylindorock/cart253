@@ -22,6 +22,7 @@ let gameOver = false; // if game is over
 let singlePlayer = true; // if sinlge player
 
 let time = 0;
+let min = 0;
 let timeBarLength = 0;
 let playTime = 0; // current frame count
 const RESPAWN_TIME = 5; // 5s for each respawn
@@ -361,7 +362,7 @@ function keyPressed() {
           baseLeft.resource -= square.cost;
         }
       } else if (keyCode === 65) {
-        if (baseLeft.resource >= 20) {
+        if (baseLeft.resource >= 28) {
           baseLeft.LeftkeyColor = BLUE;
           let uniqueId = getUniqueId();
           let circleShooter = new CircleShooter(baseLeft.x, baseLeft.y, 0, mapId, uniqueId);
@@ -372,7 +373,7 @@ function keyPressed() {
           baseLeft.resource -= circleShooter.cost;
         }
       } else if (keyCode === 68) {
-        if (baseLeft.resource >= 16) {
+        if (baseLeft.resource >= 20) {
           baseLeft.RightkeyColor = BLUE;
           let uniqueId = getUniqueId();
           let circleDemo = new CircleDemo(baseLeft.x, baseLeft.y, 0, mapId, uniqueId);
@@ -408,7 +409,7 @@ function keyPressed() {
             baseRight.resource -= square.cost;
           }
         } else if (keyCode === 37) {
-          if (baseRight.resource >= 20) {
+          if (baseRight.resource >= 28) {
             baseRight.LeftkeyColor = RED;
             let uniqueId = getUniqueId();
             let circleShooter = new CircleShooter(baseRight.x, baseRight.y, 1, mapId, uniqueId);
@@ -419,7 +420,7 @@ function keyPressed() {
             baseRight.resource -= circleShooter.cost;
           }
         } else if (keyCode === 39) {
-          if (baseRight.resource >= 16) {
+          if (baseRight.resource >= 20) {
             baseRight.RightkeyColor = RED;
             let uniqueId = getUniqueId();
             let circleDemo = new CircleDemo(baseRight.x, baseRight.y, 1, mapId, uniqueId);
@@ -469,10 +470,13 @@ function displayTime(){
     time += 0.0167;
     if (time >= 10){
       time = 0;
-      if (baseLeft.health > 0 || baseRight.health > 0){
+      if (baseLeft.health > 0 && baseRight.health > 0){
         respawnUnits();
       }
     }
+  }
+  if (playTime % 360 === 0 && playTime!=0){
+    min += 1;
   }
   timeBarLength = map(time,0,10,0,250);
   push();
@@ -485,6 +489,7 @@ function displayTime(){
     fill(GOLD);
     rect(width/2-125,50,timeBarLength,25);
     text("RESPAWN",width/2+125, 25);
+    textSize(24);
     stroke(255);
     strokeWeight(4);
     fill(255,0);
@@ -553,53 +558,62 @@ function computerPlays(){
   }
   if (p === 4){
     if (baseRight.squaresNum < 2 || baseRight.circleDemosNum < 2){
-      while(p===4){
+      while(p === 4){
         p = int(random(0,4));
       }
     }
     nextUnit = p;
+    console.log("Computer's next unit is "+nextUnit);
   }
-  if (p === 3 && nextUnit < 0){
+  if (p === 3 && nextUnit < 0 && (baseRight.squaresNum < 2 || baseRight.circleDemosNum < 2)){
     if (baseRight.resource > 32){
       nextUnit = p;
+      console.log("Computer's next unit is "+nextUnit);
     }else{
-      while(p===3){
+      while(p === 3){
         p = int(random(0,4));
       }
       nextUnit = p;
+      console.log("Computer's next unit is "+nextUnit);
     }
   }
   if (p===2  && nextUnit < 0){
     if (baseRight.circleDemosNum <= baseLeft.circleDemosNum){
       nextUnit = p;
+      console.log("Computer's next unit is "+nextUnit);
     }else{
       nextUnit = 0;
+      console.log("Computer's next unit is "+nextUnit);
     }
   }
   if (p===1  && nextUnit < 0){
     if (baseRight.resource >= 15 && baseRight.circleShootersNum <= baseLeft.circleShootersNum){
       nextUnit = p;
+      console.log("Computer's next unit is "+nextUnit);
     }else{
       p = int(random(0,4));
-      if (p===3 && baseRight.resource < 32){
-        while(p===3){
+      if (p === 3 && baseRight.resource < 32){
+        while(p === 3){
           p = int(random(0,4));
         }
       }
         nextUnit = p;
+        console.log("Computer's next unit is "+nextUnit);
       }
     }
   if (p===0  && nextUnit < 0){
     if (baseRight.squaresNum <= baseLeft.circleDemosNum){
       nextUnit = p;
+      console.log("Computer's next unit is "+nextUnit);
     }else{
       p = int(random(0,4));
-      if (p===3 && baseRight.resource < 32){
-        while(p===3){
+      if (p === 3 && baseRight.resource < 32){
+        while(p === 3){
           p = int(random(0,4));
         }
       }
       nextUnit = p;
+      console.log("Computer's next unit is "+nextUnit);
     }
   }
   if (nextUnit === 0){
@@ -616,7 +630,7 @@ function computerPlays(){
       runOnce = true;
     }
   }else if(nextUnit === 1){
-    if (baseRight.resource >= 20) {
+    if (baseRight.resource >= 28) {
       baseRight.LeftkeyColor = RED;
       let uniqueId = getUniqueId();
       let circleShooter = new CircleShooter(baseRight.x, baseRight.y, 1, mapId, uniqueId);
@@ -629,7 +643,7 @@ function computerPlays(){
       runOnce = true;
     }
   }else if(nextUnit === 2){
-    if (baseRight.resource >= 16) {
+    if (baseRight.resource >= 20) {
       baseRight.RightkeyColor = RED;
       let uniqueId = getUniqueId();
       let circleDemo = new CircleDemo(baseRight.x, baseRight.y, 1, mapId, uniqueId);
@@ -653,7 +667,20 @@ function computerPlays(){
       runOnce = true;
     }
   }else if(nextUnit === 4){
-    if (baseRight.resource >= 30){
+    if (baseRight.resource >= 32){
+      nextUnit = -1;
+      runOnce = true;
+    }
+  }else{
+    if (baseRight.resource >= 16) {
+      baseRight.UpkeyColor = RED;
+      let uniqueId = getUniqueId();
+      let square = new Square(baseRight.x, baseRight.y, 1, mapId, uniqueId);
+      baseRight.squares.push(square);
+      console.log("RED player spawned a square (id: " + uniqueId + ")");
+      baseRight.capacity++;
+      baseRight.squaresNum++;
+      baseRight.resource -= square.cost;
       nextUnit = -1;
       runOnce = true;
     }
