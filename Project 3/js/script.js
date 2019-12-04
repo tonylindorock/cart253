@@ -20,9 +20,12 @@ let modeId = -1; // record the id for mode
 let playing = false; // if playing
 let gameOver = false; // if game is over
 let singlePlayer = true; // if sinlge player
+let winner = -1;
 
 let time = 0;
+let time2 = 0;
 let min = 0;
+let sec = 0;
 let timeBarLength = 0;
 let playTime = 0; // current frame count
 const RESPAWN_TIME = 5; // 5s for each respawn
@@ -31,11 +34,11 @@ let runOnce = true;
 let p = 0;
 let nextUnit = -1;
 
+const ASSESS = ["M E D I O C R E","O P T I M A L","F L A W L E S S"];
+
 const RULE0 = "You must defend your base against your component.";
 const RULE1 = "To do so, you can buy 4 tatical units using your resources.";
 const RULE2 = "Use these units to protect your base and destory the enemy base!";
-
-let uniqueIds = [];
 
 // r g b values for background color
 let r;
@@ -100,17 +103,19 @@ function draw() {
   background(r, g, b);
 
   // different states displaying different menus
-  if (State === "starting") {
-    displayMainMenu();
-  }
-  if (State === "help") {
-    displayHelp();
-  }
-  if (State === "selectingMaps") {
-    displayMapMenu();
-  }
-  if (State === "selectingMode") {
-    displayModeMenu();
+  if (!gameOver){
+    if (State === "starting") {
+      displayMainMenu();
+    }
+    if (State === "help") {
+      displayHelp();
+    }
+    if (State === "selectingMaps") {
+      displayMapMenu();
+    }
+    if (State === "selectingMode") {
+      displayModeMenu();
+    }
   }
   // if playing
   if (playing){
@@ -127,7 +132,7 @@ function draw() {
     }
   }
   if (gameOver){
-
+    displayGameOver()
   }
 }
 
@@ -152,11 +157,13 @@ function displayBase() {
     baseLeft.display();
   }else{
     baseLeft.displayAnimation();
+    winner = 1;
   }
   if (baseRight.health > 0){
     baseRight.display();
   }else{
     baseRight.displayAnimation();
+    winner = 0;
   }
   if (keyIsDown(70)){
     baseLeft.displayUnitsMenu();
@@ -167,10 +174,14 @@ function displayBase() {
   if (baseLeft.animationFinished){
     playing = false;
     gameOver = true;
+    sec = int((frameCount / 60) % 60);
+    min = int((frameCount / 60) / 60);
   }
   if (baseRight.animationFinished){
     playing = false;
     gameOver = true;
+    sec = int((frameCount / 60) % 60);
+    min = int((frameCount / 60) / 60);
   }
 }
 
@@ -468,17 +479,18 @@ function displayTime(){
   playTime = frameCount;
   if (playTime % 1 === 0 && playTime!=0){
     time += 0.0167;
-    if (time >= 10){
+    if (time >= RESPAWN_TIME){
       time = 0;
+      time2 ++;
       if (baseLeft.health > 0 && baseRight.health > 0){
-        respawnUnits();
+        respawnUnits(time2);
+      }
+      if (time2 >= 2){
+        time2 = 0;
       }
     }
   }
-  if (playTime % 360 === 0 && playTime!=0){
-    min += 1;
-  }
-  timeBarLength = map(time,0,10,0,250);
+  timeBarLength = map(time,0,RESPAWN_TIME,0,250);
   push();
   fill(255);
   textAlign(CENTER,CENTER);
@@ -507,42 +519,46 @@ function displayTime(){
   pop();
 }
 
-function respawnUnits(){
-  for (let i = 0; i < baseLeft.squaresNum; i++) {
-    let uniqueId = getUniqueId();
-    let square = new Square(baseLeft.x, baseLeft.y, 0, mapId, uniqueId);
-    baseLeft.squares.push(square);
-    baseLeft.capacity++;
+function respawnUnits(time){
+  if (time === 1 || time === 2){
+    for (let i = 0; i < baseLeft.squaresNum; i++) {
+      let uniqueId = getUniqueId();
+      let square = new Square(baseLeft.x, baseLeft.y, 0, mapId, uniqueId);
+      baseLeft.squares.push(square);
+      baseLeft.capacity++;
+    }
+    for (let i = 0; i < baseRight.squaresNum; i++) {
+      let uniqueId = getUniqueId();
+      let square = new Square(baseRight.x, baseRight.y, 1, mapId, uniqueId);
+      baseRight.squares.push(square);
+      baseRight.capacity++;
+    }
   }
-  for (let i = 0; i < baseLeft.circleShootersNum; i++) {
-    let uniqueId = getUniqueId();
-    let circleShooter = new CircleShooter(baseLeft.x, baseLeft.y, 0, mapId, uniqueId);
-    baseLeft.circleShooters.push(circleShooter);
-    baseLeft.capacity++;
-  }
-  for (let i = 0; i < baseLeft.circleDemosNum; i++) {
-    let uniqueId = getUniqueId();
-    let circleDemo = new CircleDemo(baseLeft.x, baseLeft.y, 0, mapId, uniqueId);
-    baseLeft.circleDemos.push(circleDemo);
-    baseLeft.capacity++;
-  }
-  for (let i = 0; i < baseRight.squaresNum; i++) {
-    let uniqueId = getUniqueId();
-    let square = new Square(baseRight.x, baseRight.y, 1, mapId, uniqueId);
-    baseRight.squares.push(square);
-    baseRight.capacity++;
-  }
-  for (let i = 0; i < baseRight.circleShootersNum; i++) {
-    let uniqueId = getUniqueId();
-    let circleShooter = new CircleShooter(baseRight.x, baseRight.y, 1, mapId, uniqueId);
-    baseRight.circleShooters.push(circleShooter);
-    baseRight.capacity++;
-  }
-  for (let i = 0; i < baseRight.circleDemosNum; i++) {
-    let uniqueId = getUniqueId();
-    let circleDemo = new CircleDemo(baseRight.x, baseRight.y, 1, mapId, uniqueId);
-    baseRight.circleDemos.push(circleDemo);
-    baseRight.capacity++;
+  if (time === 2){
+    for (let i = 0; i < baseLeft.circleShootersNum; i++) {
+      let uniqueId = getUniqueId();
+      let circleShooter = new CircleShooter(baseLeft.x, baseLeft.y, 0, mapId, uniqueId);
+      baseLeft.circleShooters.push(circleShooter);
+      baseLeft.capacity++;
+    }
+    for (let i = 0; i < baseLeft.circleDemosNum; i++) {
+      let uniqueId = getUniqueId();
+      let circleDemo = new CircleDemo(baseLeft.x, baseLeft.y, 0, mapId, uniqueId);
+      baseLeft.circleDemos.push(circleDemo);
+      baseLeft.capacity++;
+    }
+    for (let i = 0; i < baseRight.circleShootersNum; i++) {
+      let uniqueId = getUniqueId();
+      let circleShooter = new CircleShooter(baseRight.x, baseRight.y, 1, mapId, uniqueId);
+      baseRight.circleShooters.push(circleShooter);
+      baseRight.capacity++;
+    }
+    for (let i = 0; i < baseRight.circleDemosNum; i++) {
+      let uniqueId = getUniqueId();
+      let circleDemo = new CircleDemo(baseRight.x, baseRight.y, 1, mapId, uniqueId);
+      baseRight.circleDemos.push(circleDemo);
+      baseRight.capacity++;
+    }
   }
 }
 
@@ -558,10 +574,11 @@ function computerPlays(){
   }
   if (p === 4){
     if (baseRight.squaresNum < 2 || baseRight.circleDemosNum < 2){
-      while(p === 4){
         p = int(random(0,4));
+        if (p===3){
+          p = int(random(0,3));
+        }
       }
-    }
     nextUnit = p;
     console.log("Computer's next unit is "+nextUnit);
   }
@@ -1034,5 +1051,75 @@ function checkModeMenuButton() {
   textSize(32);
   text("SINGLE", width / 2 - 125, height / 2);
   text("MULTI", width / 2 + 125, height / 2);
+  pop();
+}
+
+function displayGameOver(){
+  push();
+  fill(255);
+  textAlign(CENTER, CENTER);
+  imageMode(CENTER);
+  rectMode(CENTER);
+  textSize(64);
+  if (winner === 0){
+    fill(BLUE);
+    text("B L U E  W O N", width / 2, height / 2 - 100);
+  }else if (winner === 1){
+    fill(RED);
+    text("R E D  W O N", width / 2, height / 2 - 100);
+  }
+  fill(GOLD);
+  textSize(32);
+  if (min <= 9){
+    text("T I M E  C O N S U M E D\n0"+min+" : "+sec, width / 2, height / 2+50);
+  }else{
+    text("T I M E  C O N S U M E D\n"+min+" : "+sec, width / 2, height / 2+50);
+  }
+  fill(255);
+  textSize(16);
+  if (modeId === 1 || (winner === 0 && modeId === 0)){
+    if (min >=6){
+      text("A S S E S S M E N T :  "+ASSESS[0], width / 2, height / 2+200);
+    }else if (min >= 3 && min < 6){
+      text("A S S E S S M E N T :  "+ASSESS[1], width / 2, height / 2+200);
+    }else if (min < 3){
+      text("A S S E S S M E N T :  "+ASSESS[2], width / 2, height / 2+200);
+    }
+  }else{
+    text("A S S E S S M E N T :  F A I L E D", width / 2, height / 2+200);
+  }
+  pop();
+
+  checkGameOverButton();
+}
+
+function checkGameOverButton(){
+  push();
+  textAlign(CENTER, CENTER);
+  // restart button
+  rectMode(CORNER);
+  textSize(32);
+  // if hovering
+  if (mouseY < 75) {
+    fill(SELECTED);
+    rect(0, 0, width, 75);
+    fill(255);
+    text("B A C K  T O  M A I N  M E N U", width / 2, 35);
+    // if pressed, go to first state
+    if (mouseIsPressed) {
+      State = "starting";
+      gameOver = false;
+      mapId = -1;
+      modeId = -1;
+      selectedMap = false;
+      selectedMode = false;
+    }
+    // if not hovering
+  } else {
+    fill(50, 150);
+    rect(0, 0, width, 75);
+    fill(255);
+    text("B A C K  T O  M A I N  M E N U", width / 2, 35);
+  }
   pop();
 }
