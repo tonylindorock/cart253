@@ -11,7 +11,7 @@ class CircleDemo extends Soldier {
     super(x, y, playerId, mapId, uniqueId);
     this.innerSize = this.size;
     // health
-    this.maxHealth = 40;
+    this.maxHealth = 35;
     this.health = this.maxHealth;
     // cost
     this.cost = 20;
@@ -23,7 +23,7 @@ class CircleDemo extends Soldier {
     this.tx = random(0, 1000); // To make x and y noise different
     this.ty = random(0, 1000); // we use random starting values
     // damage
-    this.damage = 50;
+    this.damage = 40;
 
     this.obtainedTarget = false;
     this.targeted = 0; // how many enemies are after it

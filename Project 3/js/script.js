@@ -66,14 +66,23 @@ let MapHorizontal;
 let MapVertical;
 let MapDiagonal1;
 let MapDiagonal2;
-let PicHelp;
+let HelpPic0;
+let HelpPic1;
+let HelpPic2;
+let HelpPic3;
+let HelpPic4;
+let HelpPics;
 
 function preload() {
   MapHorizontal = loadImage("assets/images/Horizontal.jpg");
   MapVertical = loadImage("assets/images/Vertical.jpg");
   MapDiagonal1 = loadImage("assets/images/Diagonal 1.jpg");
   MapDiagonal2 = loadImage("assets/images/Diagonal 2.jpg");
-  HelpPic = loadImage("assets/images/SD Help.png");
+  HelpPic0 = loadImage("assets/images/WelcomePic.png");
+  HelpPic1 = loadImage("assets/images/ControlsPic.png");
+  HelpPic2 = loadImage("assets/images/UnitsPic.png");
+  HelpPic3 = loadImage("assets/images/ResourcePic.png");
+  HelpPic4 = loadImage("assets/images/TimePic.png");
 }
 
 // setUp()
@@ -86,6 +95,8 @@ function setup() {
   textFont("Verdana");
   textStyle(BOLD);
   noStroke();
+
+  HelpPics = [HelpPic0,HelpPic1,HelpPic2,HelpPic3,HelpPic4];
 }
 
 // randomizeBG()
@@ -881,8 +892,8 @@ function displayHelp(page){
     ellipse(width / 2 + 60, 55,16);
     fill(255);
     text("T I M E",width / 2, 90);
-
   }
+  image(HelpPics[page],width/2,height/2,640,360);
   pop();
 
   checkHelpButton();
@@ -1193,14 +1204,14 @@ function displayGameOver(){
   textSize(16);
   if (modeId === 1 || (winner === 0 && modeId === 0)){
     if (min >=6){
-      text("A S S E S S M E N T :  "+ASSESS[0], width / 2, height / 2+200);
+      text("A S S E S S M E N T :   "+ASSESS[0], width / 2, height / 2+200);
     }else if (min >= 3 && min < 6){
-      text("A S S E S S M E N T :  "+ASSESS[1], width / 2, height / 2+200);
+      text("A S S E S S M E N T :   "+ASSESS[1], width / 2, height / 2+200);
     }else if (min < 3){
-      text("A S S E S S M E N T :  "+ASSESS[2], width / 2, height / 2+200);
+      text("A S S E S S M E N T :   "+ASSESS[2], width / 2, height / 2+200);
     }
   }else{
-    text("A S S E S S M E N T :  F A I L U R E  I S  N O T  A N  O P T I O N", width / 2, height / 2+200);
+    text("A S S E S S M E N T :   F A I L U R E   I S   N O T   A N   O P T I O N", width / 2, height / 2+200);
   }
   pop();
 

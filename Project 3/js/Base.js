@@ -147,7 +147,7 @@ class Base {
     text("square", this.x, this.y - 95);
     text("shooter", this.x - 50, this.y - 45);
     text("demo", this.x + 50, this.y - 45);
-    text("square XL", this.x+50, this.y + 80);
+    text("tank", this.x, this.y+95);
     // square
     stroke(255);
     strokeWeight(2);
