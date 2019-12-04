@@ -9,7 +9,7 @@ class Square extends Soldier {
   constructor(x, y, playerId, mapId, uniqueId) {
     super(x, y, playerId, mapId, uniqueId);
     // health
-    this.maxHealth = 50;
+    this.maxHealth = 40;
     this.health = this.maxHealth;
     // speed
     this.speed += random(-0.5, 0.5);
@@ -86,9 +86,13 @@ class Square extends Soldier {
         this.attacking = false;
       }
       if (enemy.dead) {
+        if (enemy.uniqueId === 100 && enemy.uniqueId === this.targetId && d < 100){
+          this.health -= enemy.damage;
+        }
         this.targetId = -1;
         this.obtainedTarget = false;
         this.rotationSpeed = this.originalRotationSpeed;
+
       }
       if (this.dead && !enemy.dead && this.obtainedTarget) {
         if (enemy.targetId === this.uniqueId) {

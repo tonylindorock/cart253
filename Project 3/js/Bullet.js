@@ -20,7 +20,7 @@ class Bullet extends CircleShooter {
     this.size = 10;
     this.innerSize = this.size;
 
-    this.speed = 8;
+    this.speed = 10;
     this.damage = 7;
     this.hit = false; // whether it's hit or miss
 
@@ -86,7 +86,7 @@ class Bullet extends CircleShooter {
         this.innerSize -= 1;
         if (this.size >= 20 && this.uniqueId != -1) {
           this.displayBullet = false;
-          this.speed = 5;
+          this.speed = 10;
         }else if (this.size >= 30){
           this.displayBullet = false;
           this.speed = 10;

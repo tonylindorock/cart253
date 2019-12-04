@@ -98,6 +98,9 @@ class CircleShooter extends Soldier {
         }
       }
       if (enemy.dead) {
+        if (enemy.uniqueId === 100 && enemy.uniqueId === this.targetId && d < 100){
+          this.health -= enemy.damage;
+        }
         this.targetId = -1;
         this.obtainedTarget = false;
         this.attacking = false;

@@ -201,6 +201,21 @@ class Base {
     if (this.size <= 0){
       this.animationFinished = true;
     }
+    noStroke();
+    // map the health into window height
+    this.barHeight = map(this.health, 0, this.maxHealth, 0, height);
+    strokeWeight(2);
+    if (this.playerId === 0) {
+      fill(50);
+      rect(5, height / 2, 10, height);
+      fill(this.color);
+      rect(5, height / 2, 10, this.barHeight);
+    }else if (this.playerId === 1){
+      fill(50);
+      rect(width - 5, height / 2, 10, height);
+      fill(this.color);
+      rect(width - 5, height / 2, 10, this.barHeight);
+    }
     pop();
   }
 
@@ -305,6 +320,7 @@ class Base {
       rect(width - 5, height / 2, 10, height);
       fill(this.color);
       rect(width - 5, height / 2, 10, this.barHeight);
+
       textAlign(RIGHT, CENTER);
       textSize(32);
       fill(255, 150);

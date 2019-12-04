@@ -26,6 +26,8 @@ class SquareXL extends Soldier {
     this.ty = random(0, 1000); // we use random starting values
 
     this.targeted = 0; // how many enemies are after it
+
+    this.damage = 100;
     // rotation properties for animation
     this.rotation = 0;
     this.originalRotationSpeed = 1;
@@ -47,7 +49,7 @@ class SquareXL extends Soldier {
         this.y += this.speed * sin(angle);
       } else {
         if (!this.dead) {
-          enemyBase.health = enemyBase.health / 2;
+          enemyBase.health -= this.damage;
           enemyBase.health = constrain(enemyBase.health, 0, enemyBase.maxHealth);
           this.dead = true;
         }

@@ -13,6 +13,7 @@ the more expensive it will be.
 ******************/
 
 let State = "starting"; // game state
+let subPage = 0;
 let selectedMap = false; // if a map is selected
 let selectedMode = false; // if a mode is selected
 let mapId = -1; // record the id for map
@@ -32,7 +33,7 @@ const RESPAWN_TIME = 5; // 5s for each respawn
 
 let runOnce = true;
 let p = 0;
-let nextUnit = -1;
+let nextUnit = 0;
 
 const ASSESS = ["M E D I O C R E","O P T I M A L","F L A W L E S S"];
 
@@ -108,7 +109,7 @@ function draw() {
       displayMainMenu();
     }
     if (State === "help") {
-      displayHelp();
+      displayHelp(subPage);
     }
     if (State === "selectingMaps") {
       displayMapMenu();
@@ -349,6 +350,18 @@ function moveSoldiers() {
 //
 // read the inputs to spawn the specified unit
 function keyPressed() {
+  if (State === "help"){
+    if (keyCode === 39 || keyCode === 40){
+      subPage ++;
+    }else if (keyCode === 37 || keyCode === 38){
+      subPage --;
+    }
+    if (subPage >= 5){
+      subPage = 0;
+    }else if (subPage < 0){
+      subPage = 4;
+    }
+  }
   if (playing) {
     if (keyCode === 83) {
       if (baseLeft.resource >= 42 && baseLeft.squareXL===null) {
@@ -495,6 +508,7 @@ function displayTime(){
   fill(255);
   textAlign(CENTER,CENTER);
   rectMode(LEFT);
+  ellipseMode(CENTER);
   textSize(16);
   if (mapId!=3){
     text("T",width/2-125, 25);
@@ -506,6 +520,13 @@ function displayTime(){
     strokeWeight(4);
     fill(255,0);
     rect(width/2-125, 50, 250, 25);
+    if(time2 === 0){
+      fill(255,0);
+      ellipse(width/2+150,62.5,15);
+    }else{
+      fill(255);
+      ellipse(width/2+150,62.5,15);
+    }
   }else{
     text("T",width-375, 25);
     fill(GOLD);
@@ -515,6 +536,13 @@ function displayTime(){
     strokeWeight(4);
     fill(255,0);
     rect(width-375, 50, 250, 25);
+    if(time2 === 0){
+      fill(255,0);
+      ellipse(width-100,62.5,15);
+    }else{
+      fill(255);
+      ellipse(width-100,62.5,15);
+    }
   }
   pop();
 }
@@ -523,41 +551,53 @@ function respawnUnits(time){
   if (time === 1 || time === 2){
     for (let i = 0; i < baseLeft.squaresNum; i++) {
       let uniqueId = getUniqueId();
-      let square = new Square(baseLeft.x, baseLeft.y, 0, mapId, uniqueId);
-      baseLeft.squares.push(square);
-      baseLeft.capacity++;
+      if (baseLeft.capacity < baseLeft.maxCap){
+        let square = new Square(baseLeft.x, baseLeft.y, 0, mapId, uniqueId);
+        baseLeft.squares.push(square);
+        baseLeft.capacity++;
+      }
     }
     for (let i = 0; i < baseRight.squaresNum; i++) {
       let uniqueId = getUniqueId();
-      let square = new Square(baseRight.x, baseRight.y, 1, mapId, uniqueId);
-      baseRight.squares.push(square);
-      baseRight.capacity++;
+      if (baseRight.capacity < baseRight.maxCap){
+        let square = new Square(baseRight.x, baseRight.y, 1, mapId, uniqueId);
+        baseRight.squares.push(square);
+        baseRight.capacity++;
+      }
     }
   }
   if (time === 2){
     for (let i = 0; i < baseLeft.circleShootersNum; i++) {
       let uniqueId = getUniqueId();
-      let circleShooter = new CircleShooter(baseLeft.x, baseLeft.y, 0, mapId, uniqueId);
-      baseLeft.circleShooters.push(circleShooter);
-      baseLeft.capacity++;
+      if (baseLeft.capacity < baseLeft.maxCap){
+        let circleShooter = new CircleShooter(baseLeft.x, baseLeft.y, 0, mapId, uniqueId);
+        baseLeft.circleShooters.push(circleShooter);
+        baseLeft.capacity++;
+      }
     }
     for (let i = 0; i < baseLeft.circleDemosNum; i++) {
       let uniqueId = getUniqueId();
-      let circleDemo = new CircleDemo(baseLeft.x, baseLeft.y, 0, mapId, uniqueId);
-      baseLeft.circleDemos.push(circleDemo);
-      baseLeft.capacity++;
+      if (baseLeft.capacity < baseLeft.maxCap){
+        let circleDemo = new CircleDemo(baseLeft.x, baseLeft.y, 0, mapId, uniqueId);
+        baseLeft.circleDemos.push(circleDemo);
+        baseLeft.capacity++;
+      }
     }
     for (let i = 0; i < baseRight.circleShootersNum; i++) {
       let uniqueId = getUniqueId();
-      let circleShooter = new CircleShooter(baseRight.x, baseRight.y, 1, mapId, uniqueId);
-      baseRight.circleShooters.push(circleShooter);
-      baseRight.capacity++;
+      if (baseRight.capacity < baseRight.maxCap){
+        let circleShooter = new CircleShooter(baseRight.x, baseRight.y, 1, mapId, uniqueId);
+        baseRight.circleShooters.push(circleShooter);
+        baseRight.capacity++;
+      }
     }
     for (let i = 0; i < baseRight.circleDemosNum; i++) {
       let uniqueId = getUniqueId();
-      let circleDemo = new CircleDemo(baseRight.x, baseRight.y, 1, mapId, uniqueId);
-      baseRight.circleDemos.push(circleDemo);
-      baseRight.capacity++;
+      if (baseRight.capacity < baseRight.maxCap){
+        let circleDemo = new CircleDemo(baseRight.x, baseRight.y, 1, mapId, uniqueId);
+        baseRight.circleDemos.push(circleDemo);
+        baseRight.capacity++;
+      }
     }
   }
 }
@@ -568,73 +608,73 @@ function respawnUnits(time){
 // The behaviour is completely random
 // Sometimes it can be hard to beat, sometimes it can be very dumb
 function computerPlays(){
-  if (runOnce){
+  if (runOnce && baseRight.capacity < baseRight.maxCap){
     p = int(random(0,5));
     runOnce = false;
   }
-  if (p === 4){
-    if (baseRight.squaresNum < 2 || baseRight.circleDemosNum < 2){
+  if (p === 4 && nextUnit < 0){
+    if (baseRight.squaresNum <= 2 && (baseRight.circleDemosNum < 1 || baseRight.circleShootersNum < 1)){
         p = int(random(0,4));
-        if (p===3){
+        if (p===3 && baseRight.resource < 32){
           p = int(random(0,3));
         }
-      }
+    }
     nextUnit = p;
     console.log("Computer's next unit is "+nextUnit);
   }
-  if (p === 3 && nextUnit < 0 && (baseRight.squaresNum < 2 || baseRight.circleDemosNum < 2)){
+  if (p === 3 && nextUnit < 0 && (baseRight.squaresNum >= 2 || baseRight.circleDemosNum >= 2)){
     if (baseRight.resource > 32){
       nextUnit = p;
       console.log("Computer's next unit is "+nextUnit);
     }else{
       while(p === 3){
-        p = int(random(0,4));
+        p = int(random(0,5));
       }
       nextUnit = p;
       console.log("Computer's next unit is "+nextUnit);
     }
   }
-  if (p===2  && nextUnit < 0){
-    if (baseRight.circleDemosNum <= baseLeft.circleDemosNum){
+  if (p === 2  && nextUnit < 0){
+    if (baseRight.resource > 10 && baseLeft.squaresNum <= baseRight.squaresNum){
       nextUnit = p;
       console.log("Computer's next unit is "+nextUnit);
     }else{
-      nextUnit = 0;
+      while(p === 2){
+        p = int(random(0,5));
+      }
+      if (p === 4 && (baseRight.squaresNum >= 2 || baseRight.circleDemosNum >= 2)){
+        p = int(random(0,3));
+      }
+      if (p === 3 && baseRight.resource < 32){
+        p = int(random(0,2));
+      }
+      nextUnit = p;
       console.log("Computer's next unit is "+nextUnit);
     }
   }
-  if (p===1  && nextUnit < 0){
-    if (baseRight.resource >= 15 && baseRight.circleShootersNum <= baseLeft.circleShootersNum){
+  if (p === 1  && nextUnit < 0){
+    if (baseRight.resource > 20 && (baseRight.squaresNum >= 2 || baseRight.circleDemosNum >= 2)){
       nextUnit = p;
       console.log("Computer's next unit is "+nextUnit);
     }else{
       p = int(random(0,4));
       if (p === 3 && baseRight.resource < 32){
-        while(p === 3){
-          p = int(random(0,4));
-        }
+        p = int(random(0,3));
       }
-        nextUnit = p;
-        console.log("Computer's next unit is "+nextUnit);
-      }
-    }
-  if (p===0  && nextUnit < 0){
-    if (baseRight.squaresNum <= baseLeft.circleDemosNum){
-      nextUnit = p;
-      console.log("Computer's next unit is "+nextUnit);
-    }else{
-      p = int(random(0,4));
-      if (p === 3 && baseRight.resource < 32){
-        while(p === 3){
-          p = int(random(0,4));
-        }
+      while(p === 1){
+        p = int(random(0,3));
       }
       nextUnit = p;
       console.log("Computer's next unit is "+nextUnit);
-    }
+      }
   }
+  if (p === 0  && nextUnit < 0){
+      nextUnit = p;
+      console.log("Computer's next unit is "+nextUnit);
+  }
+
   if (nextUnit === 0){
-    if (baseRight.resource >= 16) {
+    if (baseRight.resource >= 16 && baseRight.capacity < baseRight.maxCap) {
       baseRight.UpkeyColor = RED;
       let uniqueId = getUniqueId();
       let square = new Square(baseRight.x, baseRight.y, 1, mapId, uniqueId);
@@ -647,7 +687,7 @@ function computerPlays(){
       runOnce = true;
     }
   }else if(nextUnit === 1){
-    if (baseRight.resource >= 28) {
+    if (baseRight.resource >= 28  && baseRight.capacity < baseRight.maxCap) {
       baseRight.LeftkeyColor = RED;
       let uniqueId = getUniqueId();
       let circleShooter = new CircleShooter(baseRight.x, baseRight.y, 1, mapId, uniqueId);
@@ -660,7 +700,7 @@ function computerPlays(){
       runOnce = true;
     }
   }else if(nextUnit === 2){
-    if (baseRight.resource >= 20) {
+    if (baseRight.resource >= 20  && baseRight.capacity < baseRight.maxCap) {
       baseRight.RightkeyColor = RED;
       let uniqueId = getUniqueId();
       let circleDemo = new CircleDemo(baseRight.x, baseRight.y, 1, mapId, uniqueId);
@@ -689,7 +729,7 @@ function computerPlays(){
       runOnce = true;
     }
   }else{
-    if (baseRight.resource >= 16) {
+    if (baseRight.resource >= 16  && baseRight.capacity < baseRight.maxCap) {
       baseRight.UpkeyColor = RED;
       let uniqueId = getUniqueId();
       let square = new Square(baseRight.x, baseRight.y, 1, mapId, uniqueId);
@@ -769,14 +809,80 @@ function checkMainMenuButton() {
 // displayHelp()
 //
 //
-function displayHelp(){
+function displayHelp(page){
   push();
   fill(255);
-  textAlign(LEFT, CENTER);
-  imageMode(CORNER);
+  textAlign(CENTER, CENTER);
+  imageMode(CENTER);
   rectMode(CENTER);
-  textSize(18);
-  image(HelpPic,0,0,width,height);
+  ellipseMode(CENTER);
+  textSize(16);
+  text("click the next circle or use arrowkeys to continue",width / 2,25);
+  if (mouseY < 63 && mouseX < width / 2 - 52 && mouseX > width / 2 - 68){
+    fill(SELECTED);
+    ellipse(width / 2 - 60, 55,24);
+    if (mouseIsPressed) {
+      subPage = 0;
+    }
+  }else if (mouseY < 63 && mouseX < width / 2 - 22 && mouseX > width / 2 - 38){
+    fill(SELECTED);
+    ellipse(width / 2 - 30, 55,24);
+    if (mouseIsPressed) {
+      subPage = 1;
+    }
+  }else if (mouseY < 63 && mouseX < width / 2 + 8 && mouseX > width / 2 - 8){
+    fill(SELECTED);
+    ellipse(width / 2, 55,24);
+    if (mouseIsPressed) {
+      subPage = 2;
+    }
+  }else if (mouseY < 63 && mouseX < width / 2 + 38 && mouseX > width / 2 + 22){
+    fill(SELECTED);
+    ellipse(width / 2 + 30, 55,24);
+    if (mouseIsPressed) {
+      subPage = 3;
+    }
+  }else if (mouseY < 63 && mouseX < width / 2 + 68 && mouseX > width / 2 + 52){
+    fill(SELECTED);
+    ellipse(width / 2 + 60, 55,24);
+    if (mouseIsPressed) {
+      subPage = 4;
+    }
+  }
+  fill(50,150);
+  ellipse(width / 2 - 60, 55,16);
+  ellipse(width / 2 - 30, 55,16);
+  ellipse(width / 2, 55,16);
+  ellipse(width / 2 + 30, 55,16);
+  ellipse(width / 2 + 60, 55,16);
+  textSize(32);
+  if (page===0){
+    fill(SELECTED);
+    ellipse(width / 2 - 60, 55,16);
+    fill(255);
+    text("W E L C O M E",width / 2, 90);
+  }else if (page===1){
+    fill(SELECTED);
+    ellipse(width / 2 - 30, 55,16);
+    fill(255);
+    text("C O N T O R L S",width / 2, 90);
+  }else if (page===2){
+    fill(SELECTED);
+    ellipse(width / 2, 55,16);
+    fill(255);
+    text("U N I T S",width / 2, 90);
+  }else if (page===3){
+    fill(SELECTED);
+    ellipse(width / 2 + 30, 55,16);
+    fill(255);
+    text("R E S O U R C E",width / 2, 90);
+  }else if (page===4){
+    fill(SELECTED);
+    ellipse(width / 2 + 60, 55,16);
+    fill(255);
+    text("T I M E",width / 2, 90);
+
+  }
   pop();
 
   checkHelpButton();
@@ -1071,9 +1177,17 @@ function displayGameOver(){
   fill(GOLD);
   textSize(32);
   if (min <= 9){
-    text("T I M E  C O N S U M E D\n0"+min+" : "+sec, width / 2, height / 2+50);
+    if (sec <= 9){
+      text("T I M E  C O N S U M E D\n0"+min+" : 0"+sec, width / 2, height / 2+50);
+    }else{
+      text("T I M E  C O N S U M E D\n0"+min+" : "+sec, width / 2, height / 2+50);
+    }
   }else{
-    text("T I M E  C O N S U M E D\n"+min+" : "+sec, width / 2, height / 2+50);
+    if (sec <= 9){
+      text("T I M E  C O N S U M E D\n"+min+" : 0"+sec, width / 2, height / 2+50);
+    }else{
+      text("T I M E  C O N S U M E D\n"+min+" : "+sec, width / 2, height / 2+50);
+    }
   }
   fill(255);
   textSize(16);
@@ -1086,7 +1200,7 @@ function displayGameOver(){
       text("A S S E S S M E N T :  "+ASSESS[2], width / 2, height / 2+200);
     }
   }else{
-    text("A S S E S S M E N T :  F A I L E D", width / 2, height / 2+200);
+    text("A S S E S S M E N T :  F A I L U R E  I S  N O T  A N  O P T I O N", width / 2, height / 2+200);
   }
   pop();
 
