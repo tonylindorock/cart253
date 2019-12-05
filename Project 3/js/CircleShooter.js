@@ -29,7 +29,7 @@ class CircleShooter extends Soldier {
     this.bulletFired = false; // if a bullet is fired
     this.animationFinished = false;
 
-    this.theEnemyBase = null;
+    this.theEnemyBase = null; // store the enemy base object
   }
 
   // attackBase(enemyBase)
@@ -41,17 +41,22 @@ class CircleShooter extends Soldier {
     let dy = this.enemyBaseY - this.y;
     let angle = atan2(dy, dx);
     if (enemyBase.health>0){
+      // move to it
       if (d >= 100) {
         this.x += this.speed * cos(angle);
         this.y += this.speed * sin(angle);
       }
+      // if in range, FIRE
       if (d < 200 && !this.bulletFired && !this.dead) {
+        // create and store a Bullet object
         this.bullet = new Bullet(this.x, this.y, enemyBase.x, enemyBase.y, this.playerId, this.uniqueId);
         this.bulletFired = true;
-        Fire.play();
+        Fire.play(); // sound
+        // enemy base is under attack
         enemyBase.underAttack = true;
         this.theEnemyBase = enemyBase;
       }
+      // make the bullet fly towards the target
       if (this.bulletFired && !this.dead) {
         this.bullet.moveTo(enemyBase);
         if (this.bullet.dead) {
@@ -68,6 +73,8 @@ class CircleShooter extends Soldier {
   // select an enemy and keep attacking it until it dies
   attack(enemy) {
     let d = dist(this.x, this.y, enemy.x, enemy.y);
+    // if within range, no target acquired, not dead, and the enemy is alive
+    // TARGET THE ENEMY
     if (d < 300 && this.targetId < 0 && !this.dead && !enemy.dead) {
       this.targetId = enemy.uniqueId;
       this.obtainedTarget = true;
@@ -77,13 +84,16 @@ class CircleShooter extends Soldier {
     let angle = atan2(dy, dx);
 
     if (this.targetId === enemy.uniqueId) {
+      // get closer to the enemy
       if (d >= 150) {
         this.x += this.speed * cos(angle);
         this.y += this.speed * sin(angle);
+      // also keep a distance from the enemy
       } else {
         this.x -= this.speed * cos(angle);
         this.y -= this.speed * sin(angle);
       }
+      // if within range, FIRE
       if (d < 200 && !this.bulletFired && !this.dead) {
         this.bullet = new Bullet(this.x, this.y, enemy.x, enemy.y, this.playerId, this.uniqueId);
         this.bulletFired = true;
@@ -94,6 +104,7 @@ class CircleShooter extends Soldier {
       }
       if (this.bulletFired && !this.dead) {
         this.attacking = true;
+        // if the enemy is not attacking, it will fight back
         if (!enemy.attacking) {
           enemy.targetId = this.uniqueId;
         }
@@ -104,6 +115,9 @@ class CircleShooter extends Soldier {
         }
       }
       if (enemy.dead) {
+        // if the targeted enemy is tank / square XL
+        // if the tank gets destroyed and this unit is close to it
+        // the explosion kills this unit
         if (enemy.uniqueId === 100 && enemy.uniqueId === this.targetId && d < 100){
           this.health -= enemy.damage;
         }
@@ -112,7 +126,7 @@ class CircleShooter extends Soldier {
         this.attacking = false;
       }
     }
-
+    // variation to the movement
     // Set velocity via noise()
     this.vx = map(noise(this.tx), 0, 1, -0.05, 0.05);
     this.vy = map(noise(this.ty), 0, 1, -0.05, 0.05);
@@ -153,6 +167,7 @@ class CircleShooter extends Soldier {
         if (this.size <= 0) {
           this.animationFinished = true;
           this.show = false;
+          // if it dies, the enemy base is no longer under attack
           if (this.theEnemyBase!=null){
             this.theEnemyBase.underAttack = false;
           }
@@ -160,27 +175,5 @@ class CircleShooter extends Soldier {
       }
       pop();
     }
-  }
-
-  // reset()
-  //
-  // might be useful
-  reset() {
-    this.x = this.baseX;
-    this.y = this.baseY;
-    this.size = 0;
-  }
-
-  respawn(){
-    this.size = this.originalSize;
-    this.health = this.maxHealth;
-    this.targetId = -1;
-    this.attacking = false;
-    this.speed = this.originalSpeed + random(-0.5, 0.5);
-    this.tx = random(0, 1000);
-    this.ty = random(0, 1000);
-    this.bullet = null;
-    this.bulletFired = false;
-    this.dead = false;
   }
 }

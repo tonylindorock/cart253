@@ -3,7 +3,7 @@
 // An unique class extended from the soldier class
 // Circle demo is a powerful class. It can destroy most of the classes.
 // However, it will die when it comes in contact with any enemy.
-// It can kill any sqaure, circleShooter, circleDemo units instantly.
+// It can kill any scout / sqaure, shooter, demo units instantly.
 // It has a decent health.
 
 class CircleDemo extends Soldier {
@@ -30,27 +30,31 @@ class CircleDemo extends Soldier {
     this.targetId = -1; // targeted enemy id
     this.attacking = false; // if attacking
 
+    // animation
     this.runOnce = true;
     this.animationFinished = false;
-
+    // store the enemy base object
     this.theEnemyBase = null;
   }
 
   // attackBase(enemyBase)
-//
-// approach and attack the enemy base
+  //
+  // approach and attack the enemy base
   attackBase(enemyBase) {
     let d = dist(this.x, this.y, this.enemyBaseX, this.enemyBaseY);
     let dx = this.enemyBaseX - this.x;
     let dy = this.enemyBaseY - this.y;
     let angle = atan2(dy, dx);
-    if (enemyBase.health>0){
+    if (enemyBase.health > 0) {
+      // if being far away from the enemy base, move to it
       if (d >= 35) {
         this.x += this.speed * cos(angle);
         this.y += this.speed * sin(angle);
+        // attack the base
       } else {
         enemyBase.health -= this.damage;
         enemyBase.health = constrain(enemyBase.health, 0, enemyBase.maxHealth);
+        // die
         this.dead = true;
         enemyBase.underAttack = true;
         this.theEnemyBase = enemyBase;
@@ -63,38 +67,51 @@ class CircleDemo extends Soldier {
   //
   // select an enemy and keep attacking it until it dies
   attack(enemy) {
+    // distance bewteen itself and the enemy
     let d = dist(this.x, this.y, enemy.x, enemy.y);
-    if (d < 300 && this.targetId < 0 && (enemy.health >= enemy.maxHealth/2 || enemy.uniqueId === 100) && !this.dead && !enemy.dead) {
+    // if within 300 distance, no target acquired, enemy health is great,
+    // it's not dead and the enemy is not dead
+    // THEN TARGET THE ENEMY
+    if (d < 300 && this.targetId < 0 && (enemy.health >= enemy.maxHealth / 2 || enemy.uniqueId === 100) && !this.dead && !enemy.dead) {
       this.targetId = enemy.uniqueId;
       this.obtainedTarget = true;
       this.attacking = true;
     }
+    // moving direction
     let dx = enemy.x - this.x;
     let dy = enemy.y - this.y;
     let angle = atan2(dy, dx);
+    // kill the targeted the enemy
     if (this.targetId === enemy.uniqueId) {
+      // move to it
       if (d > 15) {
         this.x += this.speed * cos(angle);
         this.y += this.speed * sin(angle);
       }
+      // attack
       if (d < 30) {
         if (!this.dead && !enemy.dead) {
           enemy.health -= this.damage;
           this.dead = true;
         }
       }
+      // if it dies before kills the enemy
+      // and the enemy also targets it
+      // reset the enemy target
       if (this.dead && !enemy.dead && this.obtainedTarget) {
         if (enemy.targetId === this.uniqueId) {
           enemy.targetId = -1;
         }
       }
+      // if the enemy dies before reaching it
+      // reset the target
       if (enemy.dead) {
         this.targetId = -1;
         this.obtainedTarget = false;
         this.attacking = false;
       }
     }
-
+    // variation to the movement
     // Set velocity via noise()
     this.vx = map(noise(this.tx), 0, 1, -0.05, 0.05);
     this.vy = map(noise(this.ty), 0, 1, -0.05, 0.05);
@@ -113,7 +130,7 @@ class CircleDemo extends Soldier {
   // display the circleDemo
   // play an animation when explodes
   display() {
-    if (this.show){
+    if (this.show) {
       push();
       rectMode(CENTER);
       ellipseMode(CENTER);
@@ -129,14 +146,16 @@ class CircleDemo extends Soldier {
         this.innerSize -= 1;
         this.innerSize = constrain(this.innerSize, 0, 30);
         this.speed = 0;
-        if (this.playOnce){
+        // explode sound
+        if (this.playOnce) {
           Explode.play();
           this.playOnce = false;
         }
         if (this.innerSize <= 0) {
           this.animationFinished = true;
           this.show = false;
-          if (this.theEnemyBase!=null){
+          // if dies, the enemy base is not under attack anymore
+          if (this.theEnemyBase != null) {
             this.theEnemyBase.underAttack = false;
           }
         }
@@ -144,29 +163,5 @@ class CircleDemo extends Soldier {
       ellipse(this.x, this.y, this.size);
       pop();
     }
-  }
-
-  // reset()
-  //
-  // might be useful
-  reset() {
-    this.x = this.baseX;
-    this.y = this.baseY;
-    this.size = 0;
-  }
-
-  respawn(){
-    this.size = this.originalSize;
-    this.innerSize = this.size;
-    this.health = this.maxHealth;
-    this.targeted = 0;
-    this.targetId = -1;
-    this.obtainedTarget = false;
-    this.attacking = false;
-    this.speed = this.originalSpeed + random(-0.5, 0.5);
-    this.tx = random(0, 1000);
-    this.ty = random(0, 1000);
-    this.dead = false;
-    this.runOnce = true;
   }
 }

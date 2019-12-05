@@ -1,6 +1,6 @@
 /*****************
-- Final Project -
-Simple Defence (Prototype 2-Ex8)
+- Final Project (P3) -
+Simple Defence
 
 By Yichen Wang
 
@@ -8,12 +8,22 @@ Simple Defence is a simple game with simple UI and straightforward rules.
 Players can play with the computer or with their friends.
 Players must defend their bases from their competitors and
 must destory their components to win the game.
-Players can send out soldiers using their resources. The more powerful the soldier is,
-the more expensive it will be.
+
+Players need to deploy units (soldiers) to defend the base and to attack their
+components using 4 keys. WASD for the blue player, and ARROWKEYS for the red.
+Players can also use F or L to see the units deploying menu.
+
+There are 4 units, Scout, Demo, Shooter, and Tank.
+
+To deploy them, players must spend their resources. They will gain 1
+resource count for every 1 second. Everyone starts with 32 resource count.
+
+Every unit, except Tank, will respawn after 5s or 10s depends how many deployment
+players have purchased.
 ******************/
 
 let State = "starting"; // game state
-let subPage = 0;
+let subPage = 0; // page var for the help menu
 let selectedMap = false; // if a map is selected
 let selectedMode = false; // if a mode is selected
 let mapId = -1; // record the id for map
@@ -21,26 +31,23 @@ let modeId = -1; // record the id for mode
 let playing = false; // if playing
 let gameOver = false; // if game is over
 let singlePlayer = true; // if sinlge player
-let winner = -1;
+let winner = -1; // winner id
 
-let startTime = 0;
-let time = 0;
-let time2 = 0;
-let min = 0;
-let sec = 0;
-let timeBarLength = 0;
+let startTime = 0; // store the frameCount when the game starts
+let time = 0; // 5s marker
+let time2 = 0; // 10s marker
+let min = 0; // game duration minute
+let sec = 0; // game duration second
+let timeBarLength = 0; // the length of the inner time bar (5s)
 let playTime = 0; // current frame count
-const RESPAWN_TIME = 5; // 5s for each respawn
+const RESPAWN_TIME = 5; // 5s general respawn time
 
-let runOnce = true;
-let p = 0;
-let nextUnit = 0;
+let runOnce = true; // only run once
+let p = 0; // possibility
+let nextUnit = 0; // next unit for the computer to deploy
 
-const ASSESS = ["M E D I O C R E","O P T I M A L","F L A W L E S S"];
-
-const RULE0 = "You must defend your base against your component.";
-const RULE1 = "To do so, you can buy 4 tatical units using your resources.";
-const RULE2 = "Use these units to protect your base and destory the enemy base!";
+// 3 assessments for the player based on the time
+const ASSESS = ["M E D I O C R E", "O P T I M A L", "F L A W L E S S"];
 
 // r g b values for background color
 let r;
@@ -56,7 +63,7 @@ let rectUIStroke = 10;
 let baseLeft;
 let baseRight;
 
-// highlighted color
+// special colors
 const SELECTED = "#47b3ff";
 const GOLD = "#ffce2b";
 const BLUE = "#4fc7fb";
@@ -83,9 +90,10 @@ let Explode;
 let Defeated;
 let Alarm;
 
-let playOnce = true;
+let playOnce = true; // only play once
 
 function preload() {
+  // initiate all the images
   MapHorizontal = loadImage("assets/images/Horizontal.jpg");
   MapVertical = loadImage("assets/images/Vertical.jpg");
   MapDiagonal1 = loadImage("assets/images/Diagonal 1.jpg");
@@ -96,6 +104,7 @@ function preload() {
   HelpPic3 = loadImage("assets/images/ResourcePic.png");
   HelpPic4 = loadImage("assets/images/TimePic.png");
 
+  // initiate all the sounds
   Bgm = loadSound("assets/sounds/BG Sound.mp3");
   Fire = loadSound("assets/sounds/Fire.mp3");
   Deploy = loadSound("assets/sounds/Deploy.mp3");
@@ -103,7 +112,7 @@ function preload() {
   Explode = loadSound("assets/sounds/Explode.mp3");
   Defeated = loadSound("assets/sounds/Defeated.mp3");
   Alarm = loadSound("assets/sounds/Alarm.mp3");
-
+  // set volume to all the sounds
   Bgm.setVolume(0.25);
   Fire.setVolume(0.1);
   Deploy.setVolume(0.1);
@@ -118,13 +127,13 @@ function preload() {
 // set up canvas, background, and main style
 function setup() {
   createCanvas(windowWidth, windowHeight);
-  randomizeBG();
+  randomizeBG(); // randomize BG color
 
   textFont("Verdana");
   textStyle(BOLD);
   noStroke();
-
-  HelpPics = [HelpPic0,HelpPic1,HelpPic2,HelpPic3,HelpPic4];
+  // put help pictures in an array
+  HelpPics = [HelpPic0, HelpPic1, HelpPic2, HelpPic3, HelpPic4];
 }
 
 // randomizeBG()
@@ -143,12 +152,12 @@ function draw() {
   background(r, g, b);
 
   // different states displaying different menus
-  if (!gameOver){
+  if (!gameOver) {
     if (State === "starting") {
       displayMainMenu();
     }
     if (State === "help") {
-      displayHelp(subPage);
+      displayHelp(subPage); // displaying different help images
     }
     if (State === "selectingMaps") {
       displayMapMenu();
@@ -158,27 +167,32 @@ function draw() {
     }
   }
   // if playing
-  if (playing){
-    if (!Bgm.isPlaying()){
+  if (playing) {
+    // play BGM repeatedly
+    if (!Bgm.isPlaying()) {
       Bgm.play();
     }
-    displayTime();
-    if (singlePlayer) {
+    displayTime(); // timer
+    if (singlePlayer) { // single player
       computerPlays();
       displayBase();
       displaySoldiers();
       moveSoldiers();
-    } else if (!singlePlayer) {
+    } else if (!singlePlayer) { // multi player
       displayBase();
       displaySoldiers();
       moveSoldiers();
     }
   }
-  if (gameOver){
+  // if the game is over
+  if (gameOver) {
     displayGameOver();
   }
 }
 
+// getUniqueId()
+//
+// give every unit an unique id except for tank
 function getUniqueId() {
   let id = random(0, 100);
   return id;
@@ -196,31 +210,31 @@ function setUpBase() {
 //
 // display the two bases
 function displayBase() {
-  if (baseLeft.health > 0){
+  // display when base health is > 0
+  if (baseLeft.health > 0) {
     baseLeft.display();
-  }else{
+  } else {
+    // play the animation if the base dies
+    // set the winner
     baseLeft.displayAnimation();
     winner = 1;
   }
-  if (baseRight.health > 0){
+  if (baseRight.health > 0) {
     baseRight.display();
-  }else{
+  } else {
     baseRight.displayAnimation();
     winner = 0;
   }
-  if (keyIsDown(70)){
+  // units deploying menu when pressing F or L
+  if (keyIsDown(70)) {
     baseLeft.displayUnitsMenu();
   }
-  if (keyIsDown(76) && modeId === 1){
+  if (keyIsDown(76) && modeId === 1) {
     baseRight.displayUnitsMenu();
   }
-  if (baseLeft.animationFinished){
-    playing = false;
-    gameOver = true;
-    sec = int(((frameCount - startTime) / 60) % 60);
-    min = int(((frameCount - startTime) / 60) / 60);
-  }
-  if (baseRight.animationFinished){
+  // if the animation of base is finished
+  // set game is over and calculate the game duration
+  if (baseLeft.animationFinished || baseRight.animationFinished) {
     playing = false;
     gameOver = true;
     sec = int(((frameCount - startTime) / 60) % 60);
@@ -230,26 +244,30 @@ function displayBase() {
 
 // displaySoldiers()
 //
-// display all soldier units
+// display all the units
 function displaySoldiers() {
+  // tanks / square XLs
   if (baseRight.squareXL != null) {
     baseRight.squareXL.display();
   }
   if (baseLeft.squareXL != null) {
     baseLeft.squareXL.display();
   }
+  // scouts / squares
   for (let i = 0; i < baseLeft.squares.length; i++) {
     baseLeft.squares[i].display();
   }
   for (let i = 0; i < baseRight.squares.length; i++) {
     baseRight.squares[i].display();
   }
+  // shooters
   for (let i = 0; i < baseRight.circleShooters.length; i++) {
     baseRight.circleShooters[i].display();
   }
   for (let i = 0; i < baseLeft.circleShooters.length; i++) {
     baseLeft.circleShooters[i].display();
   }
+  // demos
   for (let i = 0; i < baseLeft.circleDemos.length; i++) {
     baseLeft.circleDemos[i].display();
   }
@@ -258,8 +276,11 @@ function displaySoldiers() {
   }
 }
 
-// let all soldier units attack their enemies and enemy base
+// moveSoldiers()
+//
+// let all the units attack their enemies and enemy base
 function moveSoldiers() {
+  // BLUE scouts / squares
   for (let i = 0; i < baseLeft.squares.length; i++) {
     for (let j = 0; j < baseRight.squares.length; j++) {
       baseLeft.squares[i].attack(baseRight.squares[j]);
@@ -279,6 +300,7 @@ function moveSoldiers() {
       }
     }
   }
+  // BLUE shooters
   for (let i = 0; i < baseLeft.circleShooters.length; i++) {
     for (let j = 0; j < baseRight.squares.length; j++) {
       baseLeft.circleShooters[i].attack(baseRight.squares[j]);
@@ -298,6 +320,7 @@ function moveSoldiers() {
       }
     }
   }
+  // BLUE demos
   for (let i = 0; i < baseLeft.circleDemos.length; i++) {
     for (let j = 0; j < baseRight.squares.length; j++) {
       baseLeft.circleDemos[i].attack(baseRight.squares[j]);
@@ -317,12 +340,14 @@ function moveSoldiers() {
       }
     }
   }
+  // BLUE tank / square XL
   if (baseLeft.squareXL != null) {
     baseLeft.squareXL.attackBase(baseRight);
     if (baseLeft.squareXL.animationFinished) {
       baseLeft.squareXL = null;
     }
   }
+  // RED scouts / squares
   for (let i = 0; i < baseRight.squares.length; i++) {
     for (let j = 0; j < baseLeft.squares.length; j++) {
       baseRight.squares[i].attack(baseLeft.squares[j]);
@@ -342,6 +367,7 @@ function moveSoldiers() {
       }
     }
   }
+  // RED shooters
   for (let i = 0; i < baseRight.circleShooters.length; i++) {
     for (let j = 0; j < baseLeft.squares.length; j++) {
       baseRight.circleShooters[i].attack(baseLeft.squares[j]);
@@ -361,6 +387,7 @@ function moveSoldiers() {
       }
     }
   }
+  // RED demos
   for (let i = 0; i < baseRight.circleDemos.length; i++) {
     for (let j = 0; j < baseLeft.squares.length; j++) {
       baseRight.circleDemos[i].attack(baseLeft.squares[j]);
@@ -380,6 +407,7 @@ function moveSoldiers() {
       }
     }
   }
+  // RED tank / square XL
   if (baseRight.squareXL != null) {
     baseRight.squareXL.attackBase(baseLeft);
     if (baseRight.squareXL.animationFinished) {
@@ -392,62 +420,78 @@ function moveSoldiers() {
 //
 // read the inputs to spawn the specified unit
 function keyPressed() {
-  if (State === "help"){
-    if (keyCode === 39 || keyCode === 40){
-      subPage ++;
-    }else if (keyCode === 37 || keyCode === 38){
-      subPage --;
+  // if the player is in help menu,
+  // arrowkeys are used to navigate
+  if (State === "help") {
+    if (keyCode === 39 || keyCode === 40) {
+      subPage++;
+    } else if (keyCode === 37 || keyCode === 38) {
+      subPage--;
     }
-    if (subPage >= 5){
+    if (subPage >= 5) {
       subPage = 0;
-    }else if (subPage < 0){
+    } else if (subPage < 0) {
       subPage = 4;
     }
   }
+  // when playing
   if (playing) {
+    // key S
     if (keyCode === 83) {
-      if (baseLeft.resource >= 42 && baseLeft.squareXL===null) {
-        baseLeft.DownkeyColor = BLUE;
-        let uniqueId = getUniqueId();
+      // if the resource is enough and no tank is active
+      if (baseLeft.resource >= 42 && baseLeft.squareXL === null) {
+        baseLeft.DownkeyColor = BLUE; // fill the deploy button with color
+        // create a soldier object
         let squareXL = new SquareXL(baseLeft.x, baseLeft.y, 0, mapId, 100);
+        // give the object to the base
         baseLeft.squareXL = squareXL;
-        console.log("BLUE player spawned a square XL (id: 100)");
+        // info
+        console.log("BLUE player spawned a tank (id: 100)");
+        // update resource count
         baseLeft.resource -= squareXL.cost;
-        Deploy.play();
+        Deploy.play(); // play sounds
       }
     }
+    // if there's < 50 units
     if (baseLeft.capacity < baseLeft.maxCap) {
+      // key W
       if (keyCode === 87) {
         if (baseLeft.resource >= 16) {
           baseLeft.UpkeyColor = BLUE;
+          // create an id
           let uniqueId = getUniqueId();
           let square = new Square(baseLeft.x, baseLeft.y, 0, mapId, uniqueId);
+          // put the object in the array
           baseLeft.squares.push(square);
-          console.log("BLUE player spawned a square (id: " + uniqueId + ")");
+          console.log("BLUE player spawned a scout (id: " + uniqueId + ")");
+          // update unit number
           baseLeft.capacity++;
+          // update deploy number
           baseLeft.squaresNum++;
           baseLeft.resource -= square.cost;
           Deploy.play();
         }
+        // key A
       } else if (keyCode === 65) {
         if (baseLeft.resource >= 28) {
           baseLeft.LeftkeyColor = BLUE;
           let uniqueId = getUniqueId();
           let circleShooter = new CircleShooter(baseLeft.x, baseLeft.y, 0, mapId, uniqueId);
           baseLeft.circleShooters.push(circleShooter);
-          console.log("BLUE player spawned a circle shooter (id: " + uniqueId + ")");
+          console.log("BLUE player spawned a shooter (id: " + uniqueId + ")");
           baseLeft.capacity++;
           baseLeft.circleShootersNum++;
           baseLeft.resource -= circleShooter.cost;
           Deploy.play();
         }
+        // key D
       } else if (keyCode === 68) {
         if (baseLeft.resource >= 20) {
           baseLeft.RightkeyColor = BLUE;
           let uniqueId = getUniqueId();
           let circleDemo = new CircleDemo(baseLeft.x, baseLeft.y, 0, mapId, uniqueId);
           baseLeft.circleDemos.push(circleDemo);
-          console.log("BLUE player spawned a circle demo (id: " + uniqueId + ")");
+          console.log("BLUE player spawned a demo (id: " + uniqueId + ")");
           baseLeft.capacity++;
           baseLeft.circleDemosNum++;
           baseLeft.resource -= circleDemo.cost;
@@ -455,64 +499,69 @@ function keyPressed() {
         }
       }
     }
+    // multiplayer
     if (!singlePlayer) {
+      // key Down
       if (keyCode === 40) {
-        if (baseRight.resource >= 42  && baseRight.squareXL===null) {
+        if (baseRight.resource >= 42 && baseRight.squareXL === null) {
           baseRight.DownkeyColor = RED;
           let uniqueId = getUniqueId();
           let squareXL = new SquareXL(baseRight.x, baseRight.y, 1, mapId, 100);
           baseRight.squareXL = squareXL;
-          console.log("RED player spawned a square XL (id: 100)");
+          console.log("RED player spawned a tank (id: 100)");
           baseRight.resource -= squareXL.cost;
           Deploy.play();
-          }
         }
       }
-      if (baseRight.capacity < baseRight.maxCap) {
-        if (keyCode === 38) {
-          if (baseRight.resource >= 16) {
-            baseRight.UpkeyColor = RED;
-            let uniqueId = getUniqueId();
-            let square = new Square(baseRight.x, baseRight.y, 1, mapId, uniqueId);
-            baseRight.squares.push(square);
-            console.log("RED player spawned a square (id: " + uniqueId + ")");
-            baseRight.capacity++;
-            baseRight.squaresNum++;
-            baseRight.resource -= square.cost;
-            Deploy.play();
-          }
-        } else if (keyCode === 37) {
-          if (baseRight.resource >= 28) {
-            baseRight.LeftkeyColor = RED;
-            let uniqueId = getUniqueId();
-            let circleShooter = new CircleShooter(baseRight.x, baseRight.y, 1, mapId, uniqueId);
-            baseRight.circleShooters.push(circleShooter);
-            console.log("RED player spawned a circle shooter (id: " + uniqueId + ")");
-            baseRight.capacity++;
-            baseRight.circleShootersNum++;
-            baseRight.resource -= circleShooter.cost;
-            Deploy.play();
-          }
-        } else if (keyCode === 39) {
-          if (baseRight.resource >= 20) {
-            baseRight.RightkeyColor = RED;
-            let uniqueId = getUniqueId();
-            let circleDemo = new CircleDemo(baseRight.x, baseRight.y, 1, mapId, uniqueId);
-            baseRight.circleDemos.push(circleDemo);
-            console.log("RED player spawned a circle demo (id: " + uniqueId + ")");
-            baseRight.capacity++;
-            baseRight.circleDemosNum++;
-            baseRight.resource -= circleDemo.cost;
-            Deploy.play();
-          }
+    }
+    if (baseRight.capacity < baseRight.maxCap) {
+      // key Up
+      if (keyCode === 38) {
+        if (baseRight.resource >= 16) {
+          baseRight.UpkeyColor = RED;
+          let uniqueId = getUniqueId();
+          let square = new Square(baseRight.x, baseRight.y, 1, mapId, uniqueId);
+          baseRight.squares.push(square);
+          console.log("RED player spawned a scout (id: " + uniqueId + ")");
+          baseRight.capacity++;
+          baseRight.squaresNum++;
+          baseRight.resource -= square.cost;
+          Deploy.play();
+        }
+        // key Left
+      } else if (keyCode === 37) {
+        if (baseRight.resource >= 28) {
+          baseRight.LeftkeyColor = RED;
+          let uniqueId = getUniqueId();
+          let circleShooter = new CircleShooter(baseRight.x, baseRight.y, 1, mapId, uniqueId);
+          baseRight.circleShooters.push(circleShooter);
+          console.log("RED player spawned a shooter (id: " + uniqueId + ")");
+          baseRight.capacity++;
+          baseRight.circleShootersNum++;
+          baseRight.resource -= circleShooter.cost;
+          Deploy.play();
+        }
+        // key Right
+      } else if (keyCode === 39) {
+        if (baseRight.resource >= 20) {
+          baseRight.RightkeyColor = RED;
+          let uniqueId = getUniqueId();
+          let circleDemo = new CircleDemo(baseRight.x, baseRight.y, 1, mapId, uniqueId);
+          baseRight.circleDemos.push(circleDemo);
+          console.log("RED player spawned a demo (id: " + uniqueId + ")");
+          baseRight.capacity++;
+          baseRight.circleDemosNum++;
+          baseRight.resource -= circleDemo.cost;
+          Deploy.play();
         }
       }
     }
   }
+}
 
 // keyReleased()
 //
-// if released, let the button go back to normal
+// if released, let the deploy button go back to normal
 function keyReleased() {
   if (playing) {
     if (keyCode === 87) {
@@ -538,70 +587,90 @@ function keyReleased() {
   }
 }
 
-function displayTime(){
-  playTime = frameCount;
-  if (playTime % 1 === 0 && playTime!=0){
-    time += 0.0167;
-    if (time >= RESPAWN_TIME){
+// displayTime()
+//
+// display the timer during gameplay
+// also call the respawning of all the units
+function displayTime() {
+  playTime = frameCount; // get frame count
+  if (playTime % 1 === 0 && playTime != 0) {
+    time += 0.0167; // for smooth animation
+    // reset 5s time marker when 5s is up
+    if (time >= RESPAWN_TIME) {
       time = 0;
-      time2 ++;
-      if (baseLeft.health > 0 && baseRight.health > 0){
+      time2++; // update 10s marker
+      // respawn units
+      if (baseLeft.health > 0 && baseRight.health > 0) {
         respawnUnits(time2);
       }
-      if (time2 >= 2){
+      // reset 10s marker
+      if (time2 >= 2) {
         time2 = 0;
       }
     }
   }
-  timeBarLength = map(time,0,RESPAWN_TIME,0,250);
+  // map the time into the length of the inner time bar
+  timeBarLength = map(time, 0, RESPAWN_TIME, 0, 250);
+  // display the timer
   push();
   fill(255);
-  textAlign(CENTER,CENTER);
+  textAlign(CENTER, CENTER);
   rectMode(LEFT);
   ellipseMode(CENTER);
   textSize(16);
-  if (mapId!=3){
-    text("T",width/2-125, 25);
+  // in the middle
+  if (mapId != 3) {
+    text("T", width / 2 - 125, 25);
     fill(GOLD);
-    rect(width/2-125,50,timeBarLength,25);
-    text("RESPAWN",width/2+125, 25);
+    rect(width / 2 - 125, 50, timeBarLength, 25);
+    text("RESPAWN", width / 2 + 125, 25);
     textSize(24);
     stroke(255);
     strokeWeight(4);
-    fill(255,0);
-    rect(width/2-125, 50, 250, 25);
-    if(time2 === 0){
-      fill(255,0);
-      ellipse(width/2+150,62.5,15);
-    }else{
+    fill(255, 0);
+    rect(width / 2 - 125, 50, 250, 25);
+    // 10s indicator
+    if (time2 === 0) {
+      fill(255, 0);
+      ellipse(width / 2 + 150, 62.5, 15);
+      // fill the circle is the 10s is near
+    } else {
       fill(255);
-      ellipse(width/2+150,62.5,15);
+      ellipse(width / 2 + 150, 62.5, 15);
     }
-  }else{
-    text("T",width-375, 25);
+    // on the right if the map is vertical
+  } else {
+    text("T", width - 375, 25);
     fill(GOLD);
-    rect(width-375, 50, timeBarLength, 25);
-    text("RESPAWN",width-125, 25);
+    rect(width - 375, 50, timeBarLength, 25);
+    text("RESPAWN", width - 125, 25);
     stroke(255);
     strokeWeight(4);
-    fill(255,0);
-    rect(width-375, 50, 250, 25);
-    if(time2 === 0){
-      fill(255,0);
-      ellipse(width-100,62.5,15);
-    }else{
+    fill(255, 0);
+    rect(width - 375, 50, 250, 25);
+    if (time2 === 0) {
+      fill(255, 0);
+      ellipse(width - 100, 62.5, 15);
+    } else {
       fill(255);
-      ellipse(width-100,62.5,15);
+      ellipse(width - 100, 62.5, 15);
     }
   }
   pop();
 }
 
-function respawnUnits(time){
-  if (time === 1 || time === 2){
+// respawnUnits(time)
+//
+// takes in the time2 (10s marker)
+// 1 means 5s, 2 means 10s
+// respawn units according to the number of deployment
+function respawnUnits(time) {
+  // every 10s, respawn scouts / squares
+  // the same as deploying one
+  if (time === 1 || time === 2) {
     for (let i = 0; i < baseLeft.squaresNum; i++) {
       let uniqueId = getUniqueId();
-      if (baseLeft.capacity < baseLeft.maxCap){
+      if (baseLeft.capacity < baseLeft.maxCap) {
         let square = new Square(baseLeft.x, baseLeft.y, 0, mapId, uniqueId);
         baseLeft.squares.push(square);
         baseLeft.capacity++;
@@ -609,17 +678,18 @@ function respawnUnits(time){
     }
     for (let i = 0; i < baseRight.squaresNum; i++) {
       let uniqueId = getUniqueId();
-      if (baseRight.capacity < baseRight.maxCap){
+      if (baseRight.capacity < baseRight.maxCap) {
         let square = new Square(baseRight.x, baseRight.y, 1, mapId, uniqueId);
         baseRight.squares.push(square);
         baseRight.capacity++;
       }
     }
   }
-  if (time === 2){
+  // every 10s, respawn shooters and demos
+  if (time === 2) {
     for (let i = 0; i < baseLeft.circleShootersNum; i++) {
       let uniqueId = getUniqueId();
-      if (baseLeft.capacity < baseLeft.maxCap){
+      if (baseLeft.capacity < baseLeft.maxCap) {
         let circleShooter = new CircleShooter(baseLeft.x, baseLeft.y, 0, mapId, uniqueId);
         baseLeft.circleShooters.push(circleShooter);
         baseLeft.capacity++;
@@ -627,7 +697,7 @@ function respawnUnits(time){
     }
     for (let i = 0; i < baseLeft.circleDemosNum; i++) {
       let uniqueId = getUniqueId();
-      if (baseLeft.capacity < baseLeft.maxCap){
+      if (baseLeft.capacity < baseLeft.maxCap) {
         let circleDemo = new CircleDemo(baseLeft.x, baseLeft.y, 0, mapId, uniqueId);
         baseLeft.circleDemos.push(circleDemo);
         baseLeft.capacity++;
@@ -635,7 +705,7 @@ function respawnUnits(time){
     }
     for (let i = 0; i < baseRight.circleShootersNum; i++) {
       let uniqueId = getUniqueId();
-      if (baseRight.capacity < baseRight.maxCap){
+      if (baseRight.capacity < baseRight.maxCap) {
         let circleShooter = new CircleShooter(baseRight.x, baseRight.y, 1, mapId, uniqueId);
         baseRight.circleShooters.push(circleShooter);
         baseRight.capacity++;
@@ -643,7 +713,7 @@ function respawnUnits(time){
     }
     for (let i = 0; i < baseRight.circleDemosNum; i++) {
       let uniqueId = getUniqueId();
-      if (baseRight.capacity < baseRight.maxCap){
+      if (baseRight.capacity < baseRight.maxCap) {
         let circleDemo = new CircleDemo(baseRight.x, baseRight.y, 1, mapId, uniqueId);
         baseRight.circleDemos.push(circleDemo);
         baseRight.capacity++;
@@ -654,76 +724,114 @@ function respawnUnits(time){
 
 // computerPlays()
 //
-// This is the way how computer plays the game
-// The behaviour is completely random
-// Sometimes it can be hard to beat, sometimes it can be very dumb
-function computerPlays(){
-  if (runOnce && baseRight.capacity < baseRight.maxCap){
-    p = int(random(0,5));
+// The computer uses randomness to compete with players
+// However, it will deploy certain units to counter some of the units players deploy
+// Due to the randomness, the skill of the computer is completely random as well
+function computerPlays() {
+  // randomly choose a number from 0 - 4 once if there's room for more units
+  if (runOnce && baseRight.capacity < baseRight.maxCap) {
+    p = int(random(0, 5));
     runOnce = false;
   }
-  if (p === 4 && nextUnit < 0){
-    if (baseRight.squaresNum <= 2 && (baseRight.circleDemosNum < 1 || baseRight.circleShootersNum < 1)){
-        p = int(random(0,4));
-        if (p===3 && baseRight.resource < 32){
-          p = int(random(0,3));
-        }
+  // if the number is 4 and computer does not decide its next unit
+  if (p === 4 && nextUnit < 0) {
+    // if computer has only few units
+    if (baseRight.squaresNum <= 2 && (baseRight.circleDemosNum < 1 || baseRight.circleShootersNum < 1)) {
+      // randomize the number from 0 - 3
+      p = int(random(0, 4));
+      // if the number is 3 and the resource is not enough
+      if (p === 3 && baseRight.resource < 32) {
+        // randomize it from 0 - 3
+        p = int(random(0, 3));
+      }
+    }
+    // set next unit id
+    nextUnit = p;
+    // info
+    console.log("Computer's next unit is " + nextUnit);
+  }
+  // if the number is 3 and no next unit and enough units are deployed
+  if (p === 3 && nextUnit < 0 && (baseRight.squaresNum >= 2 || baseRight.circleDemosNum >= 2)) {
+    // if the resource is enough set the next unit
+    if (baseRight.resource > 32) {
+      nextUnit = p;
+      console.log("Computer's next unit is " + nextUnit);
+      // if not
+    } else {
+      // give it another number but not 3 and set the next unit
+      while (p === 3) {
+        p = int(random(0, 5));
+      }
+      nextUnit = p;
+      console.log("Computer's next unit is " + nextUnit);
+    }
+  }
+  // if the number is 2 and no next unit
+  if (p === 2 && nextUnit < 0) {
+    // if has enough resource and has the same or more scouts than the player
+    // set the next unit
+    if (baseRight.resource > 10 && baseLeft.squaresNum <= baseRight.squaresNum) {
+      nextUnit = p;
+      console.log("Computer's next unit is " + nextUnit);
+      // if not
+    } else {
+      // set a number but not 2
+      while (p === 2) {
+        p = int(random(0, 5));
+      }
+      // if gets 4 check if does not have enough units deployed
+      if (p === 4 && (baseRight.squaresNum < 2 || baseRight.circleDemosNum < 2)) {
+        p = int(random(0, 4));
+      }
+      // if gets 3 check if the resource is not enough
+      if (p === 3 && baseRight.resource < 32) {
+        p = int(random(0, 2));
+      }
+      nextUnit = p;
+      console.log("Computer's next unit is " + nextUnit);
+    }
+  }
+  // if the number is 1
+  if (p === 1 && nextUnit < 0) {
+    // check if has enough resource and enough units deployed
+    if (baseRight.resource > 20 && (baseRight.squaresNum >= 2 || baseRight.circleDemosNum >= 2)) {
+      nextUnit = p;
+      console.log("Computer's next unit is " + nextUnit);
+      // if not
+    } else {
+      // randomize the number from 0 - 4
+      p = int(random(0, 4));
+      // if gets a 3, check if has enough resource
+      if (p === 3 && baseRight.resource < 32) {
+        p = int(random(0, 3));
+      }
+      // if it is still 1, randomize it from 0 - 2 until it is not 1
+      while (p === 1) {
+        p = int(random(0, 3));
+      }
+      nextUnit = p;
+      console.log("Computer's next unit is " + nextUnit);
+    }
+  }
+  // if the number is 0 set next unit right away
+  if (p === 0 && nextUnit < 0) {
+    nextUnit = p;
+    console.log("Computer's next unit is " + nextUnit);
+  }
+  // if the base is under attack and the next unit is 4
+  if (baseRight.underAttack && nextUnit === 4) {
+    // randomize the number from 0 - 4
+    p = int(random(0, 4));
+    // if gets 3 and does not have enough resource
+    // randomize from 0 - 2
+    if (p === 3 && baseRight.resource < 32) {
+      p = int(random(0, 3));
     }
     nextUnit = p;
-    console.log("Computer's next unit is "+nextUnit);
+    console.log("Computer's next unit is " + nextUnit);
   }
-  if (p === 3 && nextUnit < 0 && (baseRight.squaresNum >= 2 || baseRight.circleDemosNum >= 2)){
-    if (baseRight.resource > 32){
-      nextUnit = p;
-      console.log("Computer's next unit is "+nextUnit);
-    }else{
-      while(p === 3){
-        p = int(random(0,5));
-      }
-      nextUnit = p;
-      console.log("Computer's next unit is "+nextUnit);
-    }
-  }
-  if (p === 2  && nextUnit < 0){
-    if (baseRight.resource > 10 && baseLeft.squaresNum <= baseRight.squaresNum){
-      nextUnit = p;
-      console.log("Computer's next unit is "+nextUnit);
-    }else{
-      while(p === 2){
-        p = int(random(0,5));
-      }
-      if (p === 4 && (baseRight.squaresNum >= 2 || baseRight.circleDemosNum >= 2)){
-        p = int(random(0,3));
-      }
-      if (p === 3 && baseRight.resource < 32){
-        p = int(random(0,2));
-      }
-      nextUnit = p;
-      console.log("Computer's next unit is "+nextUnit);
-    }
-  }
-  if (p === 1  && nextUnit < 0){
-    if (baseRight.resource > 20 && (baseRight.squaresNum >= 2 || baseRight.circleDemosNum >= 2)){
-      nextUnit = p;
-      console.log("Computer's next unit is "+nextUnit);
-    }else{
-      p = int(random(0,4));
-      if (p === 3 && baseRight.resource < 32){
-        p = int(random(0,3));
-      }
-      while(p === 1){
-        p = int(random(0,3));
-      }
-      nextUnit = p;
-      console.log("Computer's next unit is "+nextUnit);
-      }
-  }
-  if (p === 0  && nextUnit < 0){
-      nextUnit = p;
-      console.log("Computer's next unit is "+nextUnit);
-  }
-
-  if (nextUnit === 0){
+  // 0 is to deploy a scout / square
+  if (nextUnit === 0) {
     if (baseRight.resource >= 16 && baseRight.capacity < baseRight.maxCap) {
       baseRight.UpkeyColor = RED;
       let uniqueId = getUniqueId();
@@ -733,11 +841,12 @@ function computerPlays(){
       baseRight.capacity++;
       baseRight.squaresNum++;
       baseRight.resource -= square.cost;
-      nextUnit = -1;
+      nextUnit = -1; // reset next unit
       runOnce = true;
     }
-  }else if(nextUnit === 1){
-    if (baseRight.resource >= 28  && baseRight.capacity < baseRight.maxCap) {
+    // 1 is to deploy a shooter
+  } else if (nextUnit === 1) {
+    if (baseRight.resource >= 28 && baseRight.capacity < baseRight.maxCap) {
       baseRight.LeftkeyColor = RED;
       let uniqueId = getUniqueId();
       let circleShooter = new CircleShooter(baseRight.x, baseRight.y, 1, mapId, uniqueId);
@@ -749,8 +858,9 @@ function computerPlays(){
       nextUnit = -1;
       runOnce = true;
     }
-  }else if(nextUnit === 2){
-    if (baseRight.resource >= 20  && baseRight.capacity < baseRight.maxCap) {
+    // 2 is to deploy a demo
+  } else if (nextUnit === 2) {
+    if (baseRight.resource >= 20 && baseRight.capacity < baseRight.maxCap) {
       baseRight.RightkeyColor = RED;
       let uniqueId = getUniqueId();
       let circleDemo = new CircleDemo(baseRight.x, baseRight.y, 1, mapId, uniqueId);
@@ -762,8 +872,9 @@ function computerPlays(){
       nextUnit = -1;
       runOnce = true;
     }
-  }else if(nextUnit === 3){
-    if (baseRight.resource >= 42  && baseRight.squareXL===null) {
+    // 3 is to deploy a tank / square XL
+  } else if (nextUnit === 3) {
+    if (baseRight.resource >= 42 && baseRight.squareXL === null) {
       baseRight.DownkeyColor = RED;
       let uniqueId = getUniqueId();
       let squareXL = new SquareXL(baseRight.x, baseRight.y, 1, mapId, 100);
@@ -773,21 +884,9 @@ function computerPlays(){
       nextUnit = -1;
       runOnce = true;
     }
-  }else if(nextUnit === 4){
-    if (baseRight.resource >= 32){
-      nextUnit = -1;
-      runOnce = true;
-    }
-  }else{
-    if (baseRight.resource >= 16  && baseRight.capacity < baseRight.maxCap) {
-      baseRight.UpkeyColor = RED;
-      let uniqueId = getUniqueId();
-      let square = new Square(baseRight.x, baseRight.y, 1, mapId, uniqueId);
-      baseRight.squares.push(square);
-      console.log("RED player spawned a square (id: " + uniqueId + ")");
-      baseRight.capacity++;
-      baseRight.squaresNum++;
-      baseRight.resource -= square.cost;
+    // 4 is to wait until the resource is 32
+  } else if (nextUnit === 4) {
+    if (baseRight.resource >= 32) {
       nextUnit = -1;
       runOnce = true;
     }
@@ -858,8 +957,8 @@ function checkMainMenuButton() {
 
 // displayHelp()
 //
-//
-function displayHelp(page){
+// display images based on the subPage
+function displayHelp(page) {
   push();
   fill(255);
   textAlign(CENTER, CENTER);
@@ -867,78 +966,86 @@ function displayHelp(page){
   rectMode(CENTER);
   ellipseMode(CENTER);
   textSize(16);
-  text("click the next circle or use arrowkeys to navigate",width / 2,25);
-  if (mouseY < 63 && mouseX < width / 2 - 52 && mouseX > width / 2 - 68){
+  text("click the next circle or use arrowkeys to navigate", width / 2, 25);
+  // 5 buttons
+  if (mouseY < 63 && mouseX < width / 2 - 52 && mouseX > width / 2 - 68) {
     fill(SELECTED);
-    ellipse(width / 2 - 60, 55,24);
+    ellipse(width / 2 - 60, 55, 24);
     if (mouseIsPressed) {
       subPage = 0;
     }
-  }else if (mouseY < 63 && mouseX < width / 2 - 22 && mouseX > width / 2 - 38){
+  } else if (mouseY < 63 && mouseX < width / 2 - 22 && mouseX > width / 2 - 38) {
     fill(SELECTED);
-    ellipse(width / 2 - 30, 55,24);
+    ellipse(width / 2 - 30, 55, 24);
     if (mouseIsPressed) {
       subPage = 1;
     }
-  }else if (mouseY < 63 && mouseX < width / 2 + 8 && mouseX > width / 2 - 8){
+  } else if (mouseY < 63 && mouseX < width / 2 + 8 && mouseX > width / 2 - 8) {
     fill(SELECTED);
-    ellipse(width / 2, 55,24);
+    ellipse(width / 2, 55, 24);
     if (mouseIsPressed) {
       subPage = 2;
     }
-  }else if (mouseY < 63 && mouseX < width / 2 + 38 && mouseX > width / 2 + 22){
+  } else if (mouseY < 63 && mouseX < width / 2 + 38 && mouseX > width / 2 + 22) {
     fill(SELECTED);
-    ellipse(width / 2 + 30, 55,24);
+    ellipse(width / 2 + 30, 55, 24);
     if (mouseIsPressed) {
       subPage = 3;
     }
-  }else if (mouseY < 63 && mouseX < width / 2 + 68 && mouseX > width / 2 + 52){
+  } else if (mouseY < 63 && mouseX < width / 2 + 68 && mouseX > width / 2 + 52) {
     fill(SELECTED);
-    ellipse(width / 2 + 60, 55,24);
+    ellipse(width / 2 + 60, 55, 24);
     if (mouseIsPressed) {
       subPage = 4;
     }
   }
-  fill(50,150);
-  ellipse(width / 2 - 60, 55,16);
-  ellipse(width / 2 - 30, 55,16);
-  ellipse(width / 2, 55,16);
-  ellipse(width / 2 + 30, 55,16);
-  ellipse(width / 2 + 60, 55,16);
+  // semitransparent rounded buttons
+  fill(50, 150);
+  ellipse(width / 2 - 60, 55, 16);
+  ellipse(width / 2 - 30, 55, 16);
+  ellipse(width / 2, 55, 16);
+  ellipse(width / 2 + 30, 55, 16);
+  ellipse(width / 2 + 60, 55, 16);
   textSize(32);
-  if (page===0){
+  // titles for each page
+  // and highlights the buttons of the page
+  if (page === 0) {
     fill(SELECTED);
-    ellipse(width / 2 - 60, 55,16);
+    ellipse(width / 2 - 60, 55, 16);
     fill(255);
-    text("W E L C O M E",width / 2, 90);
-  }else if (page===1){
+    text("W E L C O M E", width / 2, 90);
+  } else if (page === 1) {
     fill(SELECTED);
-    ellipse(width / 2 - 30, 55,16);
+    ellipse(width / 2 - 30, 55, 16);
     fill(255);
-    text("C O N T O R L S",width / 2, 90);
-  }else if (page===2){
+    text("C O N T O R L S", width / 2, 90);
+  } else if (page === 2) {
     fill(SELECTED);
-    ellipse(width / 2, 55,16);
+    ellipse(width / 2, 55, 16);
     fill(255);
-    text("U N I T S",width / 2, 90);
-  }else if (page===3){
+    text("U N I T S", width / 2, 90);
+  } else if (page === 3) {
     fill(SELECTED);
-    ellipse(width / 2 + 30, 55,16);
+    ellipse(width / 2 + 30, 55, 16);
     fill(255);
-    text("R E S O U R C E",width / 2, 90);
-  }else if (page===4){
+    text("R E S O U R C E", width / 2, 90);
+  } else if (page === 4) {
     fill(SELECTED);
-    ellipse(width / 2 + 60, 55,16);
+    ellipse(width / 2 + 60, 55, 16);
     fill(255);
-    text("T I M E",width / 2, 90);
+    text("T I M E", width / 2, 90);
   }
-  image(HelpPics[page],width/2,height/2,640,360);
+  // image displayed from the array using the page as index
+  image(HelpPics[page], width / 2, height / 2, 640, 360);
   pop();
 
   checkHelpButton();
 }
 
-function checkHelpButton(){
+// checkHelpButton()
+//
+// check the button in help menu
+function checkHelpButton() {
   push();
   textAlign(CENTER, CENTER);
   // play button
@@ -953,7 +1060,7 @@ function checkHelpButton(){
     // if pressed, go to next state - choosing map
     if (mouseIsPressed) {
       State = "selectingMaps";
-      subPage = 0;
+      subPage = 0; // reset subPage
     }
     // if not hovering
   } else {
@@ -1024,9 +1131,9 @@ function checkMapMenuButton() {
   textSize(32);
   fill(SELECTED);
   // map 1
-  if (height / 2 - rectUIHeight/2 < mouseY && mouseY < height / 2 + rectUIHeight/2 &&
-    mouseX > width / 2 - 375 - rectUIWidth/2 && mouseX < width / 2 + 375 + rectUIWidth/2) {
-    if (mouseX < width / 2 - 375 + rectUIWidth/2 && mouseX > width / 2 - 375 - rectUIWidth/2) {
+  if (height / 2 - rectUIHeight / 2 < mouseY && mouseY < height / 2 + rectUIHeight / 2 &&
+    mouseX > width / 2 - 375 - rectUIWidth / 2 && mouseX < width / 2 + 375 + rectUIWidth / 2) {
+    if (mouseX < width / 2 - 375 + rectUIWidth / 2 && mouseX > width / 2 - 375 - rectUIWidth / 2) {
       rect(width / 2 - 375, height / 2, rectUIWidth + rectUIStroke, rectUIHeight + rectUIStroke);
       image(MapHorizontal, width / 2 - 375, height / 2, rectUIWidth, rectUIHeight);
       // map name
@@ -1039,7 +1146,7 @@ function checkMapMenuButton() {
         selectedMap = true;
       }
       // map 2
-    } else if (mouseX > width / 2 - 125 - rectUIWidth/2 && mouseX < width / 2 - 125 + rectUIWidth/2) {
+    } else if (mouseX > width / 2 - 125 - rectUIWidth / 2 && mouseX < width / 2 - 125 + rectUIWidth / 2) {
       rect(width / 2 - 125, height / 2, rectUIWidth + rectUIStroke, rectUIHeight + rectUIStroke);
       image(MapDiagonal1, width / 2 - 125, height / 2, rectUIWidth, rectUIHeight);
       textSize(16);
@@ -1050,7 +1157,7 @@ function checkMapMenuButton() {
         selectedMap = true;
       }
       // map 3
-    } else if (mouseX > width / 2 + 125 - rectUIWidth/2 && mouseX < width / 2 + 125 + rectUIWidth/2) {
+    } else if (mouseX > width / 2 + 125 - rectUIWidth / 2 && mouseX < width / 2 + 125 + rectUIWidth / 2) {
       rect(width / 2 + 125, height / 2, rectUIWidth + rectUIStroke, rectUIHeight + rectUIStroke);
       image(MapDiagonal2, width / 2 + 125, height / 2, rectUIWidth, rectUIHeight);
       textSize(16);
@@ -1061,7 +1168,7 @@ function checkMapMenuButton() {
         selectedMap = true;
       }
       // map 4s
-    } else if (mouseX > width / 2 + 375 - rectUIWidth/2 && mouseX < width / 2 + 375 + rectUIWidth/2) {
+    } else if (mouseX > width / 2 + 375 - rectUIWidth / 2 && mouseX < width / 2 + 375 + rectUIWidth / 2) {
       rect(width / 2 + 375, height / 2, rectUIWidth + rectUIStroke, rectUIHeight + rectUIStroke);
       image(MapVertical, width / 2 + 375, height / 2, rectUIWidth, rectUIHeight);
       textSize(16);
@@ -1148,10 +1255,10 @@ function checkModeMenuButton() {
   imageMode(CENTER);
   rectMode(CENTER);
   textSize(32);
-  if (height / 2 - rectUIHeight/2 < mouseY && mouseY < height / 2 + rectUIHeight/2 &&
-    mouseX > width / 2 - 125 - rectUIWidth/2 && mouseX < width / 2 + 125 + rectUIWidth/2) {
+  if (height / 2 - rectUIHeight / 2 < mouseY && mouseY < height / 2 + rectUIHeight / 2 &&
+    mouseX > width / 2 - 125 - rectUIWidth / 2 && mouseX < width / 2 + 125 + rectUIWidth / 2) {
     // mode 1
-    if (mouseX > width / 2 - 125 - rectUIWidth/2 && mouseX < width / 2 - 125 + rectUIWidth/2) {
+    if (mouseX > width / 2 - 125 - rectUIWidth / 2 && mouseX < width / 2 - 125 + rectUIWidth / 2) {
       fill(SELECTED);
       rect(width / 2 - 125, height / 2, rectUIWidth + rectUIStroke, rectUIHeight + rectUIStroke);
       fill(255);
@@ -1165,7 +1272,7 @@ function checkModeMenuButton() {
         selectedMode = true;
       }
       // mode 2
-    } else if (mouseX > width / 2 + 125 - rectUIWidth/2 && mouseX < width / 2 + 125 + rectUIWidth/2) {
+    } else if (mouseX > width / 2 + 125 - rectUIWidth / 2 && mouseX < width / 2 + 125 + rectUIWidth / 2) {
       fill(SELECTED);
       rect(width / 2 + 125, height / 2, rectUIWidth + rectUIStroke, rectUIHeight + rectUIStroke);
       fill(255);
@@ -1177,7 +1284,7 @@ function checkModeMenuButton() {
         selectedMode = true;
       }
     }
-  }else{
+  } else {
     // if mouse is pressed somewhere else, remove the selection
     if (mouseIsPressed && mouseY < height - 75) {
       modeId = -1;
@@ -1202,6 +1309,8 @@ function checkModeMenuButton() {
       setUpBase(); // set up player bases
       playing = true;
       time = 0;
+      time2 = 0;
+      nextUnit = 0;
       startTime = frameCount;
     }
   }
@@ -1213,54 +1322,65 @@ function checkModeMenuButton() {
   pop();
 }
 
-function displayGameOver(){
+// displayGameOver()
+//
+// display the game over screen
+function displayGameOver() {
   push();
   fill(255);
   textAlign(CENTER, CENTER);
   imageMode(CENTER);
   rectMode(CENTER);
   textSize(64);
-  if (winner === 0){
+  // winner
+  if (winner === 0) {
     fill(BLUE);
     text("B L U E   W O N", width / 2, height / 2 - 100);
-  }else if (winner === 1){
+  } else if (winner === 1) {
     fill(RED);
     text("R E D   W O N", width / 2, height / 2 - 100);
   }
+  // duration of the game
   fill(GOLD);
   textSize(32);
-  if (min <= 9){
-    if (sec <= 9){
-      text("T I M E   C O N S U M E D\n0"+min+"m 0"+sec+"s", width / 2, height / 2+50);
-    }else{
-      text("T I M E   C O N S U M E D\n0"+min+"m "+sec+"s", width / 2, height / 2+50);
+  if (min <= 9) {
+    if (sec <= 9) {
+      text("T I M E   C O N S U M E D\n0" + min + "m 0" + sec + "s", width / 2, height / 2 + 50);
+    } else {
+      text("T I M E   C O N S U M E D\n0" + min + "m " + sec + "s", width / 2, height / 2 + 50);
     }
-  }else{
-    if (sec <= 9){
-      text("T I M E   C O N S U M E D\n"+min+"m 0"+sec+"s", width / 2, height / 2+50);
-    }else{
-      text("T I M E   C O N S U M E D\n"+min+"m "+sec+"s", width / 2, height / 2+50);
+  } else {
+    if (sec <= 9) {
+      text("T I M E   C O N S U M E D\n" + min + "m 0" + sec + "s", width / 2, height / 2 + 50);
+    } else {
+      text("T I M E   C O N S U M E D\n" + min + "m " + sec + "s", width / 2, height / 2 + 50);
     }
   }
+  // assessment
   fill(255);
   textSize(16);
-  if (modeId === 1 || (winner === 0 && modeId === 0)){
-    if (min >=6){
-      text("A S S E S S M E N T :   "+ASSESS[0], width / 2, height / 2+200);
-    }else if (min >= 3 && min < 6){
-      text("A S S E S S M E N T :   "+ASSESS[1], width / 2, height / 2+200);
-    }else if (min < 3){
-      text("A S S E S S M E N T :   "+ASSESS[2], width / 2, height / 2+200);
+  // if the player wins when playing alone or playing with friends
+  if (modeId === 1 || (winner === 0 && modeId === 0)) {
+    if (min >= 6) {
+      text("A S S E S S M E N T :   " + ASSESS[0], width / 2, height / 2 + 200);
+    } else if (min >= 3 && min < 6) {
+      text("A S S E S S M E N T :   " + ASSESS[1], width / 2, height / 2 + 200);
+    } else if (min < 3) {
+      text("A S S E S S M E N T :   " + ASSESS[2], width / 2, height / 2 + 200);
     }
-  }else{
-    text("A S S E S S M E N T :   F A I L U R E   I S   N O T   A N   O P T I O N", width / 2, height / 2+200);
+    // if losses when playing alone
+  } else {
+    text("A S S E S S M E N T :   F A I L U R E   I S   N O T   A N   O P T I O N", width / 2, height / 2 + 200);
   }
   pop();
 
   checkGameOverButton();
 }
 
-function checkGameOverButton(){
+// checkGameOverButton()
+//
+// check the button in game over sreen
+function checkGameOverButton() {
   push();
   textAlign(CENTER, CENTER);
   // restart button
@@ -1272,7 +1392,7 @@ function checkGameOverButton(){
     rect(0, 0, width, 75);
     fill(255);
     text("B A C K   T O   M A I N   M E N U", width / 2, 35);
-    // if pressed, go to first state
+    // if pressed, go to first state and reset map and mode
     if (mouseIsPressed) {
       State = "starting";
       gameOver = false;

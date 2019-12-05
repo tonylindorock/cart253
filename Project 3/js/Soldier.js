@@ -85,7 +85,7 @@ class Soldier {
 
   // handleWrapping()
   //
-  // all soldier units cannot go off the edge
+  // all the units cannot go off the edge
   handleWrapping() {
     if (this.health <= 0) {
       this.dead = true;

@@ -19,29 +19,24 @@ class Bullet extends CircleShooter {
     // sizes
     this.size = 10;
     this.innerSize = this.size;
-
+    // properties
     this.speed = 10;
     this.damage = 7;
     this.hit = false; // whether it's hit or miss
 
-    this.dead = false; // if the bullet fly out of range, it dies
+    this.dead = false; // if the bullet fly out of range, it "dies"
 
     this.displayBullet = true;
     this.runOnce = true; // run only once
 
     this.playerId = playerId; // id
-    // color
-    if (this.playerId == 0) {
-      this.color = "#4fc7fb"; // blue
-    } else if (this.playerId == 1) {
-      this.color = "#FB524F"; // red
-    }
   }
 
   // moveTo(target)
   //
   // fly to the enemy to hurt them
   // or fly out of range
+  // and display the bullet
   moveTo(target) {
     // distance to target
     let d = dist(this.bulletX, this.bulletY, target.x, target.y);
@@ -54,7 +49,7 @@ class Bullet extends CircleShooter {
     this.bulletX += this.speed * cos(angle);
     this.bulletY += this.speed * sin(angle);
     // if the distance to start point greater than 250
-    // make the bullet disappear
+    // make the bullet disappear (it dies)
     if (d2 >= 250) {
       this.dead = true;
     }
@@ -87,7 +82,7 @@ class Bullet extends CircleShooter {
         if (this.size >= 20 && this.uniqueId != -1) {
           this.displayBullet = false;
           this.speed = 10;
-        }else if (this.size >= 30){
+        } else if (this.size >= 30) {
           this.displayBullet = false;
           this.speed = 10;
         }
@@ -99,14 +94,5 @@ class Bullet extends CircleShooter {
       ellipse(this.bulletX, this.bulletY, this.size);
       pop();
     }
-  }
-
-  // reset()
-  //
-  // might be useful
-  reset() {
-    this.bulletX = this.x;
-    this.bulletY = this.y;
-    this.hit = false;
   }
 }

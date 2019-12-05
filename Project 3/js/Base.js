@@ -1,14 +1,14 @@
 // Base
 //
 // The class which is the base of the player
-// Handles creating of other Soldier classes
+// Store all the units and resource 
 
 class Base {
   // constructor
   //
   // takes in player id, map id, and mode id to determine player's base position and keys
   constructor(playerId, mapId, modeId) {
-    // size
+    // sizes
     this.size = 50;
     this.outerSize = 50;
     // health
@@ -26,6 +26,7 @@ class Base {
     } else if (this.playerId === 1) {
       this.color = "#FB524F"; // red
     }
+    // deployment keys colors
     this.UpkeyColor = color(255, 0);
     this.LeftkeyColor = color(255, 0);
     this.DownkeyColor = color(255, 0);
@@ -62,39 +63,43 @@ class Base {
       }
     }
     // resource
-    this.resource = 932;
-
+    this.resource = 32;
+    // if under attack
     this.underAttack = false;
-
+    // animation
     this.animationFinished = false;
     this.playOnce = true;
-
+    // number of units
     this.squaresNum = 0;
     this.circleShootersNum = 0;
     this.circleDemosNum = 0;
-
-    // soldier arrays
+    // units arrays
     this.squares = [];
-    this.squareXL = null;
     this.circleShooters = [];
     this.circleDemos = [];
+    this.squareXL = null; // only one tank is allowed, so no array for it
   }
 
   // hasActiveSoldiers()
   //
-  // return if the base has anysoldiers alive
+  // return if the base has anys units alive
+  // also remove the dead unit from the array and update array size
   hasActiveSoldiers() {
     let check = false;
     for (let i = 0; i < this.squares.length; i++) {
+      // if has any alive
       if (this.squares[i].dead != true) {
         check = true;
-      }else{
-        if (this.squares[i].animationFinished){
+      } else {
+        // if the dying amination is finished
+        if (this.squares[i].animationFinished) {
+          // move the dead unit to the first in the array
+          // and delete it while updating the array size
           let temp = this.squares[0];
           this.squares[0] = this.squares[i];
           this.squares[i] = temp;
           this.squares.shift();
-          this.capacity--;
+          this.capacity--; // update cap
         }
       }
     }
@@ -104,8 +109,8 @@ class Base {
     for (let i = 0; i < this.circleShooters.length; i++) {
       if (this.circleShooters[i].dead != true) {
         check = true;
-      }else{
-        if (this.circleShooters[i].animationFinished){
+      } else {
+        if (this.circleShooters[i].animationFinished) {
           let temp = this.circleShooters[0];
           this.circleShooters[0] = this.circleShooters[i];
           this.circleShooters[i] = temp;
@@ -117,8 +122,8 @@ class Base {
     for (let i = 0; i < this.circleDemos.length; i++) {
       if (this.circleDemos[i].dead != true) {
         check = true;
-      }else{
-        if (this.circleDemos[i].animationFinished){
+      } else {
+        if (this.circleDemos[i].animationFinished) {
           let temp = this.circleDemos[0];
           this.circleDemos[0] = this.circleDemos[i];
           this.circleDemos[i] = temp;
@@ -140,72 +145,82 @@ class Base {
     }
   }
 
-  displayUnitsMenu(){
+  // displayUnitsMenu()
+  //
+  // display the units deployment info menu
+  displayUnitsMenu() {
     push();
     rectMode(CENTER);
     ellipseMode(CENTER);
-    textAlign(CENTER,CENTER);
-    fill(255,150);
+    textAlign(CENTER, CENTER);
+    // names of the unit
+    fill(255, 150);
     textSize(12);
-    text("square", this.x, this.y - 95);
+    text("scout", this.x, this.y - 95);
     text("shooter", this.x - 50, this.y - 45);
     text("demo", this.x + 50, this.y - 45);
-    text("tank", this.x, this.y+95);
-    // square
+    text("tank", this.x, this.y + 95);
+    // draw all the units
+    // scout / square
     stroke(255);
     strokeWeight(2);
     fill(this.color);
     rect(this.x, this.y - 50, 30, 30);
     noStroke();
     fill(255);
-    rect(this.x, this.y - 50, 30/4,30/4);
+    rect(this.x, this.y - 50, 30 / 4, 30 / 4);
 
-    //circleShooter
+    // shooter
     stroke(255);
     strokeWeight(2);
     fill(this.color);
-    ellipse(this.x-50, this.y, 30);
+    ellipse(this.x - 50, this.y, 30);
     noStroke();
     fill(255);
-    ellipse(this.x-50, this.y, 30 / 4);
+    ellipse(this.x - 50, this.y, 30 / 4);
 
-    // circleDemo
+    // demo
     stroke(255);
     strokeWeight(2);
     fill(this.color);
-    ellipse(this.x+50, this.y, 30);
+    ellipse(this.x + 50, this.y, 30);
 
-    // squareXL
-    stroke(255);
-    rect(this.x, this.y+50, 30, 30, 4);
-    line(this.x-5, this.y+55, this.x+5, this.y+45);
-    line(this.x+5, this.y+55, this.x-5, this.y+45);
+    // tank / square XL
+    rect(this.x, this.y + 50, 30, 30, 4);
+    line(this.x - 5, this.y + 55, this.x + 5, this.y + 45);
+    line(this.x + 5, this.y + 55, this.x - 5, this.y + 45);
     pop();
   }
 
-  displayAnimation(){
+  // displayAnimation()
+  //
+  // play the animtion when the base dies
+  displayAnimation() {
     push();
     fill(this.color);
     // base
     rectMode(CENTER);
     rect(this.x, this.y, this.size, this.size);
-    fill(255,0);
+    fill(255, 0);
     stroke(255);
     strokeWeight(4);
     rect(this.x, this.y, this.outerSize, this.outerSize);
-    if (this.size > 0){
+    // shrink the base while enlarge the outline
+    if (this.size > 0) {
       this.size -= 1;
       this.outerSize += 1;
       stroke(255);
       strokeWeight(4);
       line(this.x, this.y + 5, this.x, this.y - 5);
       line(this.x - 5, this.y, this.x + 5, this.y);
-      if (this.playOnce){
+      // if no health, play the sound once
+      if (this.playOnce) {
         Defeated.play();
         this.playOnce = false;
       }
     }
-    if (this.size <= 0){
+    // if the size is 0, animation is finished
+    if (this.size <= 0) {
       this.animationFinished = true;
       this.underAttack = false;
     }
@@ -218,7 +233,7 @@ class Base {
       rect(5, height / 2, 10, height);
       fill(this.color);
       rect(5, height / 2, 10, this.barHeight);
-    }else if (this.playerId === 1){
+    } else if (this.playerId === 1) {
       fill(50);
       rect(width - 5, height / 2, 10, height);
       fill(this.color);
@@ -230,14 +245,15 @@ class Base {
   // display
   //
   // display the base and its health on the side of the window
+  // also calls gaining resource and checks alive and dead units
   display() {
     this.gainResources();
     this.hasActiveSoldiers();
 
-    if (this.underAttack && !Alarm.isPlaying()){
+    // if under attack, play the sound repeatedly
+    if (this.underAttack && !Alarm.isPlaying()) {
       Alarm.play();
     }
-
     push();
     fill(this.color);
     // base
@@ -253,6 +269,7 @@ class Base {
     // map the health into window height
     this.barHeight = map(this.health, 0, this.maxHealth, 0, height);
     strokeWeight(2);
+    // all the UI elements
     if (this.playerId === 0) {
       fill(50);
       rect(5, height / 2, 10, height);
@@ -264,34 +281,34 @@ class Base {
       fill(255, 150);
       text(this.resource, this.x + 35, this.y + 50);
       // key squares
-      if(this.resource >= 16 && this.squares.length+this.circleShooters.length+this.circleDemos.length < 50){
+      if (this.resource >= 16 && this.squares.length + this.circleShooters.length + this.circleDemos.length < 50) {
         stroke(255);
-      }else{
-        stroke(255,100);
+      } else {
+        stroke(255, 100);
       }
       fill(this.UpkeyColor);
       rect(this.x, this.y - 50, 30, 30, 4);
       // shooter
-      if(this.resource >= 28  && this.squares.length+this.circleShooters.length+this.circleDemos.length < 50){
+      if (this.resource >= 28 && this.squares.length + this.circleShooters.length + this.circleDemos.length < 50) {
         stroke(255);
-      }else{
-        stroke(255,100);
+      } else {
+        stroke(255, 100);
       }
       fill(this.LeftkeyColor);
       rect(this.x - 50, this.y, 30, 30, 4);
       // squareXL
-      if(this.resource >= 42  && this.squareXL===null){
+      if (this.resource >= 42 && this.squareXL === null) {
         stroke(255);
-      }else{
-        stroke(255,100);
+      } else {
+        stroke(255, 100);
       }
       fill(this.DownkeyColor);
       rect(this.x, this.y + 50, 30, 30, 4);
       // demo
-      if(this.resource >= 20  && this.squares.length+this.circleShooters.length+this.circleDemos.length < 50){
+      if (this.resource >= 20 && this.squares.length + this.circleShooters.length + this.circleDemos.length < 50) {
         stroke(255);
-      }else{
-        stroke(255,100);
+      } else {
+        stroke(255, 100);
       }
       fill(this.RightkeyColor);
       rect(this.x + 50, this.y, 30, 30, 4);
@@ -300,31 +317,31 @@ class Base {
       textAlign(CENTER, CENTER);
       textSize(16);
       // up key square
-      if(this.resource >= 16 && this.squares.length+this.circleShooters.length+this.circleDemos.length < 50){
+      if (this.resource >= 16 && this.squares.length + this.circleShooters.length + this.circleDemos.length < 50) {
         fill(255);
-      }else{
-        fill(255,100);
+      } else {
+        fill(255, 100);
       }
       text("W", this.x, this.y - 50);
       // left key shooter
-      if(this.resource >= 28 && this.squares.length+this.circleShooters.length+this.circleDemos.length < 50){
+      if (this.resource >= 28 && this.squares.length + this.circleShooters.length + this.circleDemos.length < 50) {
         fill(255);
-      }else{
-        fill(255,100);
+      } else {
+        fill(255, 100);
       }
       text("A", this.x - 50, this.y);
       // down key squareXL
-      if(this.resource >= 42 && this.squareXL===null){
+      if (this.resource >= 42 && this.squareXL === null) {
         fill(255);
-      }else{
-        fill(255,100);
+      } else {
+        fill(255, 100);
       }
       text("S", this.x, this.y + 50);
       // right key demo
-      if(this.resource >= 20 && this.squares.length+this.circleShooters.length+this.circleDemos.length < 50){
+      if (this.resource >= 20 && this.squares.length + this.circleShooters.length + this.circleDemos.length < 50) {
         fill(255);
-      }else{
-        fill(255,100);
+      } else {
+        fill(255, 100);
       }
       text("D", this.x + 50, this.y);
     } else if (this.playerId === 1) {
@@ -339,34 +356,34 @@ class Base {
       text(this.resource, this.x - 35, this.y + 50);
       if (this.modeId === 1) {
         // key squares
-        if(this.resource >= 16  && this.squares.length+this.circleShooters.length+this.circleDemos.length < 50){
+        if (this.resource >= 16 && this.squares.length + this.circleShooters.length + this.circleDemos.length < 50) {
           stroke(255);
-        }else{
-          stroke(255,100);
+        } else {
+          stroke(255, 100);
         }
         fill(this.UpkeyColor);
         rect(this.x, this.y - 50, 30, 30, 4);
         // shooter
-        if(this.resource >= 28  && this.squares.length+this.circleShooters.length+this.circleDemos.length < 50){
+        if (this.resource >= 28 && this.squares.length + this.circleShooters.length + this.circleDemos.length < 50) {
           stroke(255);
-        }else{
-          stroke(255,100);
+        } else {
+          stroke(255, 100);
         }
         fill(this.LeftkeyColor);
         rect(this.x - 50, this.y, 30, 30, 4);
         // squareXL
-        if(this.resource >= 42  && this.squareXL===null){
+        if (this.resource >= 42 && this.squareXL === null) {
           stroke(255);
-        }else{
-          stroke(255,100);
+        } else {
+          stroke(255, 100);
         }
         fill(this.DownkeyColor);
         rect(this.x, this.y + 50, 30, 30, 4);
         // demo
-        if(this.resource >= 20 && this.squares.length+this.circleShooters.length+this.circleDemos.length < 50){
+        if (this.resource >= 20 && this.squares.length + this.circleShooters.length + this.circleDemos.length < 50) {
           stroke(255);
-        }else{
-          stroke(255,100);
+        } else {
+          stroke(255, 100);
         }
         fill(this.RightkeyColor);
         rect(this.x + 50, this.y, 30, 30, 4);
@@ -375,37 +392,37 @@ class Base {
         textSize(16);
         noStroke();
         // up key square
-        if(this.resource >= 16 && this.squares.length+this.circleShooters.length+this.circleDemos.length < 50){
+        if (this.resource >= 16 && this.squares.length + this.circleShooters.length + this.circleDemos.length < 50) {
           fill(255);
-        }else{
-          fill(255,100);
+        } else {
+          fill(255, 100);
         }
         text("↑", this.x, this.y - 50);
         // left key shooter
-        if(this.resource >= 28 && this.squares.length+this.circleShooters.length+this.circleDemos.length < 50){
+        if (this.resource >= 28 && this.squares.length + this.circleShooters.length + this.circleDemos.length < 50) {
           fill(255);
-        }else{
-          fill(255,100);
+        } else {
+          fill(255, 100);
         }
         text("←", this.x - 50, this.y);
         // down key squarexl
-        if(this.resource >= 42 && this.squareXL===null){
+        if (this.resource >= 42 && this.squareXL === null) {
           fill(255);
-        }else{
-          fill(255,100);
+        } else {
+          fill(255, 100);
         }
         text("↓", this.x, this.y + 50);
         // right key demo
-        if(this.resource >= 20 && this.squares.length+this.circleShooters.length+this.circleDemos.length < 50){
+        if (this.resource >= 20 && this.squares.length + this.circleShooters.length + this.circleDemos.length < 50) {
           fill(255);
-        }else{
-          fill(255,100);
+        } else {
+          fill(255, 100);
         }
         text("→", this.x + 50, this.y);
       }
     }
     // costs
-    if (this.modeId === 1 || (this.modeId === 0 && this.playerId === 0)){
+    if (this.modeId === 1 || (this.modeId === 0 && this.playerId === 0)) {
       fill(255, 206, 43);
       textSize(12);
       text("$16", this.x, this.y - 80);
@@ -417,15 +434,15 @@ class Base {
       rectMode(CENTER);
       fill(255);
       textSize(16);
-      rect(this.x+20,this.y-65, 30, 20, 32);
-      rect(this.x-30,this.y-15, 30, 20, 32);
-      rect(this.x+65,this.y-15, 30, 20, 32);
-      rect(this.x+20,this.y+35, 30, 20, 32);
+      rect(this.x + 20, this.y - 65, 30, 20, 32);
+      rect(this.x - 30, this.y - 15, 30, 20, 32);
+      rect(this.x + 65, this.y - 15, 30, 20, 32);
+      rect(this.x + 20, this.y + 35, 30, 20, 32);
       fill(this.color);
-      text(this.squaresNum,this.x+20,this.y-65);
-      text(this.circleShootersNum,this.x-30,this.y-15);
-      text(this.circleDemosNum,this.x+65,this.y-15);
-      text(int(this.squareXL!=null),this.x+20,this.y+35);
+      text(this.squaresNum, this.x + 20, this.y - 65);
+      text(this.circleShootersNum, this.x - 30, this.y - 15);
+      text(this.circleDemosNum, this.x + 65, this.y - 15);
+      text(int(this.squareXL != null), this.x + 20, this.y + 35);
     }
     pop();
   }
