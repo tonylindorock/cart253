@@ -79,7 +79,12 @@ let HelpPic1;
 let HelpPic2;
 let HelpPic3;
 let HelpPic4;
-let HelpPics;
+let HelpPics; // array
+let BgPattern0;
+let BgPattern1;
+let BgPattern2;
+let BgPattern3;
+let BgPatterns; // array
 
 // sounds
 let Bgm;
@@ -92,6 +97,8 @@ let Alarm;
 
 let playOnce = true; // only play once
 
+let patternId; // pattern index
+
 function preload() {
   // initiate all the images
   MapHorizontal = loadImage("assets/images/Horizontal.jpg");
@@ -103,6 +110,10 @@ function preload() {
   HelpPic2 = loadImage("assets/images/UnitsPic.png");
   HelpPic3 = loadImage("assets/images/ResourcePic.png");
   HelpPic4 = loadImage("assets/images/TimePic.png");
+  BgPattern0 = loadImage("assets/images/BG.png");
+  BgPattern1 = loadImage("assets/images/BG 1.png");
+  BgPattern2 = loadImage("assets/images/BG 2.png");
+  BgPattern3 = loadImage("assets/images/BG 3.png");
 
   // initiate all the sounds
   Bgm = loadSound("assets/sounds/BG Sound.mp3");
@@ -118,7 +129,7 @@ function preload() {
   Deploy.setVolume(0.1);
   Die.setVolume(0.1);
   Explode.setVolume(0.5);
-  Defeated.setVolume(0.5);
+  Defeated.setVolume(0.25);
   Alarm.setVolume(0.15);
 }
 
@@ -131,9 +142,11 @@ function setup() {
 
   textFont("Verdana");
   textStyle(BOLD);
+  imageMode(CENTER);
   noStroke();
-  // put help pictures in an array
+  // put images in an array
   HelpPics = [HelpPic0, HelpPic1, HelpPic2, HelpPic3, HelpPic4];
+  BgPatterns = [BgPattern0,BgPattern1,BgPattern2,BgPattern3];
 }
 
 // randomizeBG()
@@ -143,6 +156,8 @@ function randomizeBG() {
   r = random(80, 100);
   g = random(80, 100);
   b = random(80, 100);
+
+  patternId = int(random(0,4));
 }
 
 // draw()
@@ -150,6 +165,7 @@ function randomizeBG() {
 // handle the game whether the player is choosing maps, choosing modes, or playing
 function draw() {
   background(r, g, b);
+  image(BgPatterns[patternId],width/2,height/2,width,height);
 
   // different states displaying different menus
   if (!gameOver) {

@@ -47,17 +47,17 @@ class SquareXL extends Soldier {
     let dx = this.enemyBaseX - this.x;
     let dy = this.enemyBaseY - this.y;
     let angle = atan2(dy, dx);
-    if (enemyBase.health > 0){
+    if (enemyBase.health > 0) {
       // move to it
       if (d >= 35) {
         this.x += this.speed * cos(angle);
         this.y += this.speed * sin(angle);
         // if it is close to the enemy base, it is considered to be under attack
-        if (d < 150){
+        if (d < 150) {
           enemyBase.underAttack = true;
           this.theEnemyBase = enemyBase;
         }
-      // attack
+        // attack
       } else {
         if (!this.dead) {
           enemyBase.health -= this.damage;
@@ -109,14 +109,14 @@ class SquareXL extends Soldier {
       this.innerSize -= 3;
       this.innerSize = constrain(this.innerSize, 0, 100);
       this.speed = 0;
-      if (this.playOnce){
+      if (this.playOnce) {
         Explode.play();
         this.playOnce = false;
       }
       if (this.innerSize <= 0) {
         this.animationFinished = true;
         // if it dies, the enemy base is no longer under attack
-        if (this.theEnemyBase!=null){
+        if (this.theEnemyBase != null) {
           this.theEnemyBase.underAttack = false;
         }
       }
