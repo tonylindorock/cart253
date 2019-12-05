@@ -64,7 +64,7 @@ class CircleDemo extends Soldier {
   // select an enemy and keep attacking it until it dies
   attack(enemy) {
     let d = dist(this.x, this.y, enemy.x, enemy.y);
-    if (d < 300 && this.targetId < 0 && !this.dead && !enemy.dead) {
+    if (d < 300 && this.targetId < 0 && (enemy.health >= enemy.maxHealth/2 || enemy.uniqueId === 100) && !this.dead && !enemy.dead) {
       this.targetId = enemy.uniqueId;
       this.obtainedTarget = true;
       this.attacking = true;

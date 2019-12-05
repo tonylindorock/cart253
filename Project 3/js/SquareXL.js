@@ -49,13 +49,16 @@ class SquareXL extends Soldier {
       if (d >= 35) {
         this.x += this.speed * cos(angle);
         this.y += this.speed * sin(angle);
+        if (d < 150){
+          enemyBase.underAttack = true;
+          this.theEnemyBase = enemyBase;
+        }
       } else {
         if (!this.dead) {
           enemyBase.health -= this.damage;
           enemyBase.health = constrain(enemyBase.health, 0, enemyBase.maxHealth);
           this.dead = true;
-          enemyBase.underAttack = true;
-          this.theEnemyBase = enemyBase;
+          enemyBase.underAttack = false;
         }
       }
     }

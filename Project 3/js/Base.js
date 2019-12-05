@@ -62,7 +62,7 @@ class Base {
       }
     }
     // resource
-    this.resource = 32;
+    this.resource = 932;
 
     this.underAttack = false;
 

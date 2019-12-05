@@ -23,6 +23,7 @@ let gameOver = false; // if game is over
 let singlePlayer = true; // if sinlge player
 let winner = -1;
 
+let startTime = 0;
 let time = 0;
 let time2 = 0;
 let min = 0;
@@ -81,8 +82,6 @@ let Die;
 let Explode;
 let Defeated;
 let Alarm;
-let EnemySighted;
-let MainTheme;
 
 let playOnce = true;
 
@@ -101,21 +100,17 @@ function preload() {
   Fire = loadSound("assets/sounds/Fire.mp3");
   Deploy = loadSound("assets/sounds/Deploy.mp3");
   Die = loadSound("assets/sounds/Die.mp3");
-  EnemySighted = loadSound("assets/sounds/Enemy Units Sighted.mp3");
-  MainTheme = loadSound("assets/sounds/Simple Defense.mp3");
   Explode = loadSound("assets/sounds/Explode.mp3");
   Defeated = loadSound("assets/sounds/Defeated.mp3");
   Alarm = loadSound("assets/sounds/Alarm.mp3");
 
   Bgm.setVolume(0.25);
-  EnemySighted.setVolume(0.2);
-  MainTheme.setVolume(0.2);
   Fire.setVolume(0.1);
   Deploy.setVolume(0.1);
   Die.setVolume(0.1);
   Explode.setVolume(0.5);
   Defeated.setVolume(0.5);
-  Alarm.setVolume(0.2);
+  Alarm.setVolume(0.15);
 }
 
 // setUp()
@@ -169,21 +164,11 @@ function draw() {
     }
     displayTime();
     if (singlePlayer) {
-      /*
-      if (!EnemySighted.isPlaying()){
-        EnemySighted.play();
-      }
-      */
       computerPlays();
       displayBase();
       displaySoldiers();
       moveSoldiers();
     } else if (!singlePlayer) {
-      /*
-      if (!MainTheme.isPlaying()){
-        MainTheme.play();
-      }
-      */
       displayBase();
       displaySoldiers();
       moveSoldiers();
@@ -232,14 +217,14 @@ function displayBase() {
   if (baseLeft.animationFinished){
     playing = false;
     gameOver = true;
-    sec = int((frameCount / 60) % 60);
-    min = int((frameCount / 60) / 60);
+    sec = int(((frameCount - startTime) / 60) % 60);
+    min = int(((frameCount - startTime) / 60) / 60);
   }
   if (baseRight.animationFinished){
     playing = false;
     gameOver = true;
-    sec = int((frameCount / 60) % 60);
-    min = int((frameCount / 60) / 60);
+    sec = int(((frameCount - startTime) / 60) % 60);
+    min = int(((frameCount - startTime) / 60) / 60);
   }
 }
 
@@ -882,7 +867,7 @@ function displayHelp(page){
   rectMode(CENTER);
   ellipseMode(CENTER);
   textSize(16);
-  text("click the next circle or use arrowkeys to continue",width / 2,25);
+  text("click the next circle or use arrowkeys to navigate",width / 2,25);
   if (mouseY < 63 && mouseX < width / 2 - 52 && mouseX > width / 2 - 68){
     fill(SELECTED);
     ellipse(width / 2 - 60, 55,24);
@@ -1217,6 +1202,7 @@ function checkModeMenuButton() {
       setUpBase(); // set up player bases
       playing = true;
       time = 0;
+      startTime = frameCount;
     }
   }
   // modes names
@@ -1236,24 +1222,24 @@ function displayGameOver(){
   textSize(64);
   if (winner === 0){
     fill(BLUE);
-    text("B L U E  W O N", width / 2, height / 2 - 100);
+    text("B L U E   W O N", width / 2, height / 2 - 100);
   }else if (winner === 1){
     fill(RED);
-    text("R E D  W O N", width / 2, height / 2 - 100);
+    text("R E D   W O N", width / 2, height / 2 - 100);
   }
   fill(GOLD);
   textSize(32);
   if (min <= 9){
     if (sec <= 9){
-      text("T I M E  C O N S U M E D\n0"+min+" : 0"+sec, width / 2, height / 2+50);
+      text("T I M E   C O N S U M E D\n0"+min+"m 0"+sec+"s", width / 2, height / 2+50);
     }else{
-      text("T I M E  C O N S U M E D\n0"+min+" : "+sec, width / 2, height / 2+50);
+      text("T I M E   C O N S U M E D\n0"+min+"m "+sec+"s", width / 2, height / 2+50);
     }
   }else{
     if (sec <= 9){
-      text("T I M E  C O N S U M E D\n"+min+" : 0"+sec, width / 2, height / 2+50);
+      text("T I M E   C O N S U M E D\n"+min+"m 0"+sec+"s", width / 2, height / 2+50);
     }else{
-      text("T I M E  C O N S U M E D\n"+min+" : "+sec, width / 2, height / 2+50);
+      text("T I M E   C O N S U M E D\n"+min+"m "+sec+"s", width / 2, height / 2+50);
     }
   }
   fill(255);
@@ -1285,7 +1271,7 @@ function checkGameOverButton(){
     fill(SELECTED);
     rect(0, 0, width, 75);
     fill(255);
-    text("B A C K  T O  M A I N  M E N U", width / 2, 35);
+    text("B A C K   T O   M A I N   M E N U", width / 2, 35);
     // if pressed, go to first state
     if (mouseIsPressed) {
       State = "starting";
@@ -1300,7 +1286,7 @@ function checkGameOverButton(){
     fill(50, 150);
     rect(0, 0, width, 75);
     fill(255);
-    text("B A C K  T O  M A I N  M E N U", width / 2, 35);
+    text("B A C K   T O   M A I N   M E N U", width / 2, 35);
   }
   pop();
 }
