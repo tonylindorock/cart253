@@ -32,6 +32,8 @@ class CircleDemo extends Soldier {
 
     this.runOnce = true;
     this.animationFinished = false;
+
+    this.theEnemyBase = null;
   }
 
   // attackBase(enemyBase)
@@ -50,6 +52,8 @@ class CircleDemo extends Soldier {
         enemyBase.health -= this.damage;
         enemyBase.health = constrain(enemyBase.health, 0, enemyBase.maxHealth);
         this.dead = true;
+        enemyBase.underAttack = true;
+        this.theEnemyBase = enemyBase;
       }
     }
     this.handleWrapping();
@@ -125,9 +129,16 @@ class CircleDemo extends Soldier {
         this.innerSize -= 1;
         this.innerSize = constrain(this.innerSize, 0, 30);
         this.speed = 0;
+        if (this.playOnce){
+          Explode.play();
+          this.playOnce = false;
+        }
         if (this.innerSize <= 0) {
           this.animationFinished = true;
           this.show = false;
+          if (this.theEnemyBase!=null){
+            this.theEnemyBase.underAttack = false;
+          }
         }
       }
       ellipse(this.x, this.y, this.size);

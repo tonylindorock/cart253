@@ -33,6 +33,8 @@ class SquareXL extends Soldier {
     this.originalRotationSpeed = 1;
     this.rotationSpeed = this.originalRotationSpeed;
     this.animationFinished = false;
+
+    this.theEnemyBase = null;
   }
 
   // attackBase(enemyBase)
@@ -52,6 +54,8 @@ class SquareXL extends Soldier {
           enemyBase.health -= this.damage;
           enemyBase.health = constrain(enemyBase.health, 0, enemyBase.maxHealth);
           this.dead = true;
+          enemyBase.underAttack = true;
+          this.theEnemyBase = enemyBase;
         }
       }
     }
@@ -96,8 +100,15 @@ class SquareXL extends Soldier {
       this.innerSize -= 3;
       this.innerSize = constrain(this.innerSize, 0, 100);
       this.speed = 0;
+      if (this.playOnce){
+        Explode.play();
+        this.playOnce = false;
+      }
       if (this.innerSize <= 0) {
         this.animationFinished = true;
+        if (this.theEnemyBase!=null){
+          this.theEnemyBase.underAttack = false;
+        }
       }
     }
     rect(0, 0, this.size, this.size, 8);

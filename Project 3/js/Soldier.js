@@ -32,6 +32,8 @@ class Soldier {
     // dead or alive
     this.dead = false;
     this.show = true;
+
+    this.playOnce = true;
     // health
     this.maxHealth = 25;
     this.health = this.maxHealth;

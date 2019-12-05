@@ -64,7 +64,10 @@ class Base {
     // resource
     this.resource = 32;
 
+    this.underAttack = false;
+
     this.animationFinished = false;
+    this.playOnce = true;
 
     this.squaresNum = 0;
     this.circleShootersNum = 0;
@@ -197,9 +200,14 @@ class Base {
       strokeWeight(4);
       line(this.x, this.y + 5, this.x, this.y - 5);
       line(this.x - 5, this.y, this.x + 5, this.y);
+      if (this.playOnce){
+        Defeated.play();
+        this.playOnce = false;
+      }
     }
     if (this.size <= 0){
       this.animationFinished = true;
+      this.underAttack = false;
     }
     noStroke();
     // map the health into window height
@@ -225,6 +233,10 @@ class Base {
   display() {
     this.gainResources();
     this.hasActiveSoldiers();
+
+    if (this.underAttack && !Alarm.isPlaying()){
+      Alarm.play();
+    }
 
     push();
     fill(this.color);

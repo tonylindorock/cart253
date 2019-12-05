@@ -32,6 +32,8 @@ class Square extends Soldier {
 
     this.runOnce = true;
     this.animationFinished = false;
+
+    this.theEnemyBase = null;
   }
 
   // attackBase(enemyBase)
@@ -44,12 +46,14 @@ class Square extends Soldier {
     let angle = atan2(dy, dx);
     if (enemyBase.health>0){
       if (d >= 35) {
-          this.x += this.speed * cos(angle);
-          this.y += this.speed * sin(angle);
+        this.x += this.speed * cos(angle);
+        this.y += this.speed * sin(angle);
       } else {
-          this.rotationSpeed = 10;
-          enemyBase.health -= this.damage;
-          enemyBase.health = constrain(enemyBase.health, 0, enemyBase.maxHealth);
+        this.rotationSpeed = 10;
+        enemyBase.health -= this.damage;
+        enemyBase.health = constrain(enemyBase.health, 0, enemyBase.maxHealth);
+        enemyBase.underAttack = true;
+        this.theEnemyBase = enemyBase;
       }
     }
     this.handleWrapping();
@@ -150,9 +154,16 @@ class Square extends Soldier {
         this.size -= 0.5;
         this.speed = 0;
         this.size = constrain(this.size,0,this.originalSize);
+        if (this.playOnce){
+          Die.play();
+          this.playOnce = false;
+        }
         if (this.size <= 0) {
           this.animationFinished = true;
           this.show = false;
+          if (this.theEnemyBase!=null){
+            this.theEnemyBase.underAttack = false;
+          }
         }
       }
       pop();

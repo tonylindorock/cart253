@@ -73,6 +73,19 @@ let HelpPic3;
 let HelpPic4;
 let HelpPics;
 
+// sounds
+let Bgm;
+let Fire;
+let Deploy;
+let Die;
+let Explode;
+let Defeated;
+let Alarm;
+let EnemySighted;
+let MainTheme;
+
+let playOnce = true;
+
 function preload() {
   MapHorizontal = loadImage("assets/images/Horizontal.jpg");
   MapVertical = loadImage("assets/images/Vertical.jpg");
@@ -83,6 +96,26 @@ function preload() {
   HelpPic2 = loadImage("assets/images/UnitsPic.png");
   HelpPic3 = loadImage("assets/images/ResourcePic.png");
   HelpPic4 = loadImage("assets/images/TimePic.png");
+
+  Bgm = loadSound("assets/sounds/BG Sound.mp3");
+  Fire = loadSound("assets/sounds/Fire.mp3");
+  Deploy = loadSound("assets/sounds/Deploy.mp3");
+  Die = loadSound("assets/sounds/Die.mp3");
+  EnemySighted = loadSound("assets/sounds/Enemy Units Sighted.mp3");
+  MainTheme = loadSound("assets/sounds/Simple Defense.mp3");
+  Explode = loadSound("assets/sounds/Explode.mp3");
+  Defeated = loadSound("assets/sounds/Defeated.mp3");
+  Alarm = loadSound("assets/sounds/Alarm.mp3");
+
+  Bgm.setVolume(0.25);
+  EnemySighted.setVolume(0.2);
+  MainTheme.setVolume(0.2);
+  Fire.setVolume(0.1);
+  Deploy.setVolume(0.1);
+  Die.setVolume(0.1);
+  Explode.setVolume(0.5);
+  Defeated.setVolume(0.5);
+  Alarm.setVolume(0.2);
 }
 
 // setUp()
@@ -131,20 +164,33 @@ function draw() {
   }
   // if playing
   if (playing){
+    if (!Bgm.isPlaying()){
+      Bgm.play();
+    }
     displayTime();
     if (singlePlayer) {
+      /*
+      if (!EnemySighted.isPlaying()){
+        EnemySighted.play();
+      }
+      */
       computerPlays();
       displayBase();
       displaySoldiers();
       moveSoldiers();
     } else if (!singlePlayer) {
+      /*
+      if (!MainTheme.isPlaying()){
+        MainTheme.play();
+      }
+      */
       displayBase();
       displaySoldiers();
       moveSoldiers();
     }
   }
   if (gameOver){
-    displayGameOver()
+    displayGameOver();
   }
 }
 
@@ -382,6 +428,7 @@ function keyPressed() {
         baseLeft.squareXL = squareXL;
         console.log("BLUE player spawned a square XL (id: 100)");
         baseLeft.resource -= squareXL.cost;
+        Deploy.play();
       }
     }
     if (baseLeft.capacity < baseLeft.maxCap) {
@@ -395,6 +442,7 @@ function keyPressed() {
           baseLeft.capacity++;
           baseLeft.squaresNum++;
           baseLeft.resource -= square.cost;
+          Deploy.play();
         }
       } else if (keyCode === 65) {
         if (baseLeft.resource >= 28) {
@@ -406,6 +454,7 @@ function keyPressed() {
           baseLeft.capacity++;
           baseLeft.circleShootersNum++;
           baseLeft.resource -= circleShooter.cost;
+          Deploy.play();
         }
       } else if (keyCode === 68) {
         if (baseLeft.resource >= 20) {
@@ -417,6 +466,7 @@ function keyPressed() {
           baseLeft.capacity++;
           baseLeft.circleDemosNum++;
           baseLeft.resource -= circleDemo.cost;
+          Deploy.play();
         }
       }
     }
@@ -429,6 +479,8 @@ function keyPressed() {
           baseRight.squareXL = squareXL;
           console.log("RED player spawned a square XL (id: 100)");
           baseRight.resource -= squareXL.cost;
+          Deploy.play();
+          }
         }
       }
       if (baseRight.capacity < baseRight.maxCap) {
@@ -442,6 +494,7 @@ function keyPressed() {
             baseRight.capacity++;
             baseRight.squaresNum++;
             baseRight.resource -= square.cost;
+            Deploy.play();
           }
         } else if (keyCode === 37) {
           if (baseRight.resource >= 28) {
@@ -453,6 +506,7 @@ function keyPressed() {
             baseRight.capacity++;
             baseRight.circleShootersNum++;
             baseRight.resource -= circleShooter.cost;
+            Deploy.play();
           }
         } else if (keyCode === 39) {
           if (baseRight.resource >= 20) {
@@ -464,12 +518,12 @@ function keyPressed() {
             baseRight.capacity++;
             baseRight.circleDemosNum++;
             baseRight.resource -= circleDemo.cost;
+            Deploy.play();
           }
         }
       }
     }
   }
-}
 
 // keyReleased()
 //
@@ -914,6 +968,7 @@ function checkHelpButton(){
     // if pressed, go to next state - choosing map
     if (mouseIsPressed) {
       State = "selectingMaps";
+      subPage = 0;
     }
     // if not hovering
   } else {
@@ -984,9 +1039,9 @@ function checkMapMenuButton() {
   textSize(32);
   fill(SELECTED);
   // map 1
-  if (height / 2 - height / 12 < mouseY && mouseY < height / 2 + height / 12 &&
-    mouseX > width / 2 - 375 - width / 12 && mouseX < width / 2 + 375 + width / 12) {
-    if (mouseX < width / 2 - 375 + width / 12 && mouseX > width / 2 - 375 - width / 12) {
+  if (height / 2 - rectUIHeight/2 < mouseY && mouseY < height / 2 + rectUIHeight/2 &&
+    mouseX > width / 2 - 375 - rectUIWidth/2 && mouseX < width / 2 + 375 + rectUIWidth/2) {
+    if (mouseX < width / 2 - 375 + rectUIWidth/2 && mouseX > width / 2 - 375 - rectUIWidth/2) {
       rect(width / 2 - 375, height / 2, rectUIWidth + rectUIStroke, rectUIHeight + rectUIStroke);
       image(MapHorizontal, width / 2 - 375, height / 2, rectUIWidth, rectUIHeight);
       // map name
@@ -999,7 +1054,7 @@ function checkMapMenuButton() {
         selectedMap = true;
       }
       // map 2
-    } else if (mouseX > width / 2 - 125 - width / 12 && mouseX < width / 2 - 125 + width / 12) {
+    } else if (mouseX > width / 2 - 125 - rectUIWidth/2 && mouseX < width / 2 - 125 + rectUIWidth/2) {
       rect(width / 2 - 125, height / 2, rectUIWidth + rectUIStroke, rectUIHeight + rectUIStroke);
       image(MapDiagonal1, width / 2 - 125, height / 2, rectUIWidth, rectUIHeight);
       textSize(16);
@@ -1010,7 +1065,7 @@ function checkMapMenuButton() {
         selectedMap = true;
       }
       // map 3
-    } else if (mouseX > width / 2 + 125 - width / 12 && mouseX < width / 2 + 125 + width / 12) {
+    } else if (mouseX > width / 2 + 125 - rectUIWidth/2 && mouseX < width / 2 + 125 + rectUIWidth/2) {
       rect(width / 2 + 125, height / 2, rectUIWidth + rectUIStroke, rectUIHeight + rectUIStroke);
       image(MapDiagonal2, width / 2 + 125, height / 2, rectUIWidth, rectUIHeight);
       textSize(16);
@@ -1021,7 +1076,7 @@ function checkMapMenuButton() {
         selectedMap = true;
       }
       // map 4s
-    } else if (mouseX > width / 2 + 375 - width / 12 && mouseX < width / 2 + 375 + width / 12) {
+    } else if (mouseX > width / 2 + 375 - rectUIWidth/2 && mouseX < width / 2 + 375 + rectUIWidth/2) {
       rect(width / 2 + 375, height / 2, rectUIWidth + rectUIStroke, rectUIHeight + rectUIStroke);
       image(MapVertical, width / 2 + 375, height / 2, rectUIWidth, rectUIHeight);
       textSize(16);
@@ -1108,10 +1163,10 @@ function checkModeMenuButton() {
   imageMode(CENTER);
   rectMode(CENTER);
   textSize(32);
-  if (height / 2 - height / 12 < mouseY && mouseY < height / 2 + height / 12 &&
-    mouseX > width / 2 - 125 - width / 12 && mouseX < width / 2 + 125 + width / 12) {
+  if (height / 2 - rectUIHeight/2 < mouseY && mouseY < height / 2 + rectUIHeight/2 &&
+    mouseX > width / 2 - 125 - rectUIWidth/2 && mouseX < width / 2 + 125 + rectUIWidth/2) {
     // mode 1
-    if (mouseX > width / 2 - 125 - width / 12 && mouseX < width / 2 - 125 + width / 12) {
+    if (mouseX > width / 2 - 125 - rectUIWidth/2 && mouseX < width / 2 - 125 + rectUIWidth/2) {
       fill(SELECTED);
       rect(width / 2 - 125, height / 2, rectUIWidth + rectUIStroke, rectUIHeight + rectUIStroke);
       fill(255);
@@ -1125,7 +1180,7 @@ function checkModeMenuButton() {
         selectedMode = true;
       }
       // mode 2
-    } else if (mouseX > width / 2 + 125 - width / 12 && mouseX < width / 2 + 125 + width / 12) {
+    } else if (mouseX > width / 2 + 125 - rectUIWidth/2 && mouseX < width / 2 + 125 + rectUIWidth/2) {
       fill(SELECTED);
       rect(width / 2 + 125, height / 2, rectUIWidth + rectUIStroke, rectUIHeight + rectUIStroke);
       fill(255);
@@ -1137,7 +1192,7 @@ function checkModeMenuButton() {
         selectedMode = true;
       }
     }
-  } else {
+  }else{
     // if mouse is pressed somewhere else, remove the selection
     if (mouseIsPressed && mouseY < height - 75) {
       modeId = -1;
@@ -1161,6 +1216,7 @@ function checkModeMenuButton() {
       }
       setUpBase(); // set up player bases
       playing = true;
+      time = 0;
     }
   }
   // modes names

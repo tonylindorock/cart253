@@ -28,6 +28,8 @@ class CircleShooter extends Soldier {
 
     this.bulletFired = false; // if a bullet is fired
     this.animationFinished = false;
+
+    this.theEnemyBase = null;
   }
 
   // attackBase(enemyBase)
@@ -46,6 +48,9 @@ class CircleShooter extends Soldier {
       if (d < 200 && !this.bulletFired && !this.dead) {
         this.bullet = new Bullet(this.x, this.y, enemyBase.x, enemyBase.y, this.playerId, this.uniqueId);
         this.bulletFired = true;
+        Fire.play();
+        enemyBase.underAttack = true;
+        this.theEnemyBase = enemyBase;
       }
       if (this.bulletFired && !this.dead) {
         this.bullet.moveTo(enemyBase);
@@ -83,6 +88,7 @@ class CircleShooter extends Soldier {
         this.bullet = new Bullet(this.x, this.y, enemy.x, enemy.y, this.playerId, this.uniqueId);
         this.bulletFired = true;
         this.attacking = true;
+        Fire.play();
       } else {
         this.attacking = false;
       }
@@ -140,9 +146,16 @@ class CircleShooter extends Soldier {
       if (this.dead) {
         this.size -= 0.5;
         this.speed = 0;
+        if (this.playOnce){
+          Die.play();
+          this.playOnce = false;
+        }
         if (this.size <= 0) {
           this.animationFinished = true;
           this.show = false;
+          if (this.theEnemyBase!=null){
+            this.theEnemyBase.underAttack = false;
+          }
         }
       }
       pop();
