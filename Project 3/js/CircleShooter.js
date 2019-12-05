@@ -157,6 +157,7 @@ class CircleShooter extends Soldier {
       noStroke();
       fill(255);
       ellipse(this.x, this.y, this.size / 4);
+      // if dies, it will shrink
       if (this.dead) {
         this.size -= 0.5;
         this.speed = 0;

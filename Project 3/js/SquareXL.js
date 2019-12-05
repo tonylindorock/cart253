@@ -2,8 +2,9 @@
 //
 // An special class extended from the soldier class
 // This unit will not harm any moving units
-// It only will head to the enemy base and once it reaches, the health of enemy base cuts half.
-// It does a lot damage to the enemy base and has the highest health.
+// It only will head to the enemy base
+// It does a lot damage to the enemy base and has the highest health
+// If it explodes or gets destroyed, the explosion will kill any nearby hostile units
 
 class SquareXL extends Soldier {
   constructor(x, y, playerId, mapId, uniqueId) {
@@ -34,25 +35,29 @@ class SquareXL extends Soldier {
     this.rotationSpeed = this.originalRotationSpeed;
     this.animationFinished = false;
 
-    this.theEnemyBase = null;
+    this.theEnemyBase = null; // store the enemy base object
   }
 
   // attackBase(enemyBase)
   //
   // approach and attack the enemy base
   attackBase(enemyBase) {
+    // distance
     let d = dist(this.x, this.y, this.enemyBaseX, this.enemyBaseY);
     let dx = this.enemyBaseX - this.x;
     let dy = this.enemyBaseY - this.y;
     let angle = atan2(dy, dx);
     if (enemyBase.health > 0){
+      // move to it
       if (d >= 35) {
         this.x += this.speed * cos(angle);
         this.y += this.speed * sin(angle);
+        // if it is close to the enemy base, it is considered to be under attack
         if (d < 150){
           enemyBase.underAttack = true;
           this.theEnemyBase = enemyBase;
         }
+      // attack
       } else {
         if (!this.dead) {
           enemyBase.health -= this.damage;
@@ -62,7 +67,7 @@ class SquareXL extends Soldier {
         }
       }
     }
-
+    // variation to the movement
     // Set velocity via noise()
     this.vx = map(noise(this.tx), 0, 1, -0.1, 0.1);
     this.vy = map(noise(this.ty), 0, 1, -0.1, 0.1);
@@ -95,6 +100,7 @@ class SquareXL extends Soldier {
     stroke(255);
     strokeWeight(4);
     fill(this.color);
+    // if dies, it will explode
     if (this.dead) {
       fill(255);
       rect(0, 0, this.innerSize, this.innerSize, 8);
@@ -109,6 +115,7 @@ class SquareXL extends Soldier {
       }
       if (this.innerSize <= 0) {
         this.animationFinished = true;
+        // if it dies, the enemy base is no longer under attack
         if (this.theEnemyBase!=null){
           this.theEnemyBase.underAttack = false;
         }
@@ -119,6 +126,7 @@ class SquareXL extends Soldier {
       line(-10, 10, 10, -10);
       line(10, 10, -10, -10);
     }
+    // different rotation directions for blue and red
     if (this.playerId === 0) {
       if (this.rotation < 90) {
         this.rotation += this.rotationSpeed;
@@ -133,22 +141,5 @@ class SquareXL extends Soldier {
       }
     }
     pop();
-  }
-
-  // reset()
-  //
-  // might be useful
-  reset() {
-    this.x = this.baseX;
-    this.y = this.baseY;
-    this.size = this.originalSize;
-    this.rotation = 0;
-    this.rotationSpeed = this.originalRotationSpeed;
-    this.speed = this.originalSpeed + random(-0.5, 0.5);
-    this.health = this.maxHealth;
-    this.tx = random(0, 1000);
-    this.ty = random(0, 1000);
-    this.dead = false;
-    this.animationFinished = false;
   }
 }

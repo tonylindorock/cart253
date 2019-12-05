@@ -1,7 +1,7 @@
 // Square
 //
 // An unique class extended from the soldier class
-// Square is a common but reliable soldier type. It harms enemies with melee damage.
+// Square (scout) is a common but reliable soldier type. It harms enemies with melee damage.
 // It must get close to the enemies to harm them.
 // It can do standard damage and has a great health.
 
@@ -30,9 +30,9 @@ class Square extends Soldier {
     this.originalRotationSpeed = 5;
     this.rotationSpeed = this.originalRotationSpeed;
 
-    this.runOnce = true;
-    this.animationFinished = false;
-
+    this.runOnce = true; // for sound
+    this.animationFinished = false; // animation
+    // store the enemy base object
     this.theEnemyBase = null;
   }
 
@@ -40,16 +40,19 @@ class Square extends Soldier {
   //
   // approach and attack the enemy base
   attackBase(enemyBase) {
+    // distance
     let d = dist(this.x, this.y, this.enemyBaseX, this.enemyBaseY);
     let dx = this.enemyBaseX - this.x;
     let dy = this.enemyBaseY - this.y;
     let angle = atan2(dy, dx);
     if (enemyBase.health>0){
+      // move to it
       if (d >= 35) {
         this.x += this.speed * cos(angle);
         this.y += this.speed * sin(angle);
+      // attack
       } else {
-        this.rotationSpeed = 10;
+        this.rotationSpeed = 10; // faster rotation
         enemyBase.health -= this.damage;
         enemyBase.health = constrain(enemyBase.health, 0, enemyBase.maxHealth);
         enemyBase.underAttack = true;
@@ -64,6 +67,8 @@ class Square extends Soldier {
   // select an enemy and keep attacking it until it dies
   attack(enemy) {
     let d = dist(this.x, this.y, enemy.x, enemy.y);
+    // if within range, no target acquired, alive, and enemy is not dead
+    // TARGET THE ENEMY
     if (d < 300 && this.targetId < 0 && !this.dead && !enemy.dead) {
       this.targetId = enemy.uniqueId;
       this.obtainedTarget = true;
@@ -71,25 +76,33 @@ class Square extends Soldier {
     let dx = enemy.x - this.x;
     let dy = enemy.y - this.y;
     let angle = atan2(dy, dx);
+    // kill the targeted enemy
     if (this.targetId === enemy.uniqueId) {
+      // move to it
       if (d > 15) {
         this.x += this.speed * cos(angle);
         this.y += this.speed * sin(angle);
       }
+      // attack
       if (d < 30) {
         if (!this.dead) {
           enemy.health -= this.damage;
           this.rotationSpeed = 10;
           this.attacking = true;
+          // if the enemy is not attacking, it will fight back
           if (!enemy.attacking) {
             enemy.targetId = this.uniqueId;
           }
         }
+      // if not, change rotation speed to normal
       } else {
         this.rotationSpeed = this.originalRotationSpeed;
         this.attacking = false;
       }
       if (enemy.dead) {
+        // if the targeted enemy is tank / square XL
+        // if the tank gets destroyed and this unit is close to it
+        // the explosion kills this unit
         if (enemy.uniqueId === 100 && enemy.uniqueId === this.targetId && d < 100){
           this.health -= enemy.damage;
         }
@@ -98,13 +111,16 @@ class Square extends Soldier {
         this.rotationSpeed = this.originalRotationSpeed;
 
       }
+      // if it dies before kills the enemy
+      // and the enemy also targets it
+      // reset the enemy target
       if (this.dead && !enemy.dead && this.obtainedTarget) {
         if (enemy.targetId === this.uniqueId) {
           enemy.targetId = -1;
         }
       }
     }
-
+    // variation to the movement
     // Set velocity via noise()
     this.vx = map(noise(this.tx), 0, 1, -0.05, 0.05);
     this.vy = map(noise(this.ty), 0, 1, -0.05, 0.05);
@@ -137,6 +153,7 @@ class Square extends Soldier {
       noStroke();
       fill(255);
       rect(0, 0, this.size / 4, this.size / 4);
+      // different rotation directions for blue and red
       if (this.playerId === 0) {
         if (this.rotation < 90) {
           this.rotation += this.rotationSpeed;
@@ -150,6 +167,7 @@ class Square extends Soldier {
           this.rotation = this.rotationSpeed;
         }
       }
+      // if dies, it will shrink
       if (this.dead) {
         this.size -= 0.5;
         this.speed = 0;
@@ -161,6 +179,7 @@ class Square extends Soldier {
         if (this.size <= 0) {
           this.animationFinished = true;
           this.show = false;
+          // if dies, the enemy base is no longer under attack
           if (this.theEnemyBase!=null){
             this.theEnemyBase.underAttack = false;
           }
@@ -168,29 +187,5 @@ class Square extends Soldier {
       }
       pop();
     }
-  }
-
-  // reset()
-  //
-  // might be useful
-  reset() {
-    this.x = this.baseX;
-    this.y = this.baseY;
-    this.size = 0;
-  }
-
-  respawn(){
-    this.size = this.originalSize;
-    this.health = this.maxHealth;
-    this.targeted = 0;
-    this.targetId = -1;
-    this.obtainedTarget = false;
-    this.attacking = false;
-    this.speed = this.originalSpeed + random(-0.5, 0.5);
-    this.rotationSpeed = this.originalRotationSpeed;
-    this.tx = random(0, 1000);
-    this.ty = random(0, 1000);
-    this.dead = false;
-    this.runOnce = true;
   }
 }

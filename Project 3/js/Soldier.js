@@ -18,8 +18,6 @@ class Soldier {
     this.speed = this.originalSpeed;
     this.vx = 0;
     this.vy = 0;
-
-    this.damage = 0.2; // damage
     // ids
     this.playerId = playerId;
     this.mapId = mapId;
@@ -33,7 +31,7 @@ class Soldier {
     this.dead = false;
     this.show = true;
 
-    this.playOnce = true;
+    this.playOnce = true; // for the sound
     // health
     this.maxHealth = 25;
     this.health = this.maxHealth;
@@ -79,9 +77,9 @@ class Soldier {
 
   display() {}
 
-  reset(){}
+  reset() {}
 
-  respawn(){}
+  respawn() {}
 
   // handleWrapping()
   //

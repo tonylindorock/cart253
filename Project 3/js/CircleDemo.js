@@ -138,6 +138,7 @@ class CircleDemo extends Soldier {
       stroke(255);
       strokeWeight(2);
       fill(this.color);
+      // if dies, it will explode
       if (this.dead) {
         fill(255);
         ellipse(this.x, this.y, this.innerSize);
