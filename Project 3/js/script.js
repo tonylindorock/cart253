@@ -868,11 +868,10 @@ function computerPlays() {
   // 0 is to deploy a scout / square
   if (nextUnit === 0) {
     if (baseRight.resource >= 16 && baseRight.capacity < baseRight.maxCap) {
-      baseRight.UpkeyColor = RED;
       let uniqueId = getUniqueId();
       let square = new Square(baseRight.x, baseRight.y, 1, mapId, uniqueId);
       baseRight.squares.push(square);
-      console.log("RED player spawned a square (id: " + uniqueId + ")");
+      console.log("RED player spawned a scout (id: " + uniqueId + ")");
       baseRight.capacity++;
       baseRight.squaresNum++;
       baseRight.resource -= square.cost;
@@ -882,11 +881,10 @@ function computerPlays() {
     // 1 is to deploy a shooter
   } else if (nextUnit === 1) {
     if (baseRight.resource >= 28 && baseRight.capacity < baseRight.maxCap) {
-      baseRight.LeftkeyColor = RED;
       let uniqueId = getUniqueId();
       let circleShooter = new CircleShooter(baseRight.x, baseRight.y, 1, mapId, uniqueId);
       baseRight.circleShooters.push(circleShooter);
-      console.log("RED player spawned a circle shooter (id: " + uniqueId + ")");
+      console.log("RED player spawned a shooter (id: " + uniqueId + ")");
       baseRight.capacity++;
       baseRight.circleShootersNum++;
       baseRight.resource -= circleShooter.cost;
@@ -896,11 +894,10 @@ function computerPlays() {
     // 2 is to deploy a demo
   } else if (nextUnit === 2) {
     if (baseRight.resource >= 20 && baseRight.capacity < baseRight.maxCap) {
-      baseRight.RightkeyColor = RED;
       let uniqueId = getUniqueId();
       let circleDemo = new CircleDemo(baseRight.x, baseRight.y, 1, mapId, uniqueId);
       baseRight.circleDemos.push(circleDemo);
-      console.log("RED player spawned a circle demo (id: " + uniqueId + ")");
+      console.log("RED player spawned a demo (id: " + uniqueId + ")");
       baseRight.capacity++;
       baseRight.circleDemosNum++;
       baseRight.resource -= circleDemo.cost;
@@ -910,11 +907,9 @@ function computerPlays() {
     // 3 is to deploy a tank / square XL
   } else if (nextUnit === 3) {
     if (baseRight.resource >= 42 && baseRight.squareXL === null) {
-      baseRight.DownkeyColor = RED;
-      let uniqueId = getUniqueId();
       let squareXL = new SquareXL(baseRight.x, baseRight.y, 1, mapId, 100);
       baseRight.squareXL = squareXL;
-      console.log("RED player spawned a square XL (id: 100)");
+      console.log("RED player spawned a tank (id: 100)");
       baseRight.resource -= squareXL.cost;
       nextUnit = -1;
       runOnce = true;
@@ -922,6 +917,7 @@ function computerPlays() {
     // 4 is to wait until the resource is 32
   } else if (nextUnit === 4) {
     if (baseRight.resource >= 32) {
+      console.log("RED player waits");
       nextUnit = -1;
       runOnce = true;
     }
