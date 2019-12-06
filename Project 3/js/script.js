@@ -94,6 +94,7 @@ let Die;
 let Explode;
 let Defeated;
 let Alarm;
+let NoFund;
 
 let playOnce = true; // only play once
 
@@ -123,6 +124,7 @@ function preload() {
   Explode = loadSound("assets/sounds/Explode.mp3");
   Defeated = loadSound("assets/sounds/Defeated.mp3");
   Alarm = loadSound("assets/sounds/Alarm.mp3");
+  NoFund = loadSound("assets/sounds/Insufficient Fund.mp3");
   // set volume to all the sounds
   Bgm.setVolume(0.25);
   Fire.setVolume(0.1);
@@ -131,6 +133,7 @@ function preload() {
   Explode.setVolume(0.5);
   Defeated.setVolume(0.25);
   Alarm.setVolume(0.15);
+  NoFund.setVolume(0.1);
 }
 
 // setUp()
@@ -466,6 +469,8 @@ function keyPressed() {
         // update resource count
         baseLeft.resource -= squareXL.cost;
         Deploy.play(); // play sounds
+      } else {
+        NoFund.play();
       }
     }
     // if there's < 50 units
@@ -486,6 +491,8 @@ function keyPressed() {
           baseLeft.squaresNum++;
           baseLeft.resource -= square.cost;
           Deploy.play();
+        } else {
+          NoFund.play();
         }
         // key A
       } else if (keyCode === 65) {
@@ -499,6 +506,8 @@ function keyPressed() {
           baseLeft.circleShootersNum++;
           baseLeft.resource -= circleShooter.cost;
           Deploy.play();
+        } else {
+          NoFund.play();
         }
         // key D
       } else if (keyCode === 68) {
@@ -512,6 +521,8 @@ function keyPressed() {
           baseLeft.circleDemosNum++;
           baseLeft.resource -= circleDemo.cost;
           Deploy.play();
+        } else {
+          NoFund.play();
         }
       }
     }
@@ -527,48 +538,56 @@ function keyPressed() {
           console.log("RED player spawned a tank (id: 100)");
           baseRight.resource -= squareXL.cost;
           Deploy.play();
+        } else {
+          NoFund.play();
         }
       }
-    }
-    if (baseRight.squaresNum + baseRight.circleShootersNum + baseRight.circleDemosNum < 30) {
-      // key Up
-      if (keyCode === 38) {
-        if (baseRight.resource >= 16) {
-          baseRight.UpkeyColor = RED;
-          let uniqueId = getUniqueId();
-          let square = new Square(baseRight.x, baseRight.y, 1, mapId, uniqueId);
-          baseRight.squares.push(square);
-          console.log("RED player spawned a scout (id: " + uniqueId + ")");
-          baseRight.capacity++;
-          baseRight.squaresNum++;
-          baseRight.resource -= square.cost;
-          Deploy.play();
-        }
-        // key Left
-      } else if (keyCode === 37) {
-        if (baseRight.resource >= 28) {
-          baseRight.LeftkeyColor = RED;
-          let uniqueId = getUniqueId();
-          let circleShooter = new CircleShooter(baseRight.x, baseRight.y, 1, mapId, uniqueId);
-          baseRight.circleShooters.push(circleShooter);
-          console.log("RED player spawned a shooter (id: " + uniqueId + ")");
-          baseRight.capacity++;
-          baseRight.circleShootersNum++;
-          baseRight.resource -= circleShooter.cost;
-          Deploy.play();
-        }
-        // key Right
-      } else if (keyCode === 39) {
-        if (baseRight.resource >= 20) {
-          baseRight.RightkeyColor = RED;
-          let uniqueId = getUniqueId();
-          let circleDemo = new CircleDemo(baseRight.x, baseRight.y, 1, mapId, uniqueId);
-          baseRight.circleDemos.push(circleDemo);
-          console.log("RED player spawned a demo (id: " + uniqueId + ")");
-          baseRight.capacity++;
-          baseRight.circleDemosNum++;
-          baseRight.resource -= circleDemo.cost;
-          Deploy.play();
+      if (baseRight.squaresNum + baseRight.circleShootersNum + baseRight.circleDemosNum < 30) {
+        // key Up
+        if (keyCode === 38) {
+          if (baseRight.resource >= 16) {
+            baseRight.UpkeyColor = RED;
+            let uniqueId = getUniqueId();
+            let square = new Square(baseRight.x, baseRight.y, 1, mapId, uniqueId);
+            baseRight.squares.push(square);
+            console.log("RED player spawned a scout (id: " + uniqueId + ")");
+            baseRight.capacity++;
+            baseRight.squaresNum++;
+            baseRight.resource -= square.cost;
+            Deploy.play();
+          } else {
+            NoFund.play();
+          }
+          // key Left
+        } else if (keyCode === 37) {
+          if (baseRight.resource >= 28) {
+            baseRight.LeftkeyColor = RED;
+            let uniqueId = getUniqueId();
+            let circleShooter = new CircleShooter(baseRight.x, baseRight.y, 1, mapId, uniqueId);
+            baseRight.circleShooters.push(circleShooter);
+            console.log("RED player spawned a shooter (id: " + uniqueId + ")");
+            baseRight.capacity++;
+            baseRight.circleShootersNum++;
+            baseRight.resource -= circleShooter.cost;
+            Deploy.play();
+          } else {
+            NoFund.play();
+          }
+          // key Right
+        } else if (keyCode === 39) {
+          if (baseRight.resource >= 20) {
+            baseRight.RightkeyColor = RED;
+            let uniqueId = getUniqueId();
+            let circleDemo = new CircleDemo(baseRight.x, baseRight.y, 1, mapId, uniqueId);
+            baseRight.circleDemos.push(circleDemo);
+            console.log("RED player spawned a demo (id: " + uniqueId + ")");
+            baseRight.capacity++;
+            baseRight.circleDemosNum++;
+            baseRight.resource -= circleDemo.cost;
+            Deploy.play();
+          } else {
+            NoFund.play();
+          }
         }
       }
     }
