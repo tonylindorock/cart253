@@ -146,7 +146,7 @@ function setup() {
   noStroke();
   // put images in an array
   HelpPics = [HelpPic0, HelpPic1, HelpPic2, HelpPic3, HelpPic4];
-  BgPatterns = [BgPattern0,BgPattern1,BgPattern2,BgPattern3];
+  BgPatterns = [BgPattern0, BgPattern1, BgPattern2, BgPattern3];
 }
 
 // randomizeBG()
@@ -157,7 +157,7 @@ function randomizeBG() {
   g = random(80, 100);
   b = random(80, 100);
 
-  patternId = int(random(0,4));
+  patternId = int(random(0, 4));
 }
 
 // draw()
@@ -165,7 +165,7 @@ function randomizeBG() {
 // handle the game whether the player is choosing maps, choosing modes, or playing
 function draw() {
   background(r, g, b);
-  image(BgPatterns[patternId],width/2,height/2,width,height);
+  image(BgPatterns[patternId], width / 2, height / 2, width, height);
 
   // different states displaying different menus
   if (!gameOver) {
@@ -469,7 +469,7 @@ function keyPressed() {
       }
     }
     // if there's < 50 units
-    if (baseLeft.capacity < baseLeft.maxCap) {
+    if (baseLeft.squaresNum + baseLeft.circleShootersNum + baseLeft.circleDemosNum < 30) {
       // key W
       if (keyCode === 87) {
         if (baseLeft.resource >= 16) {
@@ -530,7 +530,7 @@ function keyPressed() {
         }
       }
     }
-    if (baseRight.capacity < baseRight.maxCap) {
+    if (baseRight.squaresNum + baseRight.circleShootersNum + baseRight.circleDemosNum < 30) {
       // key Up
       if (keyCode === 38) {
         if (baseRight.resource >= 16) {

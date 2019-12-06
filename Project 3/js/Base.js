@@ -1,7 +1,7 @@
 // Base
 //
 // The class which is the base of the player
-// Store all the units and resource 
+// Store all the units and resource
 
 class Base {
   // constructor
@@ -15,7 +15,7 @@ class Base {
     this.maxHealth = 300;
     this.health = this.maxHealth;
     // capacity
-    this.maxCap = 50;
+    this.maxCap = 60;
     this.capacity = 0;
     // ids
     this.playerId = playerId;
@@ -281,7 +281,7 @@ class Base {
       fill(255, 150);
       text(this.resource, this.x + 35, this.y + 50);
       // key squares
-      if (this.resource >= 16 && this.squares.length + this.circleShooters.length + this.circleDemos.length < 50) {
+      if (this.resource >= 16 && this.squaresNum + this.circleShootersNum + this.circleDemosNum < 30) {
         stroke(255);
       } else {
         stroke(255, 100);
@@ -289,7 +289,7 @@ class Base {
       fill(this.UpkeyColor);
       rect(this.x, this.y - 50, 30, 30, 4);
       // shooter
-      if (this.resource >= 28 && this.squares.length + this.circleShooters.length + this.circleDemos.length < 50) {
+      if (this.resource >= 28 && this.squaresNum + this.circleShootersNum + this.circleDemosNum < 30) {
         stroke(255);
       } else {
         stroke(255, 100);
@@ -305,7 +305,7 @@ class Base {
       fill(this.DownkeyColor);
       rect(this.x, this.y + 50, 30, 30, 4);
       // demo
-      if (this.resource >= 20 && this.squares.length + this.circleShooters.length + this.circleDemos.length < 50) {
+      if (this.resource >= 20 && this.squaresNum + this.circleShootersNum + this.circleDemosNum < 30) {
         stroke(255);
       } else {
         stroke(255, 100);
@@ -317,14 +317,14 @@ class Base {
       textAlign(CENTER, CENTER);
       textSize(16);
       // up key square
-      if (this.resource >= 16 && this.squares.length + this.circleShooters.length + this.circleDemos.length < 50) {
+      if (this.resource >= 16 && this.squaresNum + this.circleShootersNum + this.circleDemosNum < 30) {
         fill(255);
       } else {
         fill(255, 100);
       }
       text("W", this.x, this.y - 50);
       // left key shooter
-      if (this.resource >= 28 && this.squares.length + this.circleShooters.length + this.circleDemos.length < 50) {
+      if (this.resource >= 28 && this.squaresNum + this.circleShootersNum + this.circleDemosNum < 30) {
         fill(255);
       } else {
         fill(255, 100);
@@ -338,7 +338,7 @@ class Base {
       }
       text("S", this.x, this.y + 50);
       // right key demo
-      if (this.resource >= 20 && this.squares.length + this.circleShooters.length + this.circleDemos.length < 50) {
+      if (this.resource >= 20 && this.squaresNum + this.circleShootersNum + this.circleDemosNum < 30) {
         fill(255);
       } else {
         fill(255, 100);
@@ -356,7 +356,7 @@ class Base {
       text(this.resource, this.x - 35, this.y + 50);
       if (this.modeId === 1) {
         // key squares
-        if (this.resource >= 16 && this.squares.length + this.circleShooters.length + this.circleDemos.length < 50) {
+        if (this.resource >= 16 && this.squaresNum + this.circleShootersNum + this.circleDemosNum < 30) {
           stroke(255);
         } else {
           stroke(255, 100);
@@ -364,7 +364,7 @@ class Base {
         fill(this.UpkeyColor);
         rect(this.x, this.y - 50, 30, 30, 4);
         // shooter
-        if (this.resource >= 28 && this.squares.length + this.circleShooters.length + this.circleDemos.length < 50) {
+        if (this.resource >= 28 && this.squaresNum + this.circleShootersNum + this.circleDemosNum < 30) {
           stroke(255);
         } else {
           stroke(255, 100);
@@ -380,7 +380,7 @@ class Base {
         fill(this.DownkeyColor);
         rect(this.x, this.y + 50, 30, 30, 4);
         // demo
-        if (this.resource >= 20 && this.squares.length + this.circleShooters.length + this.circleDemos.length < 50) {
+        if (this.resource >= 20 && this.squaresNum + this.circleShootersNum + this.circleDemosNum < 30) {
           stroke(255);
         } else {
           stroke(255, 100);
@@ -392,14 +392,14 @@ class Base {
         textSize(16);
         noStroke();
         // up key square
-        if (this.resource >= 16 && this.squares.length + this.circleShooters.length + this.circleDemos.length < 50) {
+        if (this.resource >= 16 && this.squaresNum + this.circleShootersNum + this.circleDemosNum < 30) {
           fill(255);
         } else {
           fill(255, 100);
         }
         text("↑", this.x, this.y - 50);
         // left key shooter
-        if (this.resource >= 28 && this.squares.length + this.circleShooters.length + this.circleDemos.length < 50) {
+        if (this.resource >= 28 && this.squaresNum + this.circleShootersNum + this.circleDemosNum < 30) {
           fill(255);
         } else {
           fill(255, 100);
@@ -413,7 +413,7 @@ class Base {
         }
         text("↓", this.x, this.y + 50);
         // right key demo
-        if (this.resource >= 20 && this.squares.length + this.circleShooters.length + this.circleDemos.length < 50) {
+        if (this.resource >= 20 && this.squaresNum + this.circleShootersNum + this.circleDemosNum < 30) {
           fill(255);
         } else {
           fill(255, 100);
